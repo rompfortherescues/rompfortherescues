@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Romp for the Rescues – Fun Events for Animal Charities</title>
+  <style>
+    :root {
+      --primary: #e85d04;
+      --primary-dark: #d00000;
+      --secondary: #370617;
+      --accent: #f48c06;
+      --bg: #fff8f0;
+      --card: #ffffff;
+      --text: #2b2d42;
+      --muted: #6c757d;
+      --success: #2d6a4f;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--secondary), #6a040f);
+      color: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo span { color: var(--accent); }
+
+    nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+    nav a {
+      color: white;
+      font-weight: 600;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+    nav a:hover { opacity: 1; text-decoration: none; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(rgba(55,6,23,0.75), rgba(55,6,23,0.85)),
+                  url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23f48c06" width="1200" height="600"/><circle fill="%23e85d04" cx="200" cy="150" r="80"/><circle fill="%23d00000" cx="900" cy="400" r="120"/><circle fill="%23ffba08" cx="600" cy="100" r="60"/></svg>');
+      background-size: cover;
+      color: white;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      margin-bottom: 1rem;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      max-width: 650px;
+      margin: 0 auto 2rem;
+      opacity: 0.95;
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(232,93,4,0.4);
+      text-decoration: none;
+      color: white;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid white;
+    }
+    .btn-outline:hover {
+      background: white;
+      color: var(--secondary);
+    }
+
+    /* Sections */
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--secondary);
+      text-align: center;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      font-size: 1.1rem;
+    }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.25s;
+    }
+    .card:hover { transform: translateY(-6px); }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      padding: 1.5rem;
+    }
+
+    .card-body { padding: 1.5rem; }
+
+    .card h3 { margin-bottom: 0.5rem; font-size: 1.4rem; }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #ffe8d6;
+      color: var(--primary-dark);
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Registration form */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Charities */
+    .charity-card .card-header {
+      background: linear-gradient(135deg, #2d6a4f, #40916c);
+    }
+
+    .charity-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .btn-sm {
+      padding: 0.55rem 1.2rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-secondary {
+      background: #40916c;
+    }
+    .btn-secondary:hover {
+      background: #2d6a4f;
+      box-shadow: 0 8px 20px rgba(45,106,79,0.35);
+    }
+
+    /* Admin / Payment */
+    .payment-box {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2.5rem;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .payment-methods {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .pay-tag {
+      background: #f8f9fa;
+      border: 2px solid #dee2e6;
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* Modal / Receipt */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius);
+      max-width: 480px;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .receipt {
+      border: 3px dashed var(--primary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      background: #fff8f0;
+      text-align: center;
+    }
+
+    .receipt h4 {
+      color: var(--primary-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .receipt-code {
+      font-family: monospace;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 0.75rem 0;
+      border: 2px solid var(--accent);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--secondary);
+      color: white;
+      text-align: center;
+      padding: 2.5rem 2rem;
+      margin-top: 2rem;
+    }
+
+    footer p { opacity: 0.8; margin-top: 0.5rem; font-size: 0.95rem; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .nav-container { flex-direction: column; }
+      nav { justify-content: center; }
+      .hero { padding: 3.5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <div class="logo">🐾 <span>Romp</span> for the Rescues</div>
+      <nav>
+        <a href="#events">Events</a>
+        <a href="#charities">Charities</a>
+        <a href="#donate">Donate</a>
+        <a href="#register">Register</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" style="padding: 5rem 2rem;">
+    <h1>Romp for the Rescues</h1>
+    <p>Fun events that raise funds for animal charities.<br>
+       Come play, dress up, and help save lives — one romp at a time!</p>
+    <a href="#events" class="btn">See Upcoming Events</a>
+    &nbsp;
+    <a href="#charities" class="btn btn-outline">Meet the Charities</a>
+  </section>
+
+  <!-- Events -->
+  <section id="events">
+    <h2>Upcoming Events</h2>
+    <p class="section-sub">Every event raises funds for one or more of our partner animal charities.</p>
+
+    <div class="cards">
+      <!-- Event Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge">Bingo Night</span>
+          <h3>Mrs. Roper Romp</h3>
+        </div>
+        <div class="card-body">
+          <div class="meta">
+            <span>📅 March 14, 2027</span>
+            <span>🕕 6:00 – 10:00 PM</span>
+          </div>
+          <p>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</p>
+          <p style="margin-top:1rem;"><strong>Supporting:</strong> Blessed Paws Animal Rescue</p>
+          <button class="btn" style="margin-top:1.5rem; width:100%;" onclick="openRegister()">Register Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charities -->
+  <section id="charities">
+    <h2>Our Partner Charities</h2>
+    <p class="section-sub">Donate directly to these amazing organizations — every dollar goes straight to the animals.</p>
+
+    <div class="cards">
+      <!-- Charity 1 -->
+      <div class="card charity-card">
+        <div class="card-header">
+          <h3>Blessed Paws Animal Rescue</h3>
+        </div>
+        <div class="card-body">
+          <p>Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</p>
+          <div class="charity-links">
+            <a href="https://www.blessedpawsanimalrescue.com" target="_blank" class="btn btn-sm btn-secondary">Visit Website</a>
+            <a href="https://www.blessedpawsanimalrescue.com/why-donate" target="_blank" class="btn btn-sm">Donate Now</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charity 2 -->
+      <div class="card charity-card">
+        <div class="card-header">
+          <h3>Wild Whiskers</h3>
+        </div>
+        <div class="card-body">
+          <p>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</p>
+          <div class="charity-links">
+            <a href="https://www.wildwhiskers.org" target="_blank" class="btn btn-sm btn-secondary">Visit Website</a>
+            <a href="https://www.wildwhiskers.org/how-to-help" target="_blank" class="btn btn-sm">Donate Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Donate / Admin -->
+  <section id="donate">
+    <h2>Support the Organization</h2>
+    <p class="section-sub">Want to help keep the events running? Donations for administration keep Romp for the Rescues going strong.</p>
+
+    <div class="payment-box">
+      <p style="font-size:1.1rem; margin-bottom:1rem;">
+        All administrative donations help cover venue costs, prizes, marketing, and supplies so that <strong>100%</strong> of event proceeds can go to the charities.
+      </p>
+      <p><strong>Accepted Payment Methods:</strong></p>
+      <div class="payment-methods">
+        <span class="pay-tag">💳 Credit / Debit (Visa, MC, AMEX)</span>
+        <span class="pay-tag">🅿️ PayPal</span>
+        <span class="pay-tag">📱 Venmo</span>
+        <span class="pay-tag">⚡ Zelle</span>
+      </div>
+      <p style="margin-top:1.5rem; color:var(--muted);">
+        For administrative donations, please contact us at<br>
+        <strong>donate@rompfortherescues.org</strong><br>
+        and we will send payment instructions.
+      </p>
+    </div>
+  </section>
+
+  <!-- Registration Modal -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeRegister()">×</button>
+      <h2 style="text-align:left; margin-bottom:0.5rem;">Event Registration</h2>
+      <p style="color:var(--muted); margin-bottom:1.5rem;">Mrs. Roper Romp • March 14, 2027</p>
+
+      <form id="regForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" required placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="guests">Number of Guests (including yourself)</label>
+          <select id="guests">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5+</option>
+          </select>
+        </div>
+        <button type="submit" class="btn" style="width:100%;">Complete Registration</button>
+      </form>
+
+      <!-- Receipt (hidden until success) -->
+      <div id="receiptArea" style="display:none;">
+        <div class="receipt">
+          <h4>🎉 You’re Registered!</h4>
+          <p>Please bring this receipt (or show it on your phone) to the event.</p>
+          <div class="receipt-code" id="receiptCode"></div>
+          <p id="receiptDetails" style="font-size:0.95rem; margin-top:0.75rem;"></p>
+          <p style="font-size:0.85rem; color:var(--muted); margin-top:1rem;">
+            A confirmation has been “sent” to your email.<br>
+            (In a real deployment this would be an actual email.)
+          </p>
+          <button class="btn" style="margin-top:1rem;" onclick="window.print()">Print Receipt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="logo" style="justify-content:center; margin-bottom:0.5rem;">🐾 Romp for the Rescues</div>
+    <p>Fun events that raise funds for animal charities.</p>
+    <p style="margin-top:1rem; font-size:0.85rem;">© 2026 Romp for the Rescues. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function openRegister() {
+      document.getElementById('registerModal').classList.add('active');
+      document.getElementById('regForm').style.display = 'block';
+      document.getElementById('receiptArea').style.display = 'none';
+      document.getElementById('regForm').reset();
+    }
+
+    function closeRegister() {
+      document.getElementById('registerModal').classList.remove('active');
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const guests = document.getElementById('guests').value;
+
+      // Generate a simple receipt code
+      const code = 'RFR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      document.getElementById('receiptCode').textContent = code;
+      document.getElementById('receiptDetails').innerHTML =
+        `<strong>${name}</strong><br>${email}<br>Guests: ${guests}<br>Event: Mrs. Roper Romp – March 14, 2027`;
+
+      document.getElementById('regForm').style.display = 'none';
+      document.getElementById('receiptArea').style.display = 'block';
+
+      // In a real site you would POST this data to a backend
+      // that sends an actual email with the receipt.
+      console.log('Registration data:', { name, email, guests, code });
+    }
+
+    // Close modal on outside click
+    document.getElementById('registerModal').addEventListener('click', function(e) {
+      if (e.target === this) closeRegister();
+    });
+  </script>
+</body>
+</html>

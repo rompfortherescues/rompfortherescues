@@ -1,0 +1,39 @@
+I would like a web site that handles an organization that puts on events to help fund a number of charities that deal with animals.
+
+In addition to hosting events, links to affiliated charities are on the page to encourage donations directly to the charities.
+
+Each of the events raises funds to support one or more charities.  Each Event will have a registration to collect the person(s) email and send them a receipt to bring to the event.
+
+Each of the Charities can receive donations, or donations can be made for administration.
+Donations for specific charities will be accomplished by linking to their appropriate web pages for donations (see XML file <PayLink>.
+Donations use the Payment Methods.
+
+Here is the XML file:
+
+<Record name="Romp for the Rescues">
+	<Description>Fun events that raise funds for animal charities.</Description>
+
+<Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp">
+	<Description>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
+	<Charity />Blessed Paws Animal Rescue
+</Event>
+
+	
+<Charity>Blessed Paws Animal Rescue
+	<Description>Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</Description>
+	<Website>https://www.blessedpawsanimalrescue.com</Website>
+	<PayLink>https://www.blessedpawsanimalrescue.com/why-donate</PayLink>
+</Charity>
+
+<Charity>Wild Whiskers
+	<Description>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike.
+	Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</Description>
+	<Website>https://www.wildwhiskers.org</Website>
+	<PayLink>https://www.wildwhiskers.org/how-to-help</PayLink>
+</Charity>
+<Payment Method>Credit / Debit Card (Visa, MC, AMEX)</Payment>
+<Payment Method>PayPal</Payment>
+<Payment Method>Venmo</Payment>
+<Payment Method>Zelle</Payment>
+</Record>
+
