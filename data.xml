@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Record name="Romp for the Rescues">
+  <Description>Fun events that raise funds for animal charities.</Description>
+
+  <Events>
+    <Event
+      date="March 14, 2027"
+      time="6-10 PM"
+      type="Bingo"
+      name="Mrs. Roper Romp"
+      fee="$10.00"
+      beneficiary="Blessed Paws Animal Rescue">
+      <Description>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
+    </Event>
+  </Events>
+
+  <Charities>
+    <Charity name="Blessed Paws Animal Rescue">
+      <Description>Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</Description>
+      <Website>https://www.blessedpawsanimalrescue.com</Website>
+      <PayLink>https://www.blessedpawsanimalrescue.com/why-donate</PayLink>
+    </Charity>
+
+    <Charity name="Wild Whiskers">
+      <Description>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</Description>
+      <Website>https://www.wildwhiskers.org</Website>
+      <PayLink>https://www.wildwhiskers.org/how-to-help</PayLink>
+    </Charity>
+  </Charities>
+
+  <PaymentMethods>
+    <Method>Credit / Debit Card (Visa, MC, AMEX)</Method>
+    <Method>PayPal</Method>
+    <Method>Venmo</Method>
+    <Method>Zelle</Method>
+  </PaymentMethods>
+</Record>
