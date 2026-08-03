@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Romp for the Rescues</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+    body { font-family: 'Nunito', sans-serif; }
+    .paw { position: absolute; opacity: 0.07; font-size: 4rem; pointer-events: none; }
+    .gradient-bg { background: linear-gradient(135deg, #f97316 0%, #ea580c 40%, #0d9488 100%); }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+    .modal { display: none; }
+    .modal.active { display: flex; }
+  </style>
+</head>
+<body class="bg-orange-50 text-gray-800">
+
+  <!-- Navigation -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+      <a href="#home" class="flex items-center gap-2 text-2xl font-extrabold text-orange-600">
+        <i class="fas fa-paw"></i> Romp for the Rescues
+      </a>
+      <div class="flex flex-wrap gap-4 md:gap-6 text-sm md:text-base font-semibold">
+        <a href="#home" class="hover:text-orange-600">Home</a>
+        <a href="#events" class="hover:text-orange-600">Events</a>
+        <a href="#charities" class="hover:text-orange-600">Charities</a>
+        <a href="#volunteer" class="hover:text-orange-600">Volunteer</a>
+        <a href="#donate" class="hover:text-orange-600">Donate</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="home" class="gradient-bg text-white py-20 relative overflow-hidden">
+    <div class="paw top-10 left-10">🐾</div>
+    <div class="paw bottom-20 right-20">🐾</div>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Romp for the Rescues</h1>
+      <p class="text-xl md:text-2xl mb-8 opacity-95">Fun events that raise funds for animal charities.</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="#events" class="bg-white text-orange-600 px-8 py-3 rounded-full font-bold shadow-lg hover:bg-orange-100 transition">Upcoming Events</a>
+        <a href="#volunteer" class="bg-teal-700 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-teal-800 transition">Become a Volunteer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section id="events" class="py-16 max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-extrabold text-center mb-2 text-orange-700">Upcoming Events</h2>
+    <p class="text-center text-gray-600 mb-10">Each event raises funds to support one or more animal charities.</p>
+
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover transition max-w-2xl mx-auto">
+      <div class="bg-orange-500 text-white px-6 py-4 flex justify-between items-center">
+        <span class="font-bold text-lg"><i class="fas fa-bingo mr-2"></i>Bingo Night</span>
+        <span class="bg-white text-orange-600 px-3 py-1 rounded-full text-sm font-bold">$10.00</span>
+      </div>
+      <div class="p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">Mrs. Roper Romp</h3>
+        <p class="text-gray-600 mb-4">A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</p>
+        <div class="grid grid-cols-2 gap-3 text-sm mb-6">
+          <div><i class="far fa-calendar text-orange-500 mr-2"></i><strong>Date:</strong> March 14, 2027</div>
+          <div><i class="far fa-clock text-orange-500 mr-2"></i><strong>Time:</strong> 6–10 PM</div>
+          <div class="col-span-2"><i class="fas fa-heart text-orange-500 mr-2"></i><strong>Supports:</strong> Blessed Paws Animal Rescue</div>
+        </div>
+        <button onclick="openEventModal()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition">
+          Register & Pay with Stripe (Demo)
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charities -->
+  <section id="charities" class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-3xl font-extrabold text-center mb-2 text-teal-700">Affiliated Charities</h2>
+      <p class="text-center text-gray-600 mb-10">Click through to donate directly to these wonderful organizations.</p>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Blessed Paws -->
+        <div class="border border-teal-100 rounded-2xl p-6 shadow-lg card-hover transition">
+          <h3 class="text-xl font-bold text-teal-800 mb-3"><i class="fas fa-dog mr-2"></i>Blessed Paws Animal Rescue</h3>
+          <p class="text-gray-600 text-sm mb-4">Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</p>
+          <div class="flex flex-wrap gap-3">
+            <a href="https://www.blessedpawsanimalrescue.com" target="_blank" class="text-teal-600 hover:underline text-sm font-semibold"><i class="fas fa-globe mr-1"></i>Website</a>
+            <a href="https://www.blessedpawsanimalrescue.com/why-donate" target="_blank" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-700">Donate</a>
+          </div>
+        </div>
+
+        <!-- Wild Whiskers -->
+        <div class="border border-teal-100 rounded-2xl p-6 shadow-lg card-hover transition">
+          <h3 class="text-xl font-bold text-teal-800 mb-3"><i class="fas fa-cat mr-2"></i>Wild Whiskers</h3>
+          <p class="text-gray-600 text-sm mb-4">We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</p>
+          <div class="flex flex-wrap gap-3">
+            <a href="https://www.wildwhiskers.org" target="_blank" class="text-teal-600 hover:underline text-sm font-semibold"><i class="fas fa-globe mr-1"></i>Website</a>
+            <a href="https://www.wildwhiskers.org/how-to-help" target="_blank" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-700">Donate</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Volunteer -->
+  <section id="volunteer" class="py-16 max-w-3xl mx-auto px-4">
+    <h2 class="text-3xl font-extrabold text-center mb-2 text-orange-700">Volunteer with Us</h2>
+    <p class="text-center text-gray-600 mb-8">No fee. Sign up for general or specific duties. Information is only used in the confirmation email (nothing is stored).</p>
+
+    <form id="volunteerForm" class="bg-white rounded-2xl shadow-xl p-8 space-y-5" onsubmit="handleVolunteer(event)">
+      <div>
+        <label class="block font-semibold mb-1">Full Name *</label>
+        <input type="text" id="volName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-400 outline-none" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Email *</label>
+        <input type="email" id="volEmail" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-400 outline-none" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Telephone (optional)</label>
+        <input type="tel" id="volPhone" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-400 outline-none" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Duty Preference (optional)</label>
+        <select id="volDuty" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-400 outline-none">
+          <option value="">General / Anywhere needed</option>
+          <option>Setup / Cleanup</option>
+          <option>Registration Desk</option>
+          <option>Bingo Helper</option>
+          <option>Costume Contest</option>
+          <option>Other (see notes)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Additional Notes (optional)</label>
+        <textarea id="volNotes" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-400 outline-none"></textarea>
+      </div>
+      <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition">
+        Register as Volunteer
+      </button>
+    </form>
+  </section>
+
+  <!-- Donate -->
+  <section id="donate" class="py-16 bg-teal-50">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-extrabold mb-2 text-teal-800">Make a Donation</h2>
+      <p class="text-gray-600 mb-8">Support a specific charity or help with administration costs.</p>
+
+      <div class="grid sm:grid-cols-2 gap-6 mb-10">
+        <a href="https://www.blessedpawsanimalrescue.com/why-donate" target="_blank" class="bg-white p-6 rounded-2xl shadow card-hover transition block">
+          <i class="fas fa-dog text-3xl text-orange-500 mb-3"></i>
+          <h3 class="font-bold text-lg">Donate to Blessed Paws</h3>
+        </a>
+        <a href="https://www.wildwhiskers.org/how-to-help" target="_blank" class="bg-white p-6 rounded-2xl shadow card-hover transition block">
+          <i class="fas fa-cat text-3xl text-teal-600 mb-3"></i>
+          <h3 class="font-bold text-lg">Donate to Wild Whiskers</h3>
+        </a>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-lg inline-block text-left max-w-md w-full">
+        <h3 class="font-bold text-lg mb-3 text-center">Administration / General Support</h3>
+        <p class="text-sm text-gray-600 mb-4 text-center">Contact us or use any of the methods below. In a future version this can be wired to Stripe.</p>
+        <ul class="space-y-2 text-sm">
+          <li><i class="fas fa-credit-card text-orange-500 w-6"></i> Credit / Debit Card (Visa, MC, AMEX)</li>
+          <li><i class="fab fa-paypal text-blue-600 w-6"></i> PayPal</li>
+          <li><i class="fas fa-mobile-alt text-blue-500 w-6"></i> Venmo</li>
+          <li><i class="fas fa-university text-green-600 w-6"></i> Zelle</li>
+        </ul>
+        <p class="mt-4 text-center text-sm">
+          Email: <a href="mailto:RompfortheRescues@gmail.com" class="text-teal-600 font-semibold">RompfortheRescues@gmail.com</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-10">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <p class="text-xl font-bold text-white mb-2"><i class="fas fa-paw mr-2"></i>Romp for the Rescues</p>
+      <p class="mb-4">Fun events that raise funds for animal charities.</p>
+      <p class="text-sm">Confirmation emails are sent from <strong>donotreply@RompfortheRescues.org</strong><br>
+      with a CC to <strong>RompfortheRescues@gmail.com</strong></p>
+      <p class="mt-6 text-xs opacity-70">Demo site • No personal data is stored • Stripe payments are simulated</p>
+    </div>
+  </footer>
+
+  <!-- Event Registration Modal -->
+  <div id="eventModal" class="modal fixed inset-0 bg-black/60 z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="bg-orange-500 text-white px-6 py-4 flex justify-between items-center rounded-t-2xl">
+        <h3 class="font-bold text-lg">Register for Mrs. Roper Romp</h3>
+        <button onclick="closeEventModal()" class="text-2xl leading-none">&times;</button>
+      </div>
+      <form id="eventForm" class="p-6 space-y-4" onsubmit="handleEventReg(event)">
+        <div>
+          <label class="block font-semibold mb-1">Your Name (optional)</label>
+          <input type="text" id="evtName" class="w-full border rounded-lg px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Email *</label>
+          <input type="email" id="evtEmail" required class="w-full border rounded-lg px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Number of Tickets *</label>
+          <input type="number" id="evtQty" min="1" value="1" required class="w-full border rounded-lg px-4 py-2" />
+        </div>
+        <p class="text-sm text-gray-600">Total: $<span id="evtTotal">10.00</span></p>
+
+        <!-- Mock Stripe -->
+        <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
+          <p class="text-xs font-bold text-gray-500 mb-2 flex items-center gap-1">
+            <i class="fab fa-stripe text-indigo-600 text-lg"></i> Stripe Demo (no real charge)
+          </p>
+          <input type="text" placeholder="Card number 4242 4242 4242 4242" class="w-full border rounded-lg px-3 py-2 mb-2 text-sm" />
+          <div class="flex gap-2">
+            <input type="text" placeholder="MM/YY" class="w-1/2 border rounded-lg px-3 py-2 text-sm" />
+            <input type="text" placeholder="CVC" class="w-1/2 border rounded-lg px-3 py-2 text-sm" />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl">
+          Pay & Register (Demo)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success / Email Preview Modal -->
+  <div id="successModal" class="modal fixed inset-0 bg-black/60 z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="bg-teal-600 text-white px-6 py-4 flex justify-between items-center rounded-t-2xl">
+        <h3 class="font-bold text-lg"><i class="fas fa-check-circle mr-2"></i>Success – Email Receipt</h3>
+        <button onclick="closeSuccessModal()" class="text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">In production this email would be sent automatically. Below is the exact content that would be delivered:</p>
+        <div class="bg-gray-100 rounded-xl p-4 text-sm font-mono whitespace-pre-wrap" id="emailPreview"></div>
+        <button onclick="closeSuccessModal()" class="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Live total
+    document.getElementById('evtQty')?.addEventListener('input', function() {
+      const qty = parseInt(this.value) || 1;
+      document.getElementById('evtTotal').textContent = (qty * 10).toFixed(2);
+    });
+
+    function openEventModal() {
+      document.getElementById('eventModal').classList.add('active');
+    }
+    function closeEventModal() {
+      document.getElementById('eventModal').classList.remove('active');
+    }
+    function closeSuccessModal() {
+      document.getElementById('successModal').classList.remove('active');
+    }
+
+    function handleEventReg(e) {
+      e.preventDefault();
+      const name = document.getElementById('evtName').value.trim() || 'Guest';
+      const email = document.getElementById('evtEmail').value.trim();
+      const qty = parseInt(document.getElementById('evtQty').value) || 1;
+      const total = (qty * 10).toFixed(2);
+
+      // Simulate payment success
+      const emailBody = `From: donotreply@RompfortheRescues.org
+To: ${email}
+Cc: RompfortheRescues@gmail.com
+Subject: Registration Confirmation – Mrs. Roper Romp
+
+Hello ${name},
+
+Thank you for registering for Mrs. Roper Romp!
+
+Event Details:
+• Name: Mrs. Roper Romp
+• Type: Bingo
+• Date: March 14, 2027
+• Time: 6-10 PM
+• Fee paid: $${total} (${qty} ticket${qty > 1 ? 's' : ''} @ $10.00)
+• Supporting: Blessed Paws Animal Rescue
+
+Please bring this email (printed or on your phone) as your receipt to the event.
+
+We can't wait to see you there – costumes optional, Mrs. Roper style encouraged!
+
+Warmly,
+Romp for the Rescues
+(This is an automated message – please do not reply)`;
+
+      document.getElementById('emailPreview').textContent = emailBody;
+      closeEventModal();
+      document.getElementById('successModal').classList.add('active');
+      document.getElementById('eventForm').reset();
+      document.getElementById('evtTotal').textContent = '10.00';
+    }
+
+    function handleVolunteer(e) {
+      e.preventDefault();
+      const name = document.getElementById('volName').value.trim();
+      const email = document.getElementById('volEmail').value.trim();
+      const phone = document.getElementById('volPhone').value.trim() || 'Not provided';
+      const duty = document.getElementById('volDuty').value || 'General / Anywhere needed';
+      const notes = document.getElementById('volNotes').value.trim() || 'None';
+
+      const emailBody = `From: donotreply@RompfortheRescues.org
+To: ${email}
+Cc: RompfortheRescues@gmail.com
+Subject: Volunteer Registration Confirmation – Romp for the Rescues
+
+Hello ${name},
+
+Thank you for signing up to volunteer with Romp for the Rescues!
+
+Your details:
+• Name: ${name}
+• Email: ${email}
+• Telephone: ${phone}
+• Duty Preference: ${duty}
+• Notes: ${notes}
+
+There is no fee to volunteer. We will use the CC copy of this email for attendance tracking.
+
+We truly appreciate your help making our events a success for the animals!
+
+Warmly,
+Romp for the Rescues
+(This is an automated message – please do not reply)`;
+
+      document.getElementById('emailPreview').textContent = emailBody;
+      document.getElementById('successModal').classList.add('active');
+      document.getElementById('volunteerForm').reset();
+    }
+
+    // Close modals on outside click
+    document.getElementById('eventModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEventModal();
+    });
+    document.getElementById('successModal').addEventListener('click', function(e) {
+      if (e.target === this) closeSuccessModal();
+    });
+  </script>
+</body>
+</html>
