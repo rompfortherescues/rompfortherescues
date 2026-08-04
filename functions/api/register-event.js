@@ -1,58 +1,81 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
+
   try {
     const body = await request.json();
-    const { email, name, eventName, date, time, type, fee, location, description, charity } = body;
+    const { name, email, phone, qty, eventName, fee, date, time, location } = body;
 
-    if (!email || !eventName) {
-      return new Response(JSON.stringify({ error: 'Email and event required' }), { status: 400 });
+    if (!name || !email || !eventName) {
+      return json({ error: 'Name, email and event required' }, 400);
     }
 
-    // DEMO: In production replace this block with real Stripe Checkout Session + webhook
-    // For now we just treat the payment as accepted.
-
-    const subject = `Registration Confirmation – ${eventName}`;
+    const subject = 'receipt';
     const html = `
-      <h2>Thank you for registering!</h2>
-      <p>This is your receipt for <strong>${eventName}</strong>.</p>
+      <h2>Event Registration Receipt</h2>
+      <p>Thank you for registering with Romp for the Rescues!</p>
+      <h3>Event Details</h3>
       <ul>
-        <li><strong>Date:</strong> ${date}</li>
-        <li><strong>Time:</strong> ${time}</li>
-        <li><strong>Type:</strong> ${type}</li>
-        <li><strong>Location:</strong> ${location}</li>
-        <li><strong>Fee paid (demo):</strong> ${fee}</li>
-        <li><strong>Supporting:</strong> ${charity}</li>
+        <li><strong>Event:</strong> ${escape(eventName)}</li>
+        <li><strong>Date:</strong> ${escape(date)}</li>
+        <li><strong>Time:</strong> ${escape(time)}</li>
+        <li><strong>Location:</strong> ${escape(location)}</li>
+        <li><strong>Fee:</strong> ${escape(fee)} × ${escape(qty)} = total due at Stripe (demo)</li>
       </ul>
-      <p>${description}</p>
+      <h3>Your Information</h3>
+      <ul>
+        <li><strong>Name:</strong> ${escape(name)}</li>
+        <li><strong>Email:</strong> ${escape(email)}</li>
+        <li><strong>Phone:</strong> ${escape(phone || 'Not provided')}</li>
+        <li><strong>Attendees:</strong> ${escape(qty)}</li>
+      </ul>
       <p>Please bring this email (or a screenshot) to the event.</p>
-      <p>See you there!<br>Romp for the Rescues</p>
+      <p><em>Demo mode – no payment was processed. In production this email is sent only after Stripe confirms payment.</em></p>
+      <p>Do not reply to this address.</p>
     `;
 
-    const resendRes = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'donotreply@RompfortheRescues.org',
-        to: email,
-        cc: 'RompfortheRescues@gmail.com',
-        subject,
-        html
-      })
+    await sendResend(env, {
+      from: 'donotreply@RompfortheRescues.org',
+      to: email,
+      cc: ['RompfortheRescues@gmail.com'],
+      subject,
+      html
     });
 
-    if (!resendRes.ok) {
-      const err = await resendRes.text();
-      throw new Error('Email failed: ' + err);
-    }
-
-    return new Response(JSON.stringify({
-      message: `Demo payment accepted. Receipt emailed to ${email}.`
-    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-
+    // Production: create Stripe Checkout Session here and return { checkoutUrl }
+    // For demo we just confirm the email was sent.
+    return json({ success: true, demo: true });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    console.error(err);
+    return json({ error: err.message || 'Server error' }, 500);
+  }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+function escape(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+async function sendResend(env, opts) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(opts)
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Resend error: ${t}`);
   }
 }

@@ -1,50 +1,76 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
+
   try {
     const body = await request.json();
-    const { event, duty, name, email, phone } = body;
+    const { name, email, phone, duty, event } = body;
 
-    if (!email || !name || !event) {
-      return new Response(JSON.stringify({ error: 'Name, email and event required' }), { status: 400 });
+    if (!name || !email) {
+      return json({ error: 'Name and email required' }, 400);
+    }
+    if (!event && !phone) {
+      return json({ error: 'Phone is required for general volunteering' }, 400);
     }
 
-    const subject = `Volunteer Confirmation – ${event}`;
+    const subject = event
+      ? `Volunteer Confirmation – ${event}`
+      : 'General Volunteer Confirmation – Romp for the Rescues';
+
     const html = `
-      <h2>Thank you for volunteering!</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-      <p><strong>Event:</strong> ${event}</p>
-      <p><strong>Duty preference:</strong> ${duty || 'General help'}</p>
-      <p>We will be in touch with more details. See you at the event!</p>
-      <p>Romp for the Rescues</p>
+      <h2>Volunteer Registration Receipt</h2>
+      <p>Thank you for volunteering with Romp for the Rescues!</p>
+      <ul>
+        <li><strong>Name:</strong> ${escape(name)}</li>
+        <li><strong>Email:</strong> ${escape(email)}</li>
+        <li><strong>Phone:</strong> ${escape(phone || 'Not provided')}</li>
+        <li><strong>Event:</strong> ${escape(event || 'General (no specific event)')}</li>
+        <li><strong>Preferred Duty:</strong> ${escape(duty || 'None specified')}</li>
+      </ul>
+      <p>We look forward to seeing you!</p>
+      <p><em>This is an automated message. Do not reply.</em></p>
     `;
 
-    const resendRes = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'donotreply@RompfortheRescues.org',
-        to: email,
-        cc: 'rompfortherescues@gmail.com',
-        subject,
-        html
-      })
+    await sendResend(env, {
+      from: 'donotreply@RompfortheRescues.org',
+      to: email,
+      cc: ['rompfortherescues@gmail.com'],
+      subject,
+      html
     });
 
-    if (!resendRes.ok) {
-      const err = await resendRes.text();
-      throw new Error('Email failed: ' + err);
-    }
-
-    return new Response(JSON.stringify({
-      message: `Confirmation emailed to ${email}. Thank you!`
-    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-
+    return json({ success: true });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    console.error(err);
+    return json({ error: err.message || 'Server error' }, 500);
+  }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+function escape(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+async function sendResend(env, opts) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(opts)
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Resend error: ${t}`);
   }
 }

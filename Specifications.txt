@@ -1,0 +1,69 @@
+I have reserved a domain name with Cloudflare.  It is "RompfortheRescues.org".  Use Cloudfare exclusively for hosting this project.
+
+I would like a web site that handles an organization that puts on events to help fund a number of charities that deal with animals.
+There should be a navigation row at the top of the page (after title) with links to Events, Charities, and a link to volunteer in general
+rather than to a specific event.
+
+In addition to hosting events, links to affiliated charities are on the page to encourage donations directly to the charities.
+
+Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
+button.  The "receipt" button collects the person(s) email and other information, then links to stripe to accept the payment. We want to
+send them an email receipt (once their payment is accepted) to bring to the event.  Email subject is "receipt" and be from 
+                    "donotreply@RompfortheRescues.org" 
+and have a cc to RompfortheRescues@gmail.com.  
+The email has event data in the body. No information is stored.  Payments will be handled by Stripe.  For now just make a demo version.
+
+Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to volunteer, but an email receipt should be sent to the volunteer from "donotreply@RompfortheRescues.org" with a cc to "rompfortherescues@gmail.com". Registration for volunteers should optionally collect event, duty preference and contact info, including telephone number (optional) on volunteer to include in the email. Information collected is not stored, but is included in the email.  We will get attendance numbers from the cc's email.
+
+The form for general volunteering (no specific event) and the form for specific volunteering (clicking "volunteer" button on an event) will
+be the same form except the information on the specific event will be missing from the general volunteering and the phone number will not
+be optional on the general volunteering.
+
+Emails will be sent using an existing Resend account.
+
+Each of the Charities can receive donations, or donations can be made for administration.
+Donations for specific charities will be accomplished by linking to their appropriate web pages for donations (see XML file <PayLink>.
+Donations use the Payment Methods.
+
+Keep the javascript, style sheets, and index.html file in separate files.  I already have an XML file named data.xml, so refer to that file in the code, the code below is a copy of that file.
+Keep environment variables in a separate file for testing that will not be pushed to the origin of github.
+
+make the theme a pink and turquoise one.
+
+Here is the XML file:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Record name="Romp for the Rescues">
+  <Description>Fun events that raise funds for animal charities.</Description>
+
+  <Events>
+    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00" for="Coozie">
+    <Location>Mary's Restaurant on Main Street, Boynton Beach FL.</Location>
+    <Location>Sam's Bar on Main Street, Boynton Beach FL.</Location>
+    <Description>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
+    <Charity>Blessed Paws Animal Rescue</Charity>
+   </Event>
+  </Events>
+
+  <Charities>
+    <Charity name="Blessed Paws Animal Rescue">
+      <Description>Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</Description>
+      <Website>https://www.blessedpawsanimalrescue.com</Website>
+      <PayLink>https://www.blessedpawsanimalrescue.com/why-donate</PayLink>
+    </Charity>
+
+    <Charity name="Wild Whiskers">
+      <Description>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</Description>
+      <Website>https://www.wildwhiskers.org</Website>
+      <PayLink>https://www.wildwhiskers.org/how-to-help</PayLink>
+    </Charity>
+  </Charities>
+
+  <PaymentMethods>
+    <Method>Credit / Debit Card (Visa, MC, AMEX)</Method>
+    <Method>PayPal</Method>
+    <Method>Venmo</Method>
+    <Method>Zelle</Method>
+  </PaymentMethods>
+</Record>
+

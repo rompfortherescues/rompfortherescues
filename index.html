@@ -8,94 +8,97 @@
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Romp for the Rescues</h1>
-      <p class="tagline">Fun events that raise funds for animal charities</p>
-      <nav>
-        <a href="#events">Events</a>
-        <a href="#charities">Charities</a>
-        <a href="#donate">Donate</a>
-        <a href="#volunteer">Volunteer</a>
-      </nav>
-    </div>
+    <h1 id="org-name">Romp for the Rescues</h1>
+    <p id="org-desc"></p>
+    <nav>
+      <a href="#events">Events</a>
+      <a href="#charities">Charities</a>
+      <a href="#volunteer" id="nav-volunteer">Volunteer</a>
+    </nav>
   </header>
 
-  <main class="container">
-    <section id="about">
-      <h2>About Us</h2>
-      <p id="org-description">Loading…</p>
-    </section>
-
+  <main>
     <section id="events">
       <h2>Upcoming Events</h2>
-      <div id="events-list" class="card-grid"></div>
+      <div id="events-list"></div>
     </section>
 
     <section id="charities">
-      <h2>Our Affiliated Charities</h2>
-      <div id="charities-list" class="card-grid"></div>
+      <h2>Affiliated Charities</h2>
+      <p>Donate directly to these organizations or support administration via the payment methods below.</p>
+      <div id="charities-list"></div>
     </section>
 
-    <section id="donate">
-      <h2>Donate</h2>
-      <p>Support a specific charity by using the donation links on their cards above, or contribute to our administrative costs.</p>
-      <div id="payment-methods"></div>
-      <p class="note">For administrative donations, please use one of the methods above and include “Romp Admin” in the memo / note. We will also add a Stripe payment link here once live.</p>
-    </section>
-
-    <section id="volunteer">
-      <h2>Volunteer</h2>
-      <p>Help make the events possible! No fee – just sign up below.</p>
-      <button id="open-volunteer-btn" class="btn">Sign up to Volunteer</button>
+    <section id="payments">
+      <h2>Accepted Payment Methods</h2>
+      <ul id="payment-methods"></ul>
+      <p class="note">Administration donations and event registrations use the methods above (handled via Stripe in production).</p>
     </section>
   </main>
 
-  <footer>
-    <div class="container">
-      <p>© 2026 Romp for the Rescues · <a href="mailto:rompfortherescues@gmail.com">Contact</a></p>
-    </div>
-  </footer>
-
-  <!-- Event Registration Modal -->
-  <div id="event-modal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close" data-modal="event-modal">&times;</span>
-      <h3>Register for <span id="modal-event-name"></span></h3>
-      <form id="event-form">
-        <input type="hidden" id="event-id" />
-        <label>Email *</label>
-        <input type="email" id="event-email" required />
-        <label>Your Name (optional)</label>
-        <input type="text" id="event-name" />
-        <p class="fee-display">Fee: <strong id="modal-event-fee"></strong></p>
-        <p class="demo-note">DEMO: Clicking “Pay & Register” simulates a successful Stripe payment and sends the receipt email.</p>
-        <button type="submit" class="btn">Pay & Register (Demo)</button>
-      </form>
-      <div id="event-result" class="result hidden"></div>
-    </div>
-  </div>
-
-  <!-- Volunteer Modal -->
+  <!-- Volunteer Modal / Form -->
   <div id="volunteer-modal" class="modal hidden">
     <div class="modal-content">
-      <span class="close" data-modal="volunteer-modal">&times;</span>
-      <h3>Volunteer Sign-up</h3>
+      <span class="close" data-close="volunteer-modal">&times;</span>
+      <h2 id="volunteer-title">Volunteer Sign-up</h2>
       <form id="volunteer-form">
-        <label>Event *</label>
-        <select id="vol-event" required></select>
-        <label>Duty Preference (general or specific)</label>
-        <input type="text" id="vol-duty" placeholder="e.g. Setup, Bingo caller, General help" />
-        <label>Name *</label>
-        <input type="text" id="vol-name" required />
+        <input type="hidden" id="vol-event" name="event" value="" />
+        <label>Full Name *</label>
+        <input type="text" id="vol-name" name="name" required />
+
         <label>Email *</label>
-        <input type="email" id="vol-email" required />
-        <label>Phone (optional)</label>
-        <input type="tel" id="vol-phone" />
-        <button type="submit" class="btn">Sign Up (sends confirmation email)</button>
+        <input type="email" id="vol-email" name="email" required />
+
+        <label id="vol-phone-label">Phone <span id="phone-required-mark"></span></label>
+        <input type="tel" id="vol-phone" name="phone" />
+
+        <label>Preferred Duty (optional)</label>
+        <input type="text" id="vol-duty" name="duty" placeholder="e.g. setup, registration desk, general help" />
+
+        <p id="vol-event-display" class="event-info hidden"></p>
+
+        <button type="submit">Submit Volunteer Registration</button>
+        <p id="vol-message" class="message"></p>
       </form>
-      <div id="vol-result" class="result hidden"></div>
     </div>
   </div>
+
+  <!-- Registration (paid) Modal -->
+  <div id="register-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" data-close="register-modal">&times;</span>
+      <h2 id="reg-title">Event Registration</h2>
+      <form id="register-form">
+        <input type="hidden" id="reg-event-name" />
+        <input type="hidden" id="reg-event-fee" />
+        <input type="hidden" id="reg-event-date" />
+        <input type="hidden" id="reg-event-time" />
+        <input type="hidden" id="reg-event-location" />
+
+        <p id="reg-event-summary" class="event-info"></p>
+
+        <label>Full Name *</label>
+        <input type="text" id="reg-name" name="name" required />
+
+        <label>Email *</label>
+        <input type="email" id="reg-email" name="email" required />
+
+        <label>Phone (optional)</label>
+        <input type="tel" id="reg-phone" name="phone" />
+
+        <label>Number of attendees *</label>
+        <input type="number" id="reg-qty" name="qty" min="1" value="1" required />
+
+        <button type="submit">Proceed to Payment (Demo)</button>
+        <p id="reg-message" class="message"></p>
+        <p class="note">Demo mode: no real charge. In production this redirects to Stripe Checkout. A receipt email is sent immediately for the demo.</p>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; Romp for the Rescues · Hosted on Cloudflare · bondservant.org</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
