@@ -7,13 +7,17 @@ rather than to a specific event.
 In addition to hosting events, links to affiliated charities are on the page to encourage donations directly to the charities.
 
 Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
-button.  The "receipt" button collects the person(s) email and other information, then links to stripe to accept the payment. We want to
+button.  The "register" button collects the person(s) email and other information, then links to stripe to accept the payment. We want to
 send them an email receipt (once their payment is accepted) to bring to the event.  Email subject is "receipt" and be from 
                     "donotreply@RompfortheRescues.org" 
 and have a cc to RompfortheRescues@gmail.com.  
 The email has event data in the body. No information is stored.  Payments will be handled by Stripe.  For now just make a demo version.
 
-Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to volunteer, but an email receipt should be sent to the volunteer from "donotreply@RompfortheRescues.org" with a cc to "rompfortherescues@gmail.com". Registration for volunteers should optionally collect event, duty preference and contact info, including telephone number (optional) on volunteer to include in the email. Information collected is not stored, but is included in the email.  We will get attendance numbers from the cc's email.
+Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to 
+volunteer, but an email receipt should be sent to the volunteer from "donotreply@RompfortheRescues.org" with a cc to 
+"rompfortherescues@gmail.com". Registration for volunteers should optionally collect event, duty preference and contact info, including 
+telephone number (optional) on volunteer to include in the email. Information collected is not stored, but is included in the email.  
+We will get attendance numbers from the cc's email.
 
 The form for general volunteering (no specific event) and the form for specific volunteering (clicking "volunteer" button on an event) will
 be the same form except the information on the specific event will be missing from the general volunteering and the phone number will not
@@ -63,7 +67,6 @@ Here is the XML file:
     <Method>Credit / Debit Card (Visa, MC, AMEX)</Method>
     <Method>PayPal</Method>
     <Method>Venmo</Method>
-    <Method>Zelle</Method>
   </PaymentMethods>
 </Record>
 

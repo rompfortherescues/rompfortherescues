@@ -1,48 +1,62 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
-
   try {
     const body = await request.json();
-    const { name, email, phone, duty, event } = body;
+    const { name, email, phone, event, duty, notes, isGeneral } = body;
 
     if (!name || !email) {
-      return json({ error: 'Name and email required' }, 400);
+      return json({ ok: false, error: 'Name and email required' }, 400);
     }
-    if (!event && !phone) {
-      return json({ error: 'Phone is required for general volunteering' }, 400);
+    if (isGeneral && !phone) {
+      return json({ ok: false, error: 'Phone required for general volunteering' }, 400);
     }
 
-    const subject = event
-      ? `Volunteer Confirmation – ${event}`
-      : 'General Volunteer Confirmation – Romp for the Rescues';
-
-    const html = `
+    const htmlBody = `
       <h2>Volunteer Registration Receipt</h2>
-      <p>Thank you for volunteering with Romp for the Rescues!</p>
-      <ul>
-        <li><strong>Name:</strong> ${escape(name)}</li>
-        <li><strong>Email:</strong> ${escape(email)}</li>
-        <li><strong>Phone:</strong> ${escape(phone || 'Not provided')}</li>
-        <li><strong>Event:</strong> ${escape(event || 'General (no specific event)')}</li>
-        <li><strong>Preferred Duty:</strong> ${escape(duty || 'None specified')}</li>
-      </ul>
-      <p>We look forward to seeing you!</p>
-      <p><em>This is an automated message. Do not reply.</em></p>
+      <p>Thank you for volunteering with <strong>Romp for the Rescues</strong>!</p>
+      <p><strong>Name:</strong> ${escape(name)}<br>
+         <strong>Email:</strong> ${escape(email)}<br>
+         <strong>Phone:</strong> ${escape(phone) || '—'}<br>
+         <strong>Event:</strong> ${event ? escape(event) : 'General / No specific event'}<br>
+         <strong>Duty Preference:</strong> ${escape(duty) || '—'}<br>
+         ${notes ? `<strong>Notes:</strong> ${escape(notes)}` : ''}</p>
+      <p>We will be in touch with further details.</p>
+      <p>— Romp for the Rescues</p>
     `;
 
-    await sendResend(env, {
-      from: 'donotreply@RompfortheRescues.org',
-      to: email,
-      cc: ['rompfortherescues@gmail.com'],
-      subject,
-      html
+    const emailRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'donotreply@RompfortheRescues.org',
+        to: [email],
+        cc: ['rompfortherescues@gmail.com'],
+        subject: 'receipt',
+        html: htmlBody
+      })
     });
 
-    return json({ success: true });
+    if (!emailRes.ok) {
+      const errText = await emailRes.text();
+      return json({ ok: false, error: 'Email failed: ' + errText }, 500);
+    }
+
+    return json({ ok: true });
   } catch (err) {
-    console.error(err);
-    return json({ error: err.message || 'Server error' }, 500);
+    return json({ ok: false, error: err.message }, 500);
   }
+}
+
+function escape(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function json(data, status = 200) {
@@ -50,27 +64,4 @@ function json(data, status = 200) {
     status,
     headers: { 'Content-Type': 'application/json' }
   });
-}
-
-function escape(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-async function sendResend(env, opts) {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(opts)
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`Resend error: ${t}`);
-  }
 }

@@ -1,105 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Romp for the Rescues</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1 id="org-name">Romp for the Rescues</h1>
-    <p id="org-desc"></p>
-    <nav>
-      <a href="#events">Events</a>
-      <a href="#charities">Charities</a>
-      <a href="#volunteer" id="nav-volunteer">Volunteer</a>
-    </nav>
+    <h1>Romp for the Rescues</h1>
+    <p id="site-description"></p>
   </header>
+
+  <nav>
+    <a href="#events">Events</a>
+    <a href="#charities">Charities</a>
+    <a href="#volunteer" id="nav-volunteer">Volunteer</a>
+  </nav>
 
   <main>
     <section id="events">
       <h2>Upcoming Events</h2>
-      <div id="events-list"></div>
+      <div id="events-list" class="card-grid"></div>
     </section>
 
     <section id="charities">
       <h2>Affiliated Charities</h2>
-      <p>Donate directly to these organizations or support administration via the payment methods below.</p>
-      <div id="charities-list"></div>
+      <p class="section-intro">Donate directly to the organizations we support. Every contribution helps animals in need.</p>
+      <div id="charities-list" class="card-grid"></div>
     </section>
 
-    <section id="payments">
+    <section id="payment-methods">
       <h2>Accepted Payment Methods</h2>
-      <ul id="payment-methods"></ul>
-      <p class="note">Administration donations and event registrations use the methods above (handled via Stripe in production).</p>
+      <ul id="payment-list"></ul>
+    </section>
+
+    <section id="volunteer">
+      <h2>Volunteer With Us</h2>
+      <p>Sign up for a specific event or offer general help. No fee required.</p>
+      <button class="btn btn-turquoise" id="general-volunteer-btn">General Volunteer Sign-up</button>
     </section>
   </main>
 
-  <!-- Volunteer Modal / Form -->
-  <div id="volunteer-modal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close" data-close="volunteer-modal">&times;</span>
-      <h2 id="volunteer-title">Volunteer Sign-up</h2>
-      <form id="volunteer-form">
-        <input type="hidden" id="vol-event" name="event" value="" />
-        <label>Full Name *</label>
-        <input type="text" id="vol-name" name="name" required />
-
-        <label>Email *</label>
-        <input type="email" id="vol-email" name="email" required />
-
-        <label id="vol-phone-label">Phone <span id="phone-required-mark"></span></label>
-        <input type="tel" id="vol-phone" name="phone" />
-
-        <label>Preferred Duty (optional)</label>
-        <input type="text" id="vol-duty" name="duty" placeholder="e.g. setup, registration desk, general help" />
-
-        <p id="vol-event-display" class="event-info hidden"></p>
-
-        <button type="submit">Submit Volunteer Registration</button>
-        <p id="vol-message" class="message"></p>
-      </form>
-    </div>
-  </div>
-
-  <!-- Registration (paid) Modal -->
-  <div id="register-modal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close" data-close="register-modal">&times;</span>
-      <h2 id="reg-title">Event Registration</h2>
-      <form id="register-form">
-        <input type="hidden" id="reg-event-name" />
-        <input type="hidden" id="reg-event-fee" />
-        <input type="hidden" id="reg-event-date" />
-        <input type="hidden" id="reg-event-time" />
-        <input type="hidden" id="reg-event-location" />
-
-        <p id="reg-event-summary" class="event-info"></p>
-
-        <label>Full Name *</label>
-        <input type="text" id="reg-name" name="name" required />
-
-        <label>Email *</label>
-        <input type="email" id="reg-email" name="email" required />
-
-        <label>Phone (optional)</label>
-        <input type="tel" id="reg-phone" name="phone" />
-
-        <label>Number of attendees *</label>
-        <input type="number" id="reg-qty" name="qty" min="1" value="1" required />
-
-        <button type="submit">Proceed to Payment (Demo)</button>
-        <p id="reg-message" class="message"></p>
-        <p class="note">Demo mode: no real charge. In production this redirects to Stripe Checkout. A receipt email is sent immediately for the demo.</p>
-      </form>
-    </div>
-  </div>
-
   <footer>
-    <p>&copy; Romp for the Rescues · Hosted on Cloudflare · bondservant.org</p>
+    <p>&copy; 2026 Romp for the Rescues · Helping animal charities through fun events</p>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Register Modal -->
+  <div id="register-modal" class="modal" hidden>
+    <div class="modal-content">
+      <span class="close" data-close="register-modal">&times;</span>
+      <h3>Register for <span id="reg-event-name"></span></h3>
+      <form id="register-form">
+        <input type="hidden" id="reg-event-data">
+        <label>Full Name *</label>
+        <input type="text" id="reg-name" required>
+        <label>Email *</label>
+        <input type="email" id="reg-email" required>
+        <label>Phone (optional)</label>
+        <input type="tel" id="reg-phone">
+        <label>Number of Tickets *</label>
+        <input type="number" id="reg-qty" min="1" value="1" required>
+        <label>Notes / Other Information</label>
+        <textarea id="reg-notes" rows="2"></textarea>
+        <button type="submit" class="btn btn-pink">Proceed to Payment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Volunteer Modal -->
+  <div id="volunteer-modal" class="modal" hidden>
+    <div class="modal-content">
+      <span class="close" data-close="volunteer-modal">&times;</span>
+      <h3 id="vol-title">Volunteer Sign-up</h3>
+      <form id="volunteer-form">
+        <input type="hidden" id="vol-event-name">
+        <label>Full Name *</label>
+        <input type="text" id="vol-name" required>
+        <label>Email *</label>
+        <input type="email" id="vol-email" required>
+        <label id="vol-phone-label">Phone</label>
+        <input type="tel" id="vol-phone">
+        <label>Event (optional)</label>
+        <select id="vol-event-select">
+          <option value="">General / No specific event</option>
+        </select>
+        <label>Duty Preference</label>
+        <input type="text" id="vol-duty" placeholder="e.g. setup, registration desk, cleanup…">
+        <label>Notes</label>
+        <textarea id="vol-notes" rows="2"></textarea>
+        <button type="submit" class="btn btn-turquoise">Submit Volunteer Registration</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

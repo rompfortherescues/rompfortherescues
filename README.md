@@ -1,23 +1,21 @@
-# Romp for the Rescues (bondservant.org)
+# Romp for the Rescues
 
 Static site + Cloudflare Pages Functions.
 
 ## Local development
-1. Copy `.dev.vars.example` → `.dev.vars` and add your Resend API key.
-2. `npx wrangler pages dev . --compatibility-date=2024-09-23`
-3. Open the local URL. Forms hit `/api/*` Functions.
+1. Put your keys in `.dev.vars`
+2. `npx wrangler pages dev .`
+3. Open the URL shown (usually http://localhost:8788)
 
 ## Deploy to Cloudflare Pages
-1. Push repo to GitHub.
-2. Cloudflare Dashboard → Pages → Create project → Connect GitHub.
-3. Build settings: Framework preset = None, Build output directory = `/` (or leave empty).
-4. Settings → Environment variables → add `RESEND_API_KEY` (Production + Preview).
-5. (Later) Add custom domain `bondservant.org`.
+1. Push to GitHub (`.dev.vars` is ignored)
+2. Cloudflare Dashboard → Pages → Create project → Connect repo
+3. Build settings: Framework preset = None, Build output directory = `/`
+4. After first deploy: Settings → Environment variables → add  
+   `RESEND_API_KEY` and `STRIPE_SECRET_KEY` (Production + Preview)
+5. Custom domains → Add `RompfortheRescues.org` (already on Cloudflare)
 
-## Production Stripe (next step)
-- Create Checkout Sessions inside `functions/api/register.js`.
-- Use a success URL + webhook (or retrieve session on a success page) to send the real receipt only after payment succeeds.
-- Never expose secret keys to the browser.
-
-Emails are sent via your existing Resend account. Verify the from-domain (`RompfortheRescues.org`) in Resend.
-No form data is stored anywhere.
+## Stripe & Resend
+- Use Stripe **test** keys for the demo.
+- Domain `RompfortheRescues.org` must be verified in Resend so `donotreply@…` works.
+- All receipts are also CC’d to `rompfortherescues@gmail.com`.
