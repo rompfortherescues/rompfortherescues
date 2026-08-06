@@ -1,0 +1,7 @@
+I have an account on github that i want to create an empty repository called rompfortherescues.
+
+I have a directory on my pc at "C:\Users\roger\OneDrive\Documents\Rebeccas Website\rompfortherescues" that has all the code that I want in
+that repository.  That structure is not under control of GitHub.
+
+Can you give me instructions to accomplish this.
+
