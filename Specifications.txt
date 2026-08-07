@@ -11,7 +11,7 @@ button.  The "register" button collects the person(s) email and other informatio
 send them an email receipt (once their payment is accepted) to bring to the event.  Email subject is "receipt" and be from 
                     "donotreply@RompfortheRescues.org" 
 and have a cc to RompfortheRescues@gmail.com.  
-The email has event data in the body. No information is stored.  Payments will be handled by Stripe.  For now just make a demo version.
+The email has event data in the body. No information is stored.  Payments will be handled by Stripe.  
 
 Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to 
 volunteer, but an email receipt should be sent to the volunteer from "donotreply@RompfortheRescues.org" with a cc to 
