@@ -10,7 +10,3 @@ FROM_NAME   = "rompfortherescues.org"
 REPLY_TO    = "rompfortherescues@gmail.com"
 BCC_EMAIL   = "rogerdtinsley@gmail.com"
 
-[secrets]
-required = ["RESEND_API_KEY"]
-#required = ["STRIPE_SECRET_KEY"]
-required = ["STRIPE_WEBHOOK_SECRET"]
