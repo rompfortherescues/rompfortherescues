@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Romp for the Rescues</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1 id="org-name">Romp for the Rescues</h1>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#events">Events</a>
+      <a href="#charities">Charities</a>
+      <a href="#volunteer">Volunteer</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home">
+      <p id="description"></p>
+    </section>
+
+    <section id="events">
+      <h2>Upcoming Events</h2>
+      <div id="events-list" class="card-grid"></div>
+    </section>
+
+    <section id="charities">
+      <h2>Affiliated Charities</h2>
+      <p>Support these organizations directly. Each event raises funds for one or more of them.</p>
+      <div id="charities-list" class="card-grid"></div>
+    </section>
+
+    <section id="payments">
+      <h2>Payment Methods</h2>
+      <ul id="payment-methods"></ul>
+      <p class="note">Event registrations are processed securely via Stripe (card). Charity donations use the links on each charity card above (their own pages accept the methods listed). Administration donations can be arranged by contacting us.</p>
+    </section>
+
+    <section id="volunteer">
+      <h2>Volunteer</h2>
+      <p>Sign up for a specific event or for general help. No fee. We only use the information to send you a confirmation email (and a copy to ourselves for planning).</p>
+      <form id="volunteer-form">
+        <label>Full Name * <input type="text" name="name" required></label>
+        <label>Email * <input type="email" name="email" required></label>
+        <label>Phone <span id="phone-req-label">(optional for specific events)</span>
+          <input type="tel" name="phone" id="vol-phone">
+        </label>
+        <label>Event (leave as General for non-event volunteering)
+          <select name="event" id="vol-event">
+            <option value="">General (no specific event)</option>
+          </select>
+        </label>
+        <label>Duty preference (e.g. setup, cleanup, registration table, general help)
+          <input type="text" name="duty" placeholder="Optional">
+        </label>
+        <button type="submit" class="btn turquoise">Submit Volunteer Signup</button>
+      </form>
+      <div id="volunteer-message" class="message"></div>
+    </section>
+  </main>
+
+  <!-- Registration modal -->
+  <div id="register-modal" class="modal" hidden>
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Register for <span id="reg-event-name"></span></h3>
+      <p id="reg-event-details"></p>
+      <form id="register-form">
+        <input type="hidden" name="eventName">
+        <input type="hidden" name="eventDate">
+        <input type="hidden" name="eventTime">
+        <input type="hidden" name="eventLocation">
+        <input type="hidden" name="eventFee">
+        <input type="hidden" name="eventType">
+        <label>Full Name * <input type="text" name="name" required></label>
+        <label>Email * <input type="email" name="email" required></label>
+        <label>Number of tickets * <input type="number" name="quantity" min="1" value="1" required></label>
+        <button type="submit" class="btn pink">Proceed to Payment</button>
+      </form>
+      <div id="register-message" class="message"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; Romp for the Rescues · Supporting animal charities through fun events</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
