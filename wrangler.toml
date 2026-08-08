@@ -12,5 +12,5 @@ BCC_EMAIL   = "rogerdtinsley@gmail.com"
 
 [secrets]
 required = ["RESEND_API_KEY"]
-required = ["STRIPE_SECRET_KEY"]
-required = ["STRIPE_WEBHOOK_SECRET"]
+# required = ["STRIPE_SECRET_KEY"]
+# required = ["STRIPE_WEBHOOK_SECRET"]
