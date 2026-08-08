@@ -1,3 +1,16 @@
 name = "rompfortherescues"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "."
+
+[vars]
+# Non-secret config
+FROM_EMAIL  = "hello@rompfortherescues.org"
+CC_EMAIL    = "rompfortherescues@gmail.com"
+FROM_NAME   = "rompfortherescues.org"
+REPLY_TO    = "rompfortherescues@gmail.com"
+BCC_EMAIL   = "rogerdtinsley@gmail.com"
+
+[secrets]
+required = [RESEND_API_KEY]
+required = [STRIPE_SECRET_KEY]
+required = [STRIPE_WEBHOOK_SECRET]

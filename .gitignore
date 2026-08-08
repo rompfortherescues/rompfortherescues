@@ -1,6 +1,7 @@
 .dev.vars
 .env
 .env.*
+.DS_Store
 !.env.example
 !.dev.vars.example
 node_modules/

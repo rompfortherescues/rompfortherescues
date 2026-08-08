@@ -1,54 +1,37 @@
-import { sendEmail } from '../lib/email.js';
+import { Resend } from 'resend';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-
   try {
-    const data = await request.json();
-    const { name, email, phone = '', duty = '', notes = '', event } = data;
+    const body = await request.json();
+    const resend = new Resend(env.RESEND_API_KEY);
 
-    if (!name || !email) {
-      return json({ error: 'Name and email are required' }, 400);
-    }
+    const eventLine = body.eventName
+      ? `<p><strong>Event:</strong> ${body.eventName}</p>`
+      : `<p><strong>Event:</strong> General / No specific event</p>`;
 
-    const isGeneral = !event || !event.name;
-    if (isGeneral && !phone) {
-      return json({ error: 'Telephone is required for general volunteering' }, 400);
-    }
+    const html = `
+      <h2>Volunteer Confirmation – Romp for the Rescues</h2>
+      <p>Thank you for volunteering!</p>
+      ${eventLine}
+      <p><strong>Name:</strong> ${body.name}</p>
+      <p><strong>Email:</strong> ${body.email}</p>
+      <p><strong>Phone:</strong> ${body.phone || '—'}</p>
+      <p><strong>Preferred Duty:</strong> ${body.duty || 'Any / General'}</p>
+      <p><strong>Notes:</strong> ${body.notes || '—'}</p>
+      <p>Please bring this email (or a screenshot) if needed. See you there!</p>
+    `;
 
-    let body = `Thank you for volunteering with Romp for the Rescues!\n\n`;
-    body += `Name: ${name}\n`;
-    body += `Email: ${email}\n`;
-    body += `Phone: ${phone || 'N/A'}\n`;
-    body += `Preferred Duty: ${duty || 'General'}\n`;
-
-    if (event && event.name) {
-      body += `Event: ${event.name}\n`;
-      body += `Date: ${event.date || ''} ${event.time || ''}\n`;
-    } else {
-      body += `Event: General / Any event\n`;
-    }
-
-    if (notes) body += `Notes: ${notes}\n`;
-    body += `\nWe look forward to your help!\n\nRomp for the Rescues`;
-
-    await sendEmail(env, {
-      from: 'donotreply@RompfortheRescues.org',
-      to: [email],
-      cc: ['rompfortherescues@gmail.com'],
-      subject: 'Volunteer Registration Receipt',
-      text: body
+    await resend.emails.send({
+      from: env.FROM_EMAIL || 'donotreply@RompfortheRescues.org',
+      to: body.email,
+      cc: env.CC_EMAIL || 'rompfortherescues@gmail.com',
+      subject: 'receipt',
+      html
     });
 
-    return json({ success: true });
+    return Response.json({ ok: true });
   } catch (err) {
-    return json({ error: err.message || 'Server error' }, 500);
+    return Response.json({ error: err.message }, { status: 500 });
   }
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
 }

@@ -1,15 +1,15 @@
-import { sendEmail } from '../lib/email.js';
-import { constructEvent } from '../lib/stripe-verify.js';
+import Stripe from 'stripe';
+import { Resend } from 'resend';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-
-  const payload = await request.text();
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY);
   const sig = request.headers.get('stripe-signature');
+  const body = await request.text();
 
   let event;
   try {
-    event = await constructEvent(payload, sig, env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(body, sig, env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
@@ -17,36 +17,34 @@ export async function onRequestPost(context) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const meta = session.metadata || {};
-
-    if (meta.type === 'registration') {
-      const body = `Thank you for registering for a Romp for the Rescues event!\n\n` +
-        `Event: ${meta.event_name || ''}\n` +
-        `Date: ${meta.event_date || ''} ${meta.event_time || ''}\n` +
-        `Fee: ${meta.event_fee || ''}\n` +
-        `Quantity: ${meta.quantity || '1'}\n` +
-        `Name: ${meta.name || ''}\n` +
-        `Email: ${meta.email || ''}\n` +
-        `Phone: ${meta.phone || 'N/A'}\n\n` +
-        `Please bring this receipt (or show this email) to the event.\n\n` +
-        `Romp for the Rescues`;
-
-      try {
-        await sendEmail(env, {
-          from: 'donotreply@RompfortheRescues.org',
-          to: [meta.email],
-          cc: ['RompfortheRescues@gmail.com'],
-          subject: 'receipt',
-          text: body
-        });
-      } catch (emailErr) {
-        console.error('Email send failed', emailErr);
-        // Still return 200 so Stripe does not retry endlessly
-      }
+    if (meta.type !== 'registration') {
+      return new Response('ok', { status: 200 });
     }
+
+    const resend = new Resend(env.RESEND_API_KEY);
+    const amount = (session.amount_total / 100).toFixed(2);
+    const html = `
+      <h2>Registration Receipt – Romp for the Rescues</h2>
+      <p>Thank you for registering and supporting animal charities!</p>
+      <p><strong>Event:</strong> ${meta.eventName || '—'}</p>
+      <p><strong>Name:</strong> ${meta.name || '—'}</p>
+      <p><strong>Email:</strong> ${meta.email || session.customer_email}</p>
+      <p><strong>Phone:</strong> ${meta.phone || '—'}</p>
+      <p><strong>Attendees:</strong> ${meta.attendees || '1'}</p>
+      <p><strong>Amount Paid:</strong> $${amount} ${session.currency?.toUpperCase() || 'USD'}</p>
+      <p><strong>Notes:</strong> ${meta.notes || '—'}</p>
+      <p><strong>Stripe Session:</strong> ${session.id}</p>
+      <p>Please bring this email (or a screenshot) to the event as your receipt.</p>
+    `;
+
+    await resend.emails.send({
+      from: env.FROM_EMAIL || 'donotreply@RompfortheRescues.org',
+      to: meta.email || session.customer_email,
+      cc: env.CC_EMAIL || 'rompfortherescues@gmail.com',
+      subject: 'receipt',
+      html
+    });
   }
 
-  return new Response(JSON.stringify({ received: true }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' }
-  });
+  return new Response('ok', { status: 200 });
 }

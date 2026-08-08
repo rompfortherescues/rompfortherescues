@@ -24,7 +24,7 @@ The form for general volunteering (no specific event) and the form for specific 
 be the same form except the information on the specific event will be missing from the general volunteering and the phone number will not
 be optional on the general volunteering.
 
-Emails will be sent using an existing Resend account.
+Emails will be sent using an existing Resend account.  "rompfortherescues.org" is already a verified domain in my resend account.
 
 Each of the Charities can receive donations, or donations can be made for administration.
 Donations for specific charities will be accomplished by linking to their appropriate web pages for donations (see data.XML file <PayLink>.
@@ -32,7 +32,7 @@ Donations use the Payment Methods.
 
 Keep the javascript, style sheets, and index.html file in separate files.  I already have an XML file named data.xml, so refer to that 
 file in the code.
-Keep environment variables in a separate file for testing that will not be pushed to the origin of github.
+Environment variables for testing are in dev.vars file.  Include contents of this file along with changes that are to be made.
 
 make the theme a pink and turquoise one.
 
