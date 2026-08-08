@@ -1,200 +1,188 @@
-const STRIPE_PK = window.STRIPE_PUBLISHABLE_KEY || ''; // injected or set via env in production if needed
-let stripe = null;
-let data = null;
-
-document.getElementById('year').textContent = new Date().getFullYear();
-
-async function loadData() {
+document.addEventListener('DOMContentLoaded', async () => {
   const res = await fetch('/data.xml');
   const text = await res.text();
   const parser = new DOMParser();
-  data = parser.parseFromString(text, 'application/xml');
-  renderEvents();
-  renderCharities();
-}
+  const xml = parser.parseFromString(text, 'text/xml');
 
-function renderEvents() {
-  const container = document.getElementById('events-list');
-  const events = [...data.querySelectorAll('event')];
-  if (!events.length) {
-    container.innerHTML = '<p>No upcoming events yet.</p>';
-    return;
-  }
-  container.innerHTML = events.map(ev => {
-    const id = ev.getAttribute('id') || '';
-    const name = ev.querySelector('name')?.textContent || '';
-    const date = ev.querySelector('date')?.textContent || '';
-    const time = ev.querySelector('time')?.textContent || '';
-    const loc = ev.querySelector('location')?.textContent || '';
-    const desc = ev.querySelector('description')?.textContent || '';
-    const price = ev.querySelector('price')?.textContent || '0';
-    const charities = ev.querySelector('charities')?.textContent || '';
-    return `
-      <div class="card" data-id="${id}">
-        <h3>${name}</h3>
-        <p><strong>${date}</strong> ${time ? '· ' + time : ''}</p>
-        <p>${loc}</p>
-        <p>${desc}</p>
-        <p><em>Supports: ${charities}</em></p>
-        <p><strong>$${price}</strong> per person</p>
-        <button class="btn btn-register" data-action="register"
-          data-id="${id}" data-name="${name}" data-price="${price}">Register</button>
-        <button class="btn btn-volunteer" data-action="volunteer"
-          data-id="${id}" data-name="${name}"
-          data-duties="${ev.querySelector('duties')?.textContent || ''}">Volunteer</button>
-      </div>`;
-  }).join('');
-}
+  // Org name & description
+  const record = xml.querySelector('Record');
+  document.getElementById('org-name').textContent = record.getAttribute('name') || 'Romp for the Rescues';
+  document.getElementById('description').textContent = record.querySelector('Description')?.textContent || '';
 
-function renderCharities() {
-  const container = document.getElementById('charities-list');
-  const charities = [...data.querySelectorAll('charity')];
-  container.innerHTML = charities.map(c => {
-    const name = c.querySelector('name')?.textContent || '';
-    const desc = c.querySelector('description')?.textContent || '';
-    const web = c.querySelector('website')?.textContent || '';
-    const pay = c.querySelector('PayLink')?.textContent || '';
-    return `
-      <div class="card">
-        <h3>${name}</h3>
-        <p>${desc}</p>
-        ${web ? `<p><a href="${web}" target="_blank" rel="noopener">Website</a></p>` : ''}
-        ${pay ? `<a class="btn btn-donate" href="${pay}" target="_blank" rel="noopener">Donate</a>` : ''}
-      </div>`;
-  }).join('');
+  // Events
+  const eventsList = document.getElementById('events-list');
+  const volEventSelect = document.getElementById('vol-event');
+  const events = xml.querySelectorAll('Event');
 
-  const adminPay = data.querySelector('admin PayLink')?.textContent;
-  const adminEl = document.getElementById('admin-donate');
-  if (adminPay) {
-    adminEl.innerHTML = `<a class="btn btn-donate" href="${adminPay}" target="_blank">Donate for Administration</a>`;
-  } else {
-    adminEl.innerHTML = `<p><em>Administration donations can be made via event registration surplus or contact us.</em></p>`;
-  }
-}
+  events.forEach((ev, idx) => {
+    const name = ev.getAttribute('name') || 'Event';
+    const date = ev.getAttribute('date') || '';
+    const time = ev.getAttribute('time') || '';
+    const type = ev.getAttribute('type') || '';
+    const fee = ev.getAttribute('fee') || '$0';
+    const locations = Array.from(ev.querySelectorAll('Location')).map(l => l.textContent).join(' · ');
+    const desc = ev.querySelector('Description')?.textContent || '';
+    const charity = ev.querySelector('Charity')?.textContent || '';
 
-// Modal helpers
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    // Card
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${name}</h3>
+      <p class="meta"><strong>${date}</strong> · ${time} · ${type}</p>
+      <p class="meta">📍 ${locations}</p>
+      <p>${desc}</p>
+      <p class="meta">Supporting: <em>${charity}</em></p>
+      <p class="meta"><strong>Fee:</strong> ${fee} per person</p>
+      <button class="btn pink register-btn" data-idx="${idx}">Register</button>
+      <button class="btn turquoise volunteer-btn" data-idx="${idx}">Volunteer</button>
+    `;
+    eventsList.appendChild(card);
 
-document.querySelectorAll('[data-close]').forEach(el => {
-  el.addEventListener('click', () => closeModal(el.dataset.close));
-});
-
-// Event delegation for Register / Volunteer buttons
-document.getElementById('events-list').addEventListener('click', e => {
-  const btn = e.target.closest('button[data-action]');
-  if (!btn) return;
-  const action = btn.dataset.action;
-  const id = btn.dataset.id;
-  const name = btn.dataset.name;
-
-  if (action === 'register') {
-    document.getElementById('reg-title').textContent = `Register – ${name}`;
-    document.getElementById('reg-event-id').value = id;
-    document.getElementById('reg-event-name').value = name;
-    document.getElementById('reg-price').value = btn.dataset.price;
-    openModal('register-modal');
-  } else if (action === 'volunteer') {
-    openVolunteerForm({ id, name, duties: btn.dataset.duties, requiredPhone: false });
-  }
-});
-
-document.getElementById('btn-general-volunteer').addEventListener('click', () => {
-  openVolunteerForm({ id: '', name: '', duties: '', requiredPhone: true });
-});
-
-function openVolunteerForm({ id, name, duties, requiredPhone }) {
-  document.getElementById('vol-title').textContent = name
-    ? `Volunteer – ${name}`
-    : 'General Volunteer Sign-up';
-  document.getElementById('vol-event-id').value = id;
-  document.getElementById('vol-event-name').value = name;
-  const field = document.getElementById('vol-event-field');
-  const display = document.getElementById('vol-event-display');
-  if (name) {
-    field.style.display = 'block';
-    display.value = name;
-  } else {
-    field.style.display = 'none';
-  }
-  const phone = document.getElementById('vol-phone');
-  const label = document.getElementById('vol-phone-label');
-  if (requiredPhone) {
-    phone.required = true;
-    label.textContent = 'Phone *';
-  } else {
-    phone.required = false;
-    label.textContent = 'Phone (optional)';
-  }
-  // populate duties
-  const sel = document.getElementById('vol-duty');
-  sel.innerHTML = '<option value="">— Any / General —</option>';
-  (duties || '').split(',').map(d => d.trim()).filter(Boolean).forEach(d => {
+    // Volunteer select option
     const opt = document.createElement('option');
-    opt.value = d;
-    opt.textContent = d;
-    sel.appendChild(opt);
-  });
-  openModal('volunteer-modal');
-}
+    opt.value = name;
+    opt.textContent = `${name} (${date})`;
+    volEventSelect.appendChild(opt);
 
-// Register form → create Stripe Checkout Session
-document.getElementById('register-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const form = e.target;
-  const fd = new FormData(form);
-  const body = {
-    eventId: document.getElementById('reg-event-id').value,
-    eventName: document.getElementById('reg-event-name').value,
-    price: document.getElementById('reg-price').value,
-    name: fd.get('name'),
-    email: fd.get('email'),
-    phone: fd.get('phone') || '',
-    attendees: fd.get('attendees'),
-    notes: fd.get('notes') || ''
-  };
-
-  const res = await fetch('/api/create-checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    // Store data for buttons
+    card.querySelector('.register-btn').addEventListener('click', () => openRegisterModal({
+      name, date, time, locations, fee, type, desc, charity
+    }));
+    card.querySelector('.volunteer-btn').addEventListener('click', () => {
+      volEventSelect.value = name;
+      updatePhoneRequired();
+      document.getElementById('volunteer').scrollIntoView({ behavior: 'smooth' });
+    });
   });
-  const data = await res.json();
-  if (data.url) {
-    window.location = data.url; // Stripe Checkout
-  } else {
-    alert(data.error || 'Could not start payment');
+
+  // Charities
+  const charitiesList = document.getElementById('charities-list');
+  xml.querySelectorAll('Charity').forEach(ch => {
+    const name = ch.getAttribute('name') || '';
+    const desc = ch.querySelector('Description')?.textContent || '';
+    const website = ch.querySelector('Website')?.textContent || '#';
+    const payLink = ch.querySelector('PayLink')?.textContent || '#';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${name}</h3>
+      <p>${desc}</p>
+      <a href="${website}" target="_blank" rel="noopener" class="btn outline">Website</a>
+      <a href="${payLink}" target="_blank" rel="noopener" class="btn pink">Donate</a>
+    `;
+    charitiesList.appendChild(card);
+  });
+
+  // Payment methods
+  const pmList = document.getElementById('payment-methods');
+  xml.querySelectorAll('PaymentMethods Method').forEach(m => {
+    const li = document.createElement('li');
+    li.textContent = m.textContent;
+    pmList.appendChild(li);
+  });
+
+  // Volunteer form phone required logic
+  const phoneInput = document.getElementById('vol-phone');
+  const phoneLabel = document.getElementById('phone-req-label');
+  function updatePhoneRequired() {
+    const isGeneral = !volEventSelect.value;
+    phoneInput.required = isGeneral;
+    phoneLabel.textContent = isGeneral ? '(required for general volunteering)' : '(optional for specific events)';
   }
-});
+  volEventSelect.addEventListener('change', updatePhoneRequired);
+  updatePhoneRequired();
 
-// Volunteer form → email only
-document.getElementById('volunteer-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const form = e.target;
-  const fd = new FormData(form);
-  const body = {
-    eventId: document.getElementById('vol-event-id').value,
-    eventName: document.getElementById('vol-event-name').value,
-    name: fd.get('name'),
-    email: fd.get('email'),
-    phone: fd.get('phone') || '',
-    duty: fd.get('duty') || '',
-    notes: fd.get('notes') || ''
-  };
+  // Volunteer submit
+  document.getElementById('volunteer-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const msg = document.getElementById('volunteer-message');
+    msg.className = 'message';
+    msg.style.display = 'none';
 
-  const res = await fetch('/api/volunteer', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    const data = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      phone: form.phone.value.trim(),
+      event: form.event.value || 'General (no specific event)',
+      duty: form.duty.value.trim() || 'None specified'
+    };
+
+    try {
+      const r = await fetch('/api/volunteer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await r.json();
+      if (r.ok) {
+        msg.textContent = 'Thank you! A confirmation email has been sent.';
+        msg.className = 'message success';
+        form.reset();
+        updatePhoneRequired();
+      } else {
+        throw new Error(result.error || 'Failed');
+      }
+    } catch (err) {
+      msg.textContent = 'Error: ' + err.message;
+      msg.className = 'message error';
+    }
   });
-  const data = await res.json();
-  if (data.ok) {
-    alert('Thank you! A confirmation email has been sent.');
-    closeModal('volunteer-modal');
-    form.reset();
-  } else {
-    alert(data.error || 'Submission failed');
-  }
-});
 
-loadData().catch(console.error);
+  // Register modal
+  const modal = document.getElementById('register-modal');
+  const regForm = document.getElementById('register-form');
+  document.querySelector('.close').addEventListener('click', () => modal.hidden = true);
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.hidden = true; });
+
+  function openRegisterModal(ev) {
+    document.getElementById('reg-event-name').textContent = ev.name;
+    document.getElementById('reg-event-details').textContent =
+      `${ev.date} · ${ev.time} · ${ev.locations} · Fee ${ev.fee}`;
+    regForm.eventName.value = ev.name;
+    regForm.eventDate.value = ev.date;
+    regForm.eventTime.value = ev.time;
+    regForm.eventLocation.value = ev.locations;
+    regForm.eventFee.value = ev.fee;
+    regForm.eventType.value = ev.type;
+    modal.hidden = false;
+  }
+
+  regForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('register-message');
+    msg.className = 'message';
+    msg.style.display = 'none';
+
+    const data = {
+      name: regForm.name.value.trim(),
+      email: regForm.email.value.trim(),
+      quantity: parseInt(regForm.quantity.value, 10) || 1,
+      eventName: regForm.eventName.value,
+      eventDate: regForm.eventDate.value,
+      eventTime: regForm.eventTime.value,
+      eventLocation: regForm.eventLocation.value,
+      eventFee: regForm.eventFee.value,
+      eventType: regForm.eventType.value
+    };
+
+    try {
+      const r = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await r.json();
+      if (r.ok && result.url) {
+        window.location.href = result.url;
+      } else {
+        throw new Error(result.error || 'Could not start payment');
+      }
+    } catch (err) {
+      msg.textContent = 'Error: ' + err.message;
+      msg.className = 'message error';
+    }
+  });
+});

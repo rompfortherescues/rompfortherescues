@@ -1,37 +1,58 @@
-import { Resend } from 'resend';
-
 export async function onRequestPost(context) {
   const { request, env } = context;
   try {
-    const body = await request.json();
-    const resend = new Resend(env.RESEND_API_KEY);
+    const data = await request.json();
+    const { name, email, phone, event, duty } = data;
 
-    const eventLine = body.eventName
-      ? `<p><strong>Event:</strong> ${body.eventName}</p>`
-      : `<p><strong>Event:</strong> General / No specific event</p>`;
+    if (!name || !email) {
+      return Response.json({ error: 'Name and email required' }, { status: 400 });
+    }
+
+    const isGeneral = !event || event.startsWith('General');
+    if (isGeneral && !phone) {
+      return Response.json({ error: 'Phone is required for general volunteering' }, { status: 400 });
+    }
 
     const html = `
-      <h2>Volunteer Confirmation – Romp for the Rescues</h2>
-      <p>Thank you for volunteering!</p>
-      ${eventLine}
-      <p><strong>Name:</strong> ${body.name}</p>
-      <p><strong>Email:</strong> ${body.email}</p>
-      <p><strong>Phone:</strong> ${body.phone || '—'}</p>
-      <p><strong>Preferred Duty:</strong> ${body.duty || 'Any / General'}</p>
-      <p><strong>Notes:</strong> ${body.notes || '—'}</p>
-      <p>Please bring this email (or a screenshot) if needed. See you there!</p>
+      <h2>Volunteer Registration</h2>
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+      <p><strong>Phone:</strong> ${escapeHtml(phone || 'Not provided')}</p>
+      <p><strong>Event:</strong> ${escapeHtml(event)}</p>
+      <p><strong>Duty preference:</strong> ${escapeHtml(duty || 'None specified')}</p>
+      <p>Thank you for offering to help Romp for the Rescues!</p>
     `;
 
-    await resend.emails.send({
-      from: env.FROM_EMAIL || 'donotreply@RompfortheRescues.org',
-      to: body.email,
-      cc: env.CC_EMAIL || 'rompfortherescues@gmail.com',
-      subject: 'receipt',
-      html
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'donotreply@RompfortheRescues.org',
+        to: [email],
+        cc: ['rompfortherescues@gmail.com'],
+        subject: 'Volunteer Registration Confirmation',
+        html
+      })
     });
 
-    return Response.json({ ok: true });
+    if (!resendRes.ok) {
+      const err = await resendRes.json();
+      return Response.json({ error: err.message || 'Email failed' }, { status: 500 });
+    }
+
+    return Response.json({ success: true });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

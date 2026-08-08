@@ -3,47 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registration Successful – Romp for the Rescues</title>
+  <title>Registration Successful · Romp for the Rescues</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
     <h1>Romp for the Rescues</h1>
   </header>
-  <main class="success-page">
-    <div id="success-message" class="card">
-      <h2>Processing your registration…</h2>
-      <p>Please wait a moment while we confirm payment and send your receipt.</p>
-    </div>
+  <main style="text-align:center; padding:3rem 1rem;">
+    <h2 style="color:var(--turquoise-dark);">Thank you!</h2>
+    <p>Your payment was successful. A receipt email has been sent to you (please check spam too).</p>
+    <p>Bring the email receipt to the event.</p>
+    <a href="/" class="btn turquoise" style="margin-top:1.5rem;">Back to Home</a>
   </main>
-  <script>
-    (async () => {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get('session_id');
-      const msg = document.getElementById('success-message');
-
-      if (!sessionId) {
-        msg.innerHTML = '<h2>Missing session</h2><p><a href="/">Return home</a></p>';
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/confirm-payment?session_id=${encodeURIComponent(sessionId)}`);
-        const data = await res.json();
-        if (data.ok) {
-          msg.innerHTML = `
-            <h2>Thank you!</h2>
-            <p>Your payment was successful. A receipt has been emailed to you.</p>
-            <p>Please bring the email (or a screenshot) to the event.</p>
-            <p><a href="/" class="btn btn-turquoise">Back to Home</a></p>`;
-        } else {
-          msg.innerHTML = `<h2>Something went wrong</h2><p>${data.error || 'Please contact us.'}</p>
-            <p><a href="/">Return home</a></p>`;
-        }
-      } catch (e) {
-        msg.innerHTML = `<h2>Error</h2><p>Could not confirm payment. <a href="/">Return home</a></p>`;
-      }
-    })();
-  </script>
 </body>
 </html>
