@@ -1,20 +1,30 @@
 I have a domain named "RompfortheRescues.org" with Cloudflare.  Use Cloudfare exclusively for hosting this project.
-There is a folder on my pc at "C:\Users\roger\OneDrive\Documents\RebeccasWebsite\rompfortherescues" that i want you to reference 
-when i specifically specify a file name.
+
+
+My local github repo is at "C:\Users\roger\OneDrive\Documents\RebeccasWebsite\rompfortherescues".  It was cloned from the dev branch of the rompfortherescues main repo.
 
 I would like a web site that handles an organization that puts on events to help fund a number of charities that deal with animals.
+
 There should be a navigation row at the top of the page (after title) with links to Events, Charities, and a link to volunteer in general
-rather than to a specific event.
+rather than to a specific event.  The background for this navigation row should be the file at /images/banner.jpg.
+
+Payments will be handled by Stripe.  Successful payments should send an email to the payer and also to "rompfortherescues.gmail.com" which is the main email for the
+business defined in the stripe account.  If you can show me sample emails for both buyer and seller it would be helpful.  Alternativly can you define what information 
+is possible to include in the stripe originated emails.
+
+It is my understanding that stripe will not allow you to turn on emails until the company has been verified, which includes visiting the company web site, which is 
+what I'm constructing.  This appears to be a roadblock to initiating the site and may require that it be turned on without testing.
 
 In addition to hosting events, links to affiliated charities are on the page to encourage donations directly to the charities.
 
 There is file - data.xml - that defines all the charities, events and other information.  The page should read it to get its data.
 
 Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
-button.  The "register" button collects the person(s) email and other information, then links to stripe to accept the payment. We want to
+button.  The "register" button collects the person(s) email and other information, then links to stripe to accept the payment. We want stripe to
 send them an email receipt (once their payment is accepted) to bring to the event.  Email subject is "receipt" and be from 
-"hello@RompfortheRescues.org" and have a cc to RompfortheRescues@gmail.com.  
-The email has event data in the body. No information is stored.  Payments will be handled by Stripe.  
+"hello@RompfortheRescues.org".  Since stripe cannot have a cc to the receipt email, the switch to send emails from stripe should be se to on, so that we can be notified
+that a payment has occurred.
+The email has event data in the body. No information is stored.  
 
 Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to 
 volunteer, but an email receipt should be sent to the volunteer from "donotreply@RompfortheRescues.org" with a cc to 
