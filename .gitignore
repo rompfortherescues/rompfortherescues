@@ -3,7 +3,7 @@
 .env.*
 .DS_Store
 !.env.example
-!.dev.vars.example
+!.dev.vars.*
 node_modules/
 .wrangler/
 dist/

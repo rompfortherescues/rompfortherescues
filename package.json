@@ -1,16 +1,8 @@
 {
   "name": "rompfortherescues",
   "private": true,
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "wrangler pages dev . --port 8788",
-    "deploy": "wrangler pages deploy ."
-  },
   "dependencies": {
     "resend": "^4.0.0",
-    "stripe": "^17.0.0"
-  },
-  "devDependencies": {
-    "wrangler": "^3.0.0"
+    "stripe": "^16.0.0"
   }
 }
