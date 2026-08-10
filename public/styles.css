@@ -26,14 +26,16 @@ header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
   justify-content: center;
   gap: 2rem;
   padding: 1rem;
-  background-image: url('/images/banner.png');
+  background-image: url('/images/banner.jpg');
   background-size: cover;
   background-position: center;
-  background-color: var(--turquoise-dark); /* fallback */
+  background-repeat: no-repeat;
+  background-color: #00ced1; /* turquoise fallback so you always see something */
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  min-height: 60px; /* ensures the bar has height even if image is slow */
 }
 #main-nav a {
   color: white;

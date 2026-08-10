@@ -6,7 +6,7 @@ My local github repo is at "C:\Users\roger\OneDrive\Documents\RebeccasWebsite\ro
 I would like a web site that handles an organization that puts on events to help fund a number of charities that deal with animals.
 
 There should be a navigation row at the top of the page (after title) with links to Events, Charities, and a link to volunteer in general
-rather than to a specific event.  The background for this navigation row should be the file at /images/banner.jpg.
+rather than to a specific event.  The background for this navigation row should be the file at /images/banner.png.
 
 Payments will be handled by Stripe.  Successful payments should send an email to the payer and also to "rompfortherescues.gmail.com" which is the main email for the
 business defined in the stripe account.  If you can show me sample emails for both buyer and seller it would be helpful.  Alternativly can you define what information 
