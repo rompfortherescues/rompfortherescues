@@ -17,47 +17,61 @@ body {
 }
 
 /* Banner – first item on the page */
+/* Full banner – no cropping */
 .banner {
   width: 100%;
-  max-height: 320px;
-  overflow: hidden;
+  line-height: 0;
   background: linear-gradient(90deg, #ff69b4, #40e0d0);
-  line-height: 0;          /* removes any gap under the image */
 }
 .banner img {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: cover;
-  max-height: 320px;
+  /* no max-height, no object-fit: cover */
 }
 
-/* Navigation – centered */
-nav {
-  display: flex;
-  justify-content: center;   /* centers the links */
-  align-items: center;
-  gap: 2rem;
-  padding: 1rem;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-nav a {
-  text-decoration: none;
-  color: var(--pink);
-  font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  border-radius: 20px;
-  transition: all 0.25s;
-}
-
-nav a:hover {
-  background: var(--turquoise);
+/* Title + Navigation share the same gradient */
+header {
+  text-align: center;
+  padding: 1.5rem 1rem 0;
+  background: linear-gradient(135deg, #ff6b9d, #40e0d0);
   color: white;
+}
+header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.4rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+#tagline {
+  font-weight: 300;
+  margin-bottom: 1.2rem;
+  opacity: 0.95;
+}
+
+/* Navigation sits under the title, same color scheme */
+header nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.8rem 1rem 1.2rem;
+  background: transparent;          /* inherits the header gradient */
+}
+
+header nav a {
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1.3rem;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.18);
+  transition: all 0.25s;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+header nav a:hover {
+  background: white;
+  color: #e91e63;                   /* pink on hover */
 }
 
 header {
