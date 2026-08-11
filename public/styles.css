@@ -8,11 +8,21 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body {\.banner {
+
+body {
+  font-family: system-ui, -apple-system, 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Banner – first item on the page */
+.banner {
   width: 100%;
   max-height: 320px;
   overflow: hidden;
   background: linear-gradient(90deg, #ff69b4, #40e0d0);
+  line-height: 0;          /* removes any gap under the image */
 }
 .banner img {
   width: 100%;
@@ -21,11 +31,35 @@ body {\.banner {
   object-fit: cover;
   max-height: 320px;
 }
-  font-family: system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
+
+/* Navigation – centered */
+nav {
+  display: flex;
+  justify-content: center;   /* centers the links */
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
+
+nav a {
+  text-decoration: none;
+  color: var(--pink);
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  transition: all 0.25s;
+}
+
+nav a:hover {
+  background: var(--turquoise);
+  color: white;
+}
+
 header {
   text-align: center;
   padding: 2rem 1rem 1rem;
@@ -33,6 +67,8 @@ header {
   color: white;
 }
 header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+/* … keep the rest of your existing styles below this … */
 #main-nav {
   display: flex;
   justify-content: center;
