@@ -41,6 +41,10 @@ what I'm constructing.  This appears to be a roadblock to initiating the site an
 
 There is file - data.xml - that defines all the charities, events and other information.  The page should read it to get its data.
 
+When displaying an event, use individual lines for each <Location> element.
+
+Events also have items that are <Included> when you register.  These should be listed separately for each event if it has them.
+
 Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
 button.  The "register" button links to stripe to accept the payment.Stripe should send them an email receipt (once their payment is accepted) to bring to the event.  
 Email subject is "receipt" and be from "hello@RompfortheRescues.org".  
@@ -70,43 +74,5 @@ either the wrangler.toml file or in cloudflare.
 
 Include all instructions to establish the webhook in stripe to process successful payments so we can send them an email.
 
-the data.xml file = <?xml version="1.0" encoding="UTF-8"?>
-"<?xml version="1.0" encoding="UTF-8"?>
-<Record name="Romp for the Rescues">
-  <Description>Fun events that raise funds for animal charities.</Description>
-
-  <Events>
-    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00" for="Coozie">
-      <Location>Mary's Restaurant on Main Street, Boynton Beach FL.</Location>
-      <Location>Sam's Bar on Main Street, Boynton Beach FL.</Location>
-      <Description>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
-      <Charity>Blessed Paws Animal Rescue</Charity>
-    </Event>
-  </Events>
-
-  <Charities>
-    <Charity name="Blessed Paws Animal Rescue">
-      <Description>Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</Description>
-      <Website>https://www.blessedpawsanimalrescue.com</Website>
-      <PayLink>https://www.blessedpawsanimalrescue.com/why-donate</PayLink>
-    </Charity>
-
-    <Charity name="Wild Whiskers">
-      <Description>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</Description>
-      <Website>https://www.wildwhiskers.org</Website>
-      <PayLink>https://www.wildwhiskers.org/how-to-help</PayLink>
-    </Charity>
-  </Charities>
-
-  <PaymentMethods>
-    <Method>Credit / Debit Card (Visa, MC, AMEX)</Method>
-    <Method>PayPal</Method>
-    <Method>Venmo</Method>
-    <Method>Zelle</Method>
-  </PaymentMethods>
-</Record>>"
-
-The .dev.vars fields are:
-"RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-STRIPE_WEBHOOK_SECRET=xxxxxxxxxxxxxx"
+the data.xml file can be seen at "rompfortherescues.pages.dev/public/data.xml 
+The .dev.vars fields can be seen at "rompfortherescues.pages.dev/public/dev.vars"

@@ -16,20 +16,19 @@ body {
   line-height: 1.5;
 }
 
-/* Banner – first item on the page */
-/* Banner – about 1 inch taller */
+/* Banner – keeps original height-to-width ratio */
 .banner {
   width: 100%;
-  max-height: 480px;   
   line-height: 0;
   background: linear-gradient(90deg, #ff69b4, #40e0d0);
+  /* removed max-height and overflow: hidden */
 }
 
 .banner img {
   width: 100%;
-  height: auto;
-  max-height: 480px;
+  height: auto;          /* ← this is the key */
   display: block;
+  /* removed height: 100%, max-height, object-fit, object-position */
 }
 /* Header (no title) + Navigation */
 header {
