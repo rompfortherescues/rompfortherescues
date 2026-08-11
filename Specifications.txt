@@ -9,7 +9,7 @@ WEBSITE
 
 The theme of the site should be a pink and turquoise one.
 
-The first item on the page is a picture to be used as a banner.
+The first item on the page is a picture to be used as a header - it includes the name of the organization.
 
 The next banner on the page is a navigation row with links to Events, Charities, and a link to volunteer in general rather than to a specific event.
 

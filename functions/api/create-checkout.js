@@ -42,14 +42,15 @@ export async function onRequestPost(context) {
         quantity
       }],
       metadata: {
-        event_name: event.name,
-        event_date: event.date,
-        event_time: event.time || '',
-        event_location: event.location || '',
-        event_charity: event.charity || '',
-        registrant_name: name,
-        registrant_phone: phone || '',
-        quantity: String(quantity)
+         type: 'registration',
+         event_name: event.name,
+         event_date: event.date,
+         event_time: event.time || '',
+         event_location: event.location || '',
+         event_charity: event.charity || '',
+         registrant_name: name,
+         registrant_phone: phone || '',
+         quantity: String(quantity)
       },
       success_url: `${origin}/?payment=success`,
       cancel_url: `${origin}/#events`,
