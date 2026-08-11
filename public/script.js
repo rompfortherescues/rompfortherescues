@@ -19,27 +19,37 @@ async function loadData() {
     // Events
     const eventsList = document.getElementById('events-list');
     eventsList.innerHTML = '';
-    xml.querySelectorAll('Event').forEach(ev => {
+    xml.querySelectorAll('Events > Event').forEach(ev => {
       const name = ev.getAttribute('name') || '';
       const date = ev.getAttribute('date') || '';
       const time = ev.getAttribute('time') || '';
       const type = ev.getAttribute('type') || '';
-      const fee = ev.getAttribute('fee') || '$10.00';
+      const fee = ev.getAttribute('fee') || '';
       const forWhom = ev.getAttribute('for') || '';
-      const locs = Array.from(ev.querySelectorAll('Location')).map(l => l.textContent.trim()).join(' · ');
-      const desc = ev.querySelector('Description')?.textContent?.trim() || '';
+      const locations = Array.from(ev.querySelectorAll('Location')).map(l => l.textContent.trim());
+      const description = ev.querySelector('Description')?.textContent?.trim() || '';
       const charity = ev.querySelector('Charity')?.textContent?.trim() || '';
+      const included = Array.from(ev.querySelectorAll('Included')).map(i => i.textContent.trim());
 
-      const eventObj = { name, date, time, type, fee, for: forWhom, location: locs, description: desc, charity };
+      const eventObj = {
+        name, date, time, type, fee, for: forWhom,
+        locations, description, charity, included
+      };
+
+      const locHtml = locations.map(l => `<p>${l}</p>`).join('');
+      const inclHtml = included.length
+        ? `<div class="included"><strong>Included with registration:</strong><ul>${included.map(i => `<li>${i}</li>`).join('')}</ul></div>`
+        : '';
 
       const card = document.createElement('div');
       card.className = 'event-card';
       card.innerHTML = `
         <h3>${name}</h3>
         <p><strong>${date}</strong> · ${time} · ${type}</p>
-        <p>${locs}</p>
-        <p>${desc}</p>
-        <p>Supports: <em>${charity}</em> · Fee: ${fee} (${forWhom})</p>
+        <div class="locations">${locHtml}</div>
+        <p>${description}</p>
+        ${inclHtml}
+        <p>Supports: <em>${charity}</em> · Fee: ${fee}${forWhom ? ` (${forWhom})` : ''}</p>
         <button class="btn btn-pink register-btn">Register</button>
         <button class="btn btn-turquoise volunteer-btn">Volunteer for this Event</button>
       `;
@@ -51,7 +61,7 @@ async function loadData() {
     // Charities
     const charitiesList = document.getElementById('charities-list');
     charitiesList.innerHTML = '';
-    xml.querySelectorAll('Charity').forEach(ch => {
+    xml.querySelectorAll('Charities > Charity').forEach(ch => {
       const name = ch.getAttribute('name') || '';
       const desc = ch.querySelector('Description')?.textContent?.trim() || '';
       const website = ch.querySelector('Website')?.textContent?.trim() || '#';
@@ -73,7 +83,7 @@ async function loadData() {
     // Payment methods
     const methods = document.getElementById('payment-methods');
     methods.innerHTML = '';
-    xml.querySelectorAll('Method').forEach(m => {
+    xml.querySelectorAll('PaymentMethods > Method').forEach(m => {
       const li = document.createElement('li');
       li.textContent = m.textContent.trim();
       methods.appendChild(li);
@@ -89,6 +99,7 @@ function openRegister(eventData) {
   document.getElementById('reg-event-data').value = JSON.stringify(eventData);
   document.getElementById('register-modal').style.display = 'block';
   document.getElementById('reg-message').textContent = '';
+  document.getElementById('reg-message').className = 'message';
 }
 
 function openSpecificVolunteer(eventData) {
@@ -97,9 +108,9 @@ function openSpecificVolunteer(eventData) {
   document.getElementById('vol-spec-event-data').value = JSON.stringify(eventData);
   document.getElementById('vol-modal').style.display = 'block';
   document.getElementById('vol-spec-message').textContent = '';
+  document.getElementById('vol-spec-message').className = 'message';
 }
 
-// Close modals
 document.querySelectorAll('.close').forEach(el => {
   el.addEventListener('click', () => {
     document.getElementById(el.dataset.modal).style.display = 'none';
@@ -109,7 +120,6 @@ window.addEventListener('click', e => {
   if (e.target.classList.contains('modal')) e.target.style.display = 'none';
 });
 
-// Register → Stripe Checkout
 document.getElementById('register-form').addEventListener('submit', async e => {
   e.preventDefault();
   const eventData = JSON.parse(document.getElementById('reg-event-data').value);
@@ -144,7 +154,6 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   }
 });
 
-// General volunteer form (phone required)
 document.getElementById('volunteer-form').addEventListener('submit', async e => {
   e.preventDefault();
   await submitVolunteer({
@@ -157,7 +166,6 @@ document.getElementById('volunteer-form').addEventListener('submit', async e => 
   }, 'vol-message', e.target);
 });
 
-// Specific volunteer modal (phone optional)
 document.getElementById('vol-specific-form').addEventListener('submit', async e => {
   e.preventDefault();
   const eventData = JSON.parse(document.getElementById('vol-spec-event-data').value || '{}');
@@ -188,7 +196,8 @@ async function submitVolunteer(payload, msgId, form) {
       msg.className = 'message success';
       form.reset();
       setTimeout(() => {
-        document.getElementById('vol-modal').style.display = 'none';
+        const modal = document.getElementById('vol-modal');
+        if (modal) modal.style.display = 'none';
       }, 1500);
     } else {
       msg.textContent = data.error || 'Failed – please try again';
@@ -200,7 +209,6 @@ async function submitVolunteer(payload, msgId, form) {
   }
 }
 
-// Handle return from Stripe
 if (new URLSearchParams(location.search).get('payment') === 'success') {
   alert('Payment successful! Check your email for the receipt.');
   history.replaceState({}, '', location.pathname);

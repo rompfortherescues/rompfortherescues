@@ -25,6 +25,7 @@ export async function onRequestPost(context) {
     });
 
     const origin = new URL(request.url).origin;
+    const locStr = Array.isArray(event.locations) ? event.locations.join(' | ') : (event.location || '');
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -35,26 +36,26 @@ export async function onRequestPost(context) {
           currency: 'usd',
           product_data: {
             name: `${event.name} – ${event.date}`,
-            description: event.description || event.type
+            description: event.description || event.type || ''
           },
           unit_amount: unitAmount
         },
         quantity
       }],
       metadata: {
-         type: 'registration',
-         event_name: event.name,
-         event_date: event.date,
-         event_time: event.time || '',
-         event_location: event.location || '',
-         event_charity: event.charity || '',
-         registrant_name: name,
-         registrant_phone: phone || '',
-         quantity: String(quantity)
+        type: 'registration',
+        event_name: event.name || '',
+        event_date: event.date || '',
+        event_time: event.time || '',
+        event_fee: event.fee || '',
+        event_location: locStr,
+        event_charity: event.charity || '',
+        registrant_name: name,
+        registrant_phone: phone || '',
+        quantity: String(quantity)
       },
       success_url: `${origin}/?payment=success`,
       cancel_url: `${origin}/#events`,
-      // Helps Stripe send its own receipt once enabled
       payment_intent_data: {
         receipt_email: email
       }

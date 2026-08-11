@@ -8,16 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Banner – full picture, no cropping -->
+  <!-- First item: banner picture (includes org name). Aspect ratio preserved. -->
   <div class="banner">
-    <img src="images/banners.png" alt="Romp for the Rescues – Fun events for animal charities" id="banner-img">
-    <!-- or images/banner.png if you renamed it -->
+    <img src="images/banners.png" alt="Romp for the Rescues – Fun events that raise funds for animal charities" id="banner-img">
   </div>
 
-  <!-- Title + Navigation together (same color scheme) -->
   <header>
     <p id="tagline">Fun events that raise funds for animal charities.</p>
-
     <nav>
       <a href="#events">Events</a>
       <a href="#charities">Charities</a>
@@ -26,14 +23,11 @@
   </header>
 
   <main>
-    <!-- rest of the page stays the same -->
-    <!-- 3. Events currently being promoted -->
     <section id="events">
       <h2>Upcoming Events</h2>
       <div id="events-list" class="cards"></div>
     </section>
 
-    <!-- 4. Charities being supported + direct donation links -->
     <section id="charities">
       <h2>Affiliated Charities</h2>
       <p>Each event supports one or more of these organizations. Donate directly via their links. You can also support Romp for the Rescues administration.</p>
@@ -42,12 +36,10 @@
       <ul id="payment-methods"></ul>
     </section>
 
-    <!-- 5. General volunteer form -->
     <section id="volunteer">
       <h2>Volunteer for Romp for the Rescues</h2>
       <p>Sign up for general help or any event. No fee. Telephone is required for general volunteering.</p>
       <form id="volunteer-form" class="form-card">
-        <input type="hidden" id="vol-event-data" value="">
         <div class="form-group">
           <label for="vol-name">Full Name *</label>
           <input type="text" id="vol-name" required>
@@ -74,7 +66,7 @@
     </section>
   </main>
 
-  <!-- Register Modal (Stripe) -->
+  <!-- Register Modal -->
   <div id="register-modal" class="modal">
     <div class="modal-content">
       <span class="close" data-modal="register-modal">&times;</span>
@@ -138,7 +130,6 @@
     </div>
   </div>
 
-  <!-- Standard footer -->
   <footer>
     <p>&copy; <span id="year"></span> Romp for the Rescues. Supporting animal charities through fun events.</p>
     <p>Contact: hello@RompfortheRescues.org</p>

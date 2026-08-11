@@ -22,30 +22,31 @@ export async function onRequestPost(context) {
 
 Event: ${meta.event_name || ''}
 Date: ${meta.event_date || ''} ${meta.event_time || ''}
-Fee: ${meta.event_fee || ''}
+Fee: ${meta.event_fee || meta.fee || ''}
 Quantity: ${meta.quantity || '1'}
-Name: ${meta.name || ''}
-Email: ${meta.email || ''}
-Phone: ${meta.phone || 'N/A'}
-
+Name: ${meta.registrant_name || meta.name || ''}
+Email: ${session.customer_email || meta.email || ''}
+Phone: ${meta.registrant_phone || meta.phone || 'N/A'}
+${meta.event_location ? `Location(s): ${meta.event_location}\n` : ''}
+${meta.event_charity ? `Supporting: ${meta.event_charity}\n` : ''}
 Please bring this receipt (or show this email) to the event.
 
 Romp for the Rescues
 hello@RompfortheRescues.org`;
 
       try {
-        // Buyer receipt
+        // Buyer
         await sendEmail(env, {
           from: 'hello@RompfortheRescues.org',
-          to: [meta.email],
+          to: [session.customer_email || meta.email],
           subject: 'receipt',
           text: body
         });
-        // Also notify the organization
+        // Organization
         await sendEmail(env, {
           from: 'hello@RompfortheRescues.org',
           to: ['rompfortherescues@gmail.com'],
-          subject: 'New Registration Receipt – ' + (meta.event_name || ''),
+          subject: 'New Registration – ' + (meta.event_name || ''),
           text: body
         });
       } catch (emailErr) {

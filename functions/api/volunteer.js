@@ -8,33 +8,42 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { name, email, phone, duty, event } = body;
-    if (!name || !email) return json({ error: 'Name and email required' }, 400);
-    if (!event && !phone) return json({ error: 'Phone required for general volunteering' }, 400);
+    const { name, email, phone = '', duty = '', notes = '', event } = body;
+
+    if (!name || !email) {
+      return json({ error: 'Name and email required' }, 400);
+    }
+
+    const isGeneral = !event || !event.name;
+    if (isGeneral && !phone) {
+      return json({ error: 'Telephone is required for general volunteering' }, 400);
+    }
 
     const resend = new Resend(env.RESEND_API_KEY);
 
-    const eventLine = event ? `<p><strong>Event:</strong> ${event}</p>` : '<p><strong>Event:</strong> General / any</p>';
-    const dutyLine = duty ? `<p><strong>Preferred duty:</strong> ${duty}</p>` : '';
-    const phoneLine = phone ? `<p><strong>Phone:</strong> ${phone}</p>` : '';
+    let text = `Thank you for volunteering with Romp for the Rescues!\n\n`;
+    text += `Name: ${name}\n`;
+    text += `Email: ${email}\n`;
+    text += `Phone: ${phone || 'N/A'}\n`;
+    text += `Preferred Duty: ${duty || 'General'}\n`;
 
-    const html = `
-      <h2>Volunteer Confirmation – Romp for the Rescues</h2>
-      <p>Thank you, ${name}!</p>
-      ${eventLine}
-      ${dutyLine}
-      ${phoneLine}
-      <p>Email: ${email}</p>
-      <p>We look forward to seeing you. No further action needed.</p>
-      <p>– Romp for the Rescues</p>
-    `;
+    if (event && event.name) {
+      text += `Event: ${event.name}\n`;
+      text += `Date: ${event.date || ''} ${event.time || ''}\n`;
+    } else {
+      text += `Event: General / Any event\n`;
+    }
+    if (notes) text += `Notes: ${notes}\n`;
+    text += `\nWe look forward to your help!\n\nRomp for the Rescues`;
 
     await resend.emails.send({
-      from: 'Romp for the Rescues <donotreply@RompfortheRescues.org>',
+      from: 'donotreply@RompfortheRescues.org',
       to: [email],
       cc: ['rompfortherescues@gmail.com'],
-      subject: event ? `Volunteer confirmation – ${event}` : 'Volunteer confirmation – General',
-      html
+      subject: event?.name
+        ? `Volunteer confirmation – ${event.name}`
+        : 'Volunteer confirmation – General',
+      text
     });
 
     return json({ ok: true });
