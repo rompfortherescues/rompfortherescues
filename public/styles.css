@@ -17,17 +17,22 @@ body {
 }
 
 /* Banner – first item on the page */
-/* Full banner – no cropping */
+/* Banner – controlled height, still shows the picture nicely */
 .banner {
   width: 100%;
+  max-height: 280px;          /* adjust this number if you want taller/shorter */
+  overflow: hidden;
   line-height: 0;
   background: linear-gradient(90deg, #ff69b4, #40e0d0);
 }
+
 .banner img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  max-height: 280px;
+  object-fit: cover;          /* fills the area without distortion */
+  object-position: center;    /* centers the most important part of the image */
   display: block;
-  /* no max-height, no object-fit: cover */
 }
 
 /* Title + Navigation share the same gradient */
