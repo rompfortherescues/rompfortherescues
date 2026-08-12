@@ -8,12 +8,12 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { event, name, email, quantity = 1, phone } = body;
+    const { event, name, email, quantity = 1, phone, type = 'registration' } = body;
     if (!event || !name || !email) {
       return json({ error: 'Missing fields' }, 400);
     }
 
-    const feeStr = (event.fee || '$10.00').replace(/[^0-9.]/g, '');
+    const feeStr = (event.fee || '$25.00').replace(/[^0-9.]/g, '');
     const unitAmount = Math.round(parseFloat(feeStr) * 100);
     if (!unitAmount || unitAmount < 50) {
       return json({ error: 'Invalid fee' }, 400);
@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${event.name} – ${event.date}`,
+            name: `${event.name}${event.date ? ' – ' + event.date : ''}`,
             description: event.description || event.type || ''
           },
           unit_amount: unitAmount
@@ -43,7 +43,7 @@ export async function onRequestPost(context) {
         quantity
       }],
       metadata: {
-        type: 'registration',
+        type,
         event_name: event.name || '',
         event_date: event.date || '',
         event_time: event.time || '',
@@ -52,10 +52,11 @@ export async function onRequestPost(context) {
         event_charity: event.charity || '',
         registrant_name: name,
         registrant_phone: phone || '',
-        quantity: String(quantity)
+        quantity: String(quantity),
+        email
       },
-      success_url: `${origin}/?payment=success`,
-      cancel_url: `${origin}/#events`,
+      success_url: `${origin}/success.html`,
+      cancel_url: `${origin}/cancel.html`,
       payment_intent_data: {
         receipt_email: email
       }

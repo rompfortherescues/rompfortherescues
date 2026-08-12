@@ -27,4 +27,9 @@
     </Charity>
   </Charities>
 
+  <PaymentMethods>
+    <Method>Credit / Debit Card (Stripe)</Method>
+    <Method>Apple Pay / Google Pay (where available)</Method>
+    <Method>PayPal (via Stripe if enabled)</Method>
+  </PaymentMethods>
 </Record>
