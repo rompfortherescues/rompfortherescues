@@ -1,5 +1,7 @@
 Romp for the Rescues
 
+8/12/2026
+
 GENERAL
 
 I would like a web site that handles an organization that puts on events to help fund a number of charities that deal with animals.  Visitors to the site may either register 
@@ -43,7 +45,7 @@ what I'm constructing.  This appears to be a roadblock to initiating the site an
 
 There is file - data.xml - that defines all the charities, events and other information.  The page should read it to get its data.
 
-When displaying an event, use individual lines for each <Location> element.
+Events have one or more <Location>s that are listed separately with each event.
 
 Events also have items that are <Included> when you register.  These should be listed separately for each event if it has them.
 
