@@ -74,8 +74,4 @@ async function loadData() {
         <p>${desc}</p>
         <p>
           <a href="${website}" target="_blank" rel="noopener">Website</a> ·
-          <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink" style="padding:0.3rem 0.8rem;font-size:0.9rem;">Donate</a>
-      `;
-      charitiesList.appendChild(card);
-    });
           <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink
