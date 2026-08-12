@@ -3,11 +3,7 @@
   <Description>Fun events that raise funds for animal charities.</Description>
 
   <Events>
-<<<<<<< Updated upstream
-    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00" for="Coozie">
-=======
-    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00" >
->>>>>>> Stashed changes
+    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00">
       <Location>Mary's Restaurant on Main Street, Boynton Beach FL.</Location>
       <Location>Sam's Bar on Main Street, Boynton Beach FL.</Location>
       <Description>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
@@ -31,10 +27,4 @@
     </Charity>
   </Charities>
 
-  <PaymentMethods>
-    <Method>Credit / Debit Card (Visa, MC, AMEX)</Method>
-    <Method>PayPal</Method>
-    <Method>Venmo</Method>
-    <Method>Zelle</Method>
-  </PaymentMethods>
 </Record>

@@ -26,7 +26,8 @@ Make a standard page footer for now.
 
 TECHNICALS
 
-reference "rompfortherescues.pages.dev" to determine if changes need to be made.  Don't report if files would be the same.
+reference "rompfortherescues.pages.dev" to determine if changes need to be made.  Don't report if files would be the same, but do report 
+all content for files that need changes.
 
 I have a domain named "RompfortheRescues.org" with Cloudflare.  Use Cloudfare exclusively for hosting this project.
 
