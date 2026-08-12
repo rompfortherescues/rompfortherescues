@@ -55,8 +55,8 @@ export async function onRequestPost(context) {
         quantity: String(quantity),
         email
       },
-      success_url: `${origin}/success.html`,
-      cancel_url: `${origin}/cancel.html`,
+      success_url: `${origin}/success`,
+      cancel_url: `${origin}/cancel`,
       payment_intent_data: {
         receipt_email: email
       }
