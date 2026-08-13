@@ -4,7 +4,7 @@ pages_build_output_dir = "public"
 
 [vars]
 # Non-secret config
-FROM_EMAIL  = "hello@rompfortherescues.org"
+FROM_EMAIL  = "donotreply@rompfortherescues.org"
 CC_EMAIL    = "rompfortherescues@gmail.com"
 FROM_NAME   = "rompfortherescues.org"
 REPLY_TO    = "rompfortherescues@gmail.com"
