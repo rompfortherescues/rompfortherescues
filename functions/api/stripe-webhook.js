@@ -37,14 +37,14 @@ hello@RompfortheRescues.org`;
       try {
         // Buyer / donor receipt (sample)
         await sendEmail(env, {
-          from: 'hello@RompfortheRescues.org',
+          from: 'donotreply@RompfortheRescues.org',
           to: [session.customer_email || meta.email],
           subject: 'receipt',
           text: body
         });
         // Organization copy
         await sendEmail(env, {
-          from: 'hello@RompfortheRescues.org',
+          from: 'donotreply@RompfortheRescues.org',
           to: ['rompfortherescues@gmail.com'],
           subject: (isDonation ? 'New Donation – ' : 'New Registration – ') + (meta.event_name || ''),
           text: body

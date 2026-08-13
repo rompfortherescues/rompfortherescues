@@ -52,7 +52,7 @@ Events also have items that are <Included> when you register.  These should be l
 
 Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
 button.  The "register" button links to stripe to accept the payment.Stripe should send them an email receipt (once their payment is accepted) to bring to the event.  
-Email subject is "receipt" and be from "hello@RompfortheRescues.org".  
+Email subject is "receipt" and be from "donotreply@RompfortheRescues.org".  
 The email has event data in the body. No information is stored.  
 
 Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to 
