@@ -2,6 +2,14 @@
 <Record name="Romp for the Rescues">
   <Description>Fun events that raise funds for animal charities.</Description>
 
+  <Duties>
+    <Duty>Setup</Duty>
+    <Duty>Registration desk</Duty>
+    <Duty>Cleanup</Duty>
+    <Duty>General help</Duty>
+    <Duty>Photography</Duty>
+  </Duties>
+
   <Events>
     <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00">
       <Location>Mary's Restaurant on Main Street, Boynton Beach FL.</Location>
@@ -10,6 +18,10 @@
       <Charity>Blessed Paws Animal Rescue</Charity>
       <Included>5 free bingo cards</Included>
       <Included>2 raffle tickets</Included>
+      <Duty>Bingo caller</Duty>
+      <Duty>Prize distribution</Duty>
+      <Duty>Setup</Duty>
+      <Duty>General help</Duty>
     </Event>
   </Events>
 

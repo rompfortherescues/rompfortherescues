@@ -40,9 +40,7 @@ export async function onRequestPost(context) {
       from: 'donotreply@RompfortheRescues.org',
       to: [email],
       cc: ['rompfortherescues@gmail.com'],
-      subject: event?.name
-        ? `Volunteer confirmation – ${event.name}`
-        : 'Volunteer confirmation – General',
+      subject: 'volunteer',
       text
     });
 

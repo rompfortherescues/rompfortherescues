@@ -38,34 +38,38 @@ code modifications will be handled by visual studio code.  commits will be handl
 the picture located at "rompfortherescues.pages.dev/public/images/banners.png" should maintain its aspect ratio when displayed as the first banner.
 
 Payments will be handled by Stripe.  Successful payments should send an email to the payer and also to "rompfortherescues.gmail.com" which is the main email for the
-business defined in the stripe account.  If you can show me sample emails for both buyer and seller it would be helpful.  Alternativly can you define what information 
-is possible to include in the stripe originated emails.
+business defined in the stripe account.  Show me what information is possible to include in the stripe originated emails.
 
 It is my understanding that stripe will not allow you to turn on emails until the company has been verified, which includes visiting the company web site, which is 
 what I'm constructing.  This appears to be a roadblock to initiating the site and may require that it be turned on without testing.
 
 There is file - data.xml - that defines all the charities, events and other information.  The page should read it to get its data.
 
-Events have one or more <Location>s that are listed separately with each event.
+Events have one or more <Location>s that are shown in a bulleted list titled "Where".
 
 Events also have items that are <Included> when you register.  These should be listed separately for each event if it has them.
 
-Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
-button.  The "register" button links to stripe to accept the payment.Stripe should send them an email receipt (once their payment is accepted) to bring to the event.  
-Email subject is "receipt" and be from "donotreply@RompfortheRescues.org".  
-The email has event data in the body. No information is stored.  
+Events also have a list of <Duty>s that are presented to volunteers to select their choice of what they are volunteering for.
 
-Volunteers may "register" to sign up for any event or for no specific events and for general or specific duties.  There is no fee to 
-volunteer, but an email receipt should be sent to the volunteer from "donotreply@RompfortheRescues.org" with a cc to 
-"rompfortherescues@gmail.com". Registration for volunteers should optionally collect event, duty preference and contact info, including 
-telephone number (optional) on volunteer to include in the email. Information collected is not stored, but is included in the email.  
-We will get attendance numbers from the cc's email.
+Each of the events raises funds to support one or more charities.  Each Event will have a default "registration" button and a "volunteer" 
+button.  The "register" button links to stripe to accept the payment.  Once payment is accepted we (not stripe) will send them an email to bring to the event to use
+as a ticket.  
+The email has a subject of "Registration" as well as event data in the body. No information is stored.  
+
+Volunteers may "volunteer" to sign up for any event or for no specific events and for general or specific duties.  When volunteering for a specific event, the form should pick 
+the duty preference from the list of <Duty> elements in the event.  If volunteering in general, the duty preference should be picked from the list of <Duties>.
+
+ There is no fee to volunteer, but an email receipt should be sent to the volunteer with a subject of "volunteer". 
+ 
+ Registration for volunteers should optionally collect event, duty preference and contact info, including telephone number (optional) on volunteer to include in the email. 
+ Information collected is not stored, but is included in the email.  We will get attendance numbers from the cc's email.
 
 The form for general volunteering (no specific event) and the form for specific volunteering (clicking "volunteer" button on an event) will
 be the same form except the information on the specific event will be missing from the general volunteering and the phone number will not
 be optional on the general volunteering.
 
 Emails will be sent using an existing Resend account.  "rompfortherescues.org" is already a verified domain in my resend account.
+All emails that resend sends will have a "from" address of "donotreply@RompfortheRescues.org" with a cc to "rompfortherescues@gmail.com
 
 Each of the Charities can receive donations, or donations can be made for administration.
 Donations for specific charities will be accomplished by linking to their appropriate web pages for donations (see data.XML file <PayLink>.
@@ -81,3 +85,5 @@ Include all instructions to establish the webhook in stripe to process successfu
 
 the data.xml file can be seen at "rompfortherescues.pages.dev/public/data.xml 
 The .dev.vars fields can be seen at "rompfortherescues.pages.dev/public/dev.vars"
+
+create a .bat file with all the powershell commands needed to test locally.

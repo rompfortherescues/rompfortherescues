@@ -30,25 +30,20 @@ Email: ${session.customer_email || meta.email || ''}
 Phone: ${meta.registrant_phone || meta.phone || 'N/A'}
 ${meta.event_location ? `Location(s): ${meta.event_location}\n` : ''}
 ${meta.event_charity ? `Supporting: ${meta.event_charity}\n` : ''}
-${isDonation ? '' : 'Please bring this receipt (or show this email) to the event.\n'}
+${isDonation ? '' : 'Please bring this receipt (or show this email) to the event as your ticket.\n'}
 Romp for the Rescues
 hello@RompfortheRescues.org`;
 
       try {
-        // Buyer / donor receipt (sample)
+        // Buyer / donor receipt
         await sendEmail(env, {
           from: 'donotreply@RompfortheRescues.org',
           to: [session.customer_email || meta.email],
-          subject: 'receipt',
+          cc: ['rompfortherescues@gmail.com'],
+          subject: isDonation ? 'Donation Receipt' : 'Registration',
           text: body
         });
-        // Organization copy
-        await sendEmail(env, {
-          from: 'donotreply@RompfortheRescues.org',
-          to: ['rompfortherescues@gmail.com'],
-          subject: (isDonation ? 'New Donation – ' : 'New Registration – ') + (meta.event_name || ''),
-          text: body
-        });
+        // Organization copy (already cc’d, but explicit if needed)
       } catch (emailErr) {
         console.error('Email send failed', emailErr);
       }

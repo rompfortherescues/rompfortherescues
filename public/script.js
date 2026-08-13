@@ -1,5 +1,7 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
+let globalDuties = [];
+
 async function loadData() {
   try {
     const res = await fetch('/data.xml');
@@ -16,6 +18,10 @@ async function loadData() {
     const tagEl = document.getElementById('tagline');
     if (tagEl) tagEl.textContent = tagline;
 
+    // Global duties
+    globalDuties = Array.from(xml.querySelectorAll('Duties > Duty')).map(d => d.textContent.trim());
+    populateDutySelect(document.getElementById('vol-duty'), globalDuties);
+
     // Events
     const eventsList = document.getElementById('events-list');
     eventsList.innerHTML = '';
@@ -30,13 +36,16 @@ async function loadData() {
       const description = ev.querySelector('Description')?.textContent?.trim() || '';
       const charity = ev.querySelector('Charity')?.textContent?.trim() || '';
       const included = Array.from(ev.querySelectorAll('Included')).map(i => i.textContent.trim());
+      const duties = Array.from(ev.querySelectorAll('Duty')).map(d => d.textContent.trim());
 
       const eventObj = {
         name, date, time, type, fee, for: forWhom,
-        locations, description, charity, included
+        locations, description, charity, included, duties
       };
 
-      const locHtml = locations.map(l => `<p>${l}</p>`).join('');
+      const locHtml = locations.length
+        ? `<div class="locations"><strong>Where:</strong><ul>${locations.map(l => `<li>${l}</li>`).join('')}</ul></div>`
+        : '';
       const inclHtml = included.length
         ? `<div class="included"><strong>Included with registration:</strong><ul>${included.map(i => `<li>${i}</li>`).join('')}</ul></div>`
         : '';
@@ -46,7 +55,7 @@ async function loadData() {
       card.innerHTML = `
         <h3>${name}</h3>
         <p><strong>${date}</strong> · ${time} · ${type}</p>
-        <div class="locations">${locHtml}</div>
+        ${locHtml}
         <p>${description}</p>
         ${inclHtml}
         <p>Supports: <em>${charity}</em> · Fee: ${fee}${forWhom ? ` (${forWhom})` : ''}</p>
@@ -95,6 +104,21 @@ async function loadData() {
   }
 }
 
+function populateDutySelect(selectEl, duties) {
+  if (!selectEl) return;
+  selectEl.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = '';
+  empty.textContent = '— select or leave blank —';
+  selectEl.appendChild(empty);
+  (duties || []).forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    selectEl.appendChild(opt);
+  });
+}
+
 function openRegister(eventObj) {
   document.getElementById('reg-event-info').textContent =
     `${eventObj.name} – ${eventObj.date} ${eventObj.time} – Fee: ${eventObj.fee}`;
@@ -106,6 +130,7 @@ function openSpecificVolunteer(eventObj) {
   document.getElementById('vol-event-info').textContent =
     `Event: ${eventObj.name} – ${eventObj.date} ${eventObj.time}`;
   document.getElementById('vol-spec-event-data').value = JSON.stringify(eventObj);
+  populateDutySelect(document.getElementById('vol-spec-duty'), eventObj.duties || globalDuties);
   document.getElementById('vol-modal').style.display = 'block';
 }
 
