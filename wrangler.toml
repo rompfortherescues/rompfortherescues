@@ -1,2 +1,6 @@
+# wrangler.toml – Cloudflare Pages
 name = "comingsoon"
+compatibility_date = "2026-08-23"
+
+# Folder that contains the finished site (index.html, images, etc.)
 pages_build_output_dir = "./public"
