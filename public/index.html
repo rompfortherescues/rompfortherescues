@@ -3,145 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Romp for the Rescues</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>Coming Soon – Romp for the Rescues</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff5f8; /* soft pink to match your theme */
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      padding: 1rem;
+    }
+    img {
+      max-width: 90%;
+      max-height: 70vh;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    h1 {
+      margin-top: 1.5rem;
+      color: #ff6b9d;
+      font-size: 1.8rem;
+    }
+    p {
+      margin-top: 0.5rem;
+      color: #333;
+      max-width: 500px;
+    }
+  </style>
 </head>
 <body>
-  <!-- First item: banner picture (includes org name). Aspect ratio preserved. -->
-  <div class="banner">
-    <img src="images/banners.png" alt="Romp for the Rescues – Fun events that raise funds for animal charities" id="banner-img">
-  </div>
-
-  <header>
-    <p id="tagline">Fun events that raise funds for animal charities.</p>
-    <nav>
-      <a href="#events">Events</a>
-      <a href="#charities">Charities</a>
-      <a href="#volunteer">Volunteer</a>
-    </nav>
-  </header>
-
-  <main>
-    <section id="events">
-      <h2>Upcoming Events</h2>
-      <div id="events-list" class="cards"></div>
-    </section>
-
-    <section id="charities">
-      <h2>Affiliated Charities</h2>
-      <p>Each event supports one or more of these organizations. Donate directly via their links. You can also support Romp for the Rescues administration.</p>
-      <div id="charities-list" class="cards"></div>
-
-      <div class="event-card" style="border-left-color: var(--pink);">
-        <h3>Donate to Romp for the Rescues (Administration)</h3>
-        <p>Help cover event costs, insurance, and outreach so more funds reach the animal charities.</p>
-        <button class="btn btn-pink" id="admin-donate-btn">Donate via Stripe</button>
-      </div>
-
-      <h3>Accepted Payment Methods</h3>
-      <ul id="payment-methods"></ul>
-    </section>
-
-    <section id="volunteer">
-      <h2>Volunteer for Romp for the Rescues</h2>
-      <p>Sign up for general help or any event. No fee. Telephone is required for general volunteering.</p>
-      <form id="volunteer-form" class="form-card">
-        <div class="form-group">
-          <label for="vol-name">Full Name *</label>
-          <input type="text" id="vol-name" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-email">Email *</label>
-          <input type="email" id="vol-email" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-phone">Telephone *</label>
-          <input type="tel" id="vol-phone" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-duty">Preferred Duty</label>
-          <select id="vol-duty"></select>
-        </div>
-        <div class="form-group">
-          <label for="vol-notes">Notes (optional)</label>
-          <textarea id="vol-notes" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-turquoise">Submit Volunteer Registration</button>
-      </form>
-      <div id="vol-message" class="message"></div>
-    </section>
-  </main>
-
-  <!-- Register Modal -->
-  <div id="register-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" data-modal="register-modal">&times;</span>
-      <h2>Register for Event</h2>
-      <p id="reg-event-info"></p>
-      <form id="register-form">
-        <input type="hidden" id="reg-event-data">
-        <div class="form-group">
-          <label for="reg-name">Full Name *</label>
-          <input type="text" id="reg-name" required>
-        </div>
-        <div class="form-group">
-          <label for="reg-email">Email *</label>
-          <input type="email" id="reg-email" required>
-        </div>
-        <div class="form-group">
-          <label for="reg-phone">Telephone (optional)</label>
-          <input type="tel" id="reg-phone">
-        </div>
-        <div class="form-group">
-          <label for="reg-qty">Number of Tickets *</label>
-          <input type="number" id="reg-qty" min="1" value="1" required>
-        </div>
-        <button type="submit" class="btn btn-pink">Proceed to Payment (Stripe)</button>
-      </form>
-      <div id="reg-message" class="message"></div>
-    </div>
-  </div>
-
-  <!-- Specific Volunteer Modal (phone optional) -->
-  <div id="vol-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" data-modal="vol-modal">&times;</span>
-      <h2>Volunteer for Event</h2>
-      <p id="vol-event-info"></p>
-      <form id="vol-specific-form">
-        <input type="hidden" id="vol-spec-event-data">
-        <div class="form-group">
-          <label for="vol-spec-name">Full Name *</label>
-          <input type="text" id="vol-spec-name" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-email">Email *</label>
-          <input type="email" id="vol-spec-email" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-phone">Telephone (optional)</label>
-          <input type="tel" id="vol-spec-phone">
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-duty">Preferred Duty</label>
-          <select id="vol-spec-duty"></select>
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-notes">Notes (optional)</label>
-          <textarea id="vol-spec-notes" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-turquoise">Submit Volunteer Registration</button>
-      </form>
-      <div id="vol-spec-message" class="message"></div>
-    </div>
-  </div>
-
-  <footer>
-    <p>&copy; <span id="year"></span> Romp for the Rescues. Supporting animal charities through fun events.</p>
-    <p>Contact: hello@RompfortheRescues.org</p>
-  </footer>
-
-  <script src="script.js"></script>
+  <img src="/images/coming-soon.png" alt="Romp for the Rescues – Coming Soon">
+  <h1>Coming Soon</h1>
+  <p>Romp for the Rescues is on the way. Something special is being built for the animals we love.</p>
 </body>
 </html>
