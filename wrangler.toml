@@ -1,13 +1,2 @@
 name = "comingsoon"
-compatibility_date = "2024-09-23"
-pages_build_output_dir = "public"
- 
- 
-[vars]
-# Non-secret config
-FROM_EMAIL  = "donotreply@rompfortherescues.org"
-CC_EMAIL    = "rompfortherescues@gmail.com"
-FROM_NAME   = "rompfortherescues.org"
-REPLY_TO    = "rompfortherescues@gmail.com"
-BCC_EMAIL   = "rogerdtinsley@gmail.com"
-
+pages_build_output_dir = "./public"
