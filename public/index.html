@@ -7,19 +7,72 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <img
-    src="images/banners.png"
-    alt="Romp for the Rescues – fun events that raise funds for animal charities"
-  >
-  <img
-    src="images/coming-soon.PNG"
-    alt="Romp for the Rescues – Save the Date"
-  >
-  <img
-    src="images/Band.png"
-    alt="Band - Fness – Save the Date"
-  >
-  <p>"F'NESS Band 7-10 PM at the Bamboo Room"</p>
+  <main class="page">
+    <h1>Coming Soon – Romp for the Rescues</h1>
+    <p class="intro">
+      Romp for the Rescues is on the way. Something special is being built
+      for the animals we love.
+    </p>
+
+    <article class="row">
+      <img
+        class="photo"
+        src="images/banners.png"
+        alt="Romp for the Rescues – fun events that raise funds for animal charities"
+      >
+      <div class="copy">
+        <h2>Romp for the Rescues</h2>
+        <p>Fun events that raise funds for animal charities.</p>
+      </div>
+    </article>
+
+    <article class="row">
+      <img
+        class="photo"
+        src="images/coming-soon.PNG"
+        alt="Romp for the Rescues – Save the Date"
+      >
+      <div class="copy">
+        <p class="eyebrow">Save the Date</p>
+        <h2>Mrs. Roper Romp</h2>
+        <p class="meta">Saturday, February 6, 2027</p>
+        <p class="meta">Lake Worth Beach, Florida</p>
+        <p>
+          A fun-filled evening of costumes (Mrs. Roper style encouraged!),
+          prizes, and live music — raising funds for local animal rescues.
+        </p>
+        <div class="countdown" aria-label="Countdown to February 6, 2027">
+          <div class="count-box"><span id="days">0</span><small>Days</small></div>
+          <div class="count-box"><span id="hours">00</span><small>Hours</small></div>
+          <div class="count-box"><span id="minutes">00</span><small>Minutes</small></div>
+          <div class="count-box"><span id="seconds">00</span><small>Seconds</small></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="row">
+      <img
+        class="photo"
+        src="images/Band.png"
+        alt="Band - Fness – Save the Date"
+      >
+      <div class="copy">
+        <p class="eyebrow">Live Music</p>
+        <h2>F'NESS</h2>
+        <p class="meta">7–10 PM at the Bamboo Room</p>
+        <p>
+          After the pub crawl energy, dance it out with F'NESS at the Bamboo Room
+          in Lake Worth Beach.
+        </p>
+        <p class="quote">"F'NESS Band 7-10 PM at the Bamboo Room"</p>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span> Romp for the Rescues.</p>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>

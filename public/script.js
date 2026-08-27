@@ -1,5 +1,6 @@
 (function () {
   const eventDate = new Date("2027-02-06T19:00:00-05:00"); // 7 PM Eastern
+
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -8,13 +9,14 @@
   const minutesEl = document.getElementById("minutes");
   const secondsEl = document.getElementById("seconds");
 
+  if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
   function pad(n) {
     return String(n).padStart(2, "0");
   }
 
   function tick() {
-    const now = new Date();
-    let diff = eventDate.getTime() - now.getTime();
+    let diff = eventDate.getTime() - Date.now();
 
     if (diff < 0) {
       daysEl.textContent = "0";
