@@ -2,18 +2,25 @@
 <Record name="Romp for the Rescues">
   <Description>Fun events that raise funds for animal charities.</Description>
 
+  <Duties>
+    <Duty>Setup</Duty>
+    <Duty>Registration desk</Duty>
+    <Duty>Cleanup</Duty>
+    <Duty>General help</Duty>
+    <Duty>Photography</Duty>
+  </Duties>
+
   <Events>
-<<<<<<< Updated upstream
-    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00" for="Coozie">
-=======
-    <Event date="March 14, 2027" time="6-10 PM" type="Bingo" name="Mrs. Roper Romp" fee="$10.00" >
->>>>>>> Stashed changes
-      <Location>Mary's Restaurant on Main Street, Boynton Beach FL.</Location>
-      <Location>Sam's Bar on Main Street, Boynton Beach FL.</Location>
-      <Description>A fun-filled evening of bingo, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
+    <Event date="February 6, 2027" time="4 PM" type="Pub Crawl" name="Mrs. Roper Romp" fee="$10.00">
+      <Location>Mary's Restaurant on Main Street, Lake Worth Beach FL.</Location>
+      <Location>Sam's Bar on Main Street, Lake Worth Beach FL.</Location>
+      <Description>A fun-filled evening of partying, raffles and more, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
       <Charity>Blessed Paws Animal Rescue</Charity>
       <Included>5 free bingo cards</Included>
       <Included>2 raffle tickets</Included>
+      <Duty>Prize distribution</Duty>
+      <Duty>Setup</Duty>
+      <Duty>General help</Duty>
     </Event>
   </Events>
 
@@ -23,7 +30,6 @@
       <Website>https://www.blessedpawsanimalrescue.com</Website>
       <PayLink>https://www.blessedpawsanimalrescue.com/why-donate</PayLink>
     </Charity>
-
     <Charity name="Wild Whiskers">
       <Description>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</Description>
       <Website>https://www.wildwhiskers.org</Website>
@@ -31,10 +37,4 @@
     </Charity>
   </Charities>
 
-  <PaymentMethods>
-    <Method>Credit / Debit Card (Visa, MC, AMEX)</Method>
-    <Method>PayPal</Method>
-    <Method>Venmo</Method>
-    <Method>Zelle</Method>
-  </PaymentMethods>
 </Record>
