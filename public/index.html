@@ -4,42 +4,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Coming Soon – Romp for the Rescues</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #fff5f8; /* soft pink to match your theme */
-      font-family: system-ui, sans-serif;
-      text-align: center;
-      padding: 1rem;
-    }
-    img {
-      max-width: 90%;
-      max-height: 70vh;
-      height: auto;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    h1 {
-      margin-top: 1.5rem;
-      color: #ff6b9d;
-      font-size: 1.8rem;
-    }
-    p {
-      margin-top: 0.5rem;
-      color: #333;
-      max-width: 500px;
-    }
-  </style>
-
+  <meta name="description" content="Romp for the Rescues – fun events that raise funds for animal charities. Save the date: February 6, 2027 in Lake Worth Beach, FL.">
+  <link rel="icon" href="images/logo.jpg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <img src="images/coming-soon.PNG" alt="Romp for the Rescues – Save the Date">
-  <img src="images/Band.png" alt="Band - Fness – Save the Date">
-  <p>"F'NESS Band 7-10 PM at the Bamboo Room"</p>
+  <div class="page">
+    <header class="topbar">
+      <img class="logo" src="images/logo.jpg" alt="Romp for the Rescues logo">
+      <div>
+        <p class="eyebrow">Coming Soon</p>
+        <h1>Romp for the Rescues</h1>
+        <p class="tagline">Fun events that raise funds for animal charities.</p>
+      </div>
+    </header>
+
+    <section class="hero">
+      <img
+        class="poster"
+        src="images/coming-soon.PNG"
+        alt="Save the Date! Romp for the Rescues, February 6, 2027, Lake Worth Beach, FL"
+      >
+      <div class="hero-copy">
+        <p class="kicker">Save the Date</p>
+        <h2>Mrs. Roper Romp</h2>
+        <p class="date">Saturday, February 6, 2027</p>
+        <p class="place">Lake Worth Beach, Florida</p>
+        <p class="blurb">
+          A fun-filled evening of costumes (Mrs. Roper style encouraged!),
+          prizes, and live music — raising funds for local animal rescues.
+        </p>
+
+        <div class="countdown" id="countdown" aria-live="polite">
+          <div class="unit"><span id="days">0</span><label>Days</label></div>
+          <div class="unit"><span id="hours">0</span><label>Hours</label></div>
+          <div class="unit"><span id="minutes">0</span><label>Minutes</label></div>
+          <div class="unit"><span id="seconds">0</span><label>Seconds</label></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <img
+        class="band-photo"
+        src="images/Band.png"
+        alt="F'NESS band — Save the Date"
+      >
+      <div class="band-copy">
+        <p class="kicker">Live Music</p>
+        <h2>F'NESS</h2>
+        <p class="when">7–10 PM at the Bamboo Room</p>
+        <p class="blurb">
+          After the pub crawl energy, dance it out with F'NESS at the Bamboo Room
+          in Lake Worth Beach.
+        </p>
+      </div>
+    </section>
+
+    <section class="banner-wrap">
+      <img
+        class="site-banner"
+        src="images/banners.png"
+        alt="Romp for the Rescues – dog and cat in curly wigs"
+      >
+    </section>
+
+    <footer>
+      <p>&copy; <span id="year"></span> Romp for the Rescues. Supporting animal charities through fun events.</p>
+      <p>Contact: <a href="mailto:hello@RompfortheRescues.org">hello@RompfortheRescues.org</a></p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

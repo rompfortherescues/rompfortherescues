@@ -1,6 +1,5 @@
-name = "comingsoon"
+name = "home"
 compatibility_date = "2026-08-23"
-account_id = "9e735c7a11638417681dac18504ca540"
 
 [assets]
 directory = "./public"
