@@ -1,0 +1,11 @@
+Add two step authentication to gitHub
+Add two step authentication to Stripe
+Verify Romp for the Rescues, LLC with stripe
+Determine if the Stripe Mobile App is needed to accept payments in person
+Activate Stripe Account
+Create STRIPE_SECRET_KEY for the production environment and update 1Password Stripe-Romp with that value.
+Determine if that same key needs to be put into staging.
+Learn how to go from Stripe sandbox to live site.
+Determine if Paypal or Venmo is to be used for payments.
+Test Stripe using ACH.  If an ACH payment fails, we notify the buyer.
+Test Every Stripe payment failure.
