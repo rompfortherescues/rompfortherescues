@@ -8,4 +8,8 @@ Determine if that same key needs to be put into staging.
 Learn how to go from Stripe sandbox to live site.
 Determine if Paypal or Venmo is to be used for payments.
 Test Stripe using ACH.  If an ACH payment fails, we notify the buyer.
-Test Every Stripe payment failure.
+Test Every Stripe payment failure on every type of card 9 causes X 22 different types of cards
+Transfer ownership of stripe account to Rebecca after all testing is complete.
+Determine use of radar in Stripe payment processing.
+determine support address for stripe.  P.O.Box or virtual mailing address (anytime mailbox, ipostal1, physicaladdress, etc).
+
