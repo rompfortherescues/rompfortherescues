@@ -20,13 +20,24 @@ body {
   width: 100%;
   line-height: 0;
   background: linear-gradient(90deg, #ff69b4, #40e0d0);
+  display: flex;
+  justify-content: center;
 }
 
 .banner img {
   width: 100%;
-  height: auto;          /* maintains aspect ratio */
+  height: auto;
   display: block;
-  max-height: none;
+}
+
+@media (min-width: 768px) {
+  .banner img {
+    width: auto;
+    max-width: 100%;
+    max-height: 25vh;
+    height: auto;
+    object-fit: contain;
+  }
 }
 
 header {
@@ -161,7 +172,6 @@ h2 { color: var(--pink); border-bottom: 3px solid var(--turquoise); padding-bott
 footer {
   text-align: center;
   padding: 1.5rem;
-  color: #666;
   font-size: 0.9rem;
   background: linear-gradient(90deg, var(--turquoise), var(--pink));
   color: white;
