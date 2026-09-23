@@ -31,6 +31,9 @@ async function loadData() {
     const tagline = record.querySelector('Description')?.textContent || '';
     const tagEl = document.getElementById('tagline');
     if (tagEl) tagEl.textContent = tagline;
+    const mission = record.querySelector('Mission')?.textContent?.trim() || '';
+    const missionEl = document.getElementById('mission');
+    if (missionEl) missionEl.textContent = mission;
 
     // Events
     const eventsList = document.getElementById('events-list');
