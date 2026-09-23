@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Record name="Romp for the Rescues">
+  <Description>"Romp" - (verb) To play or frolic in a lively, loud and happy way.</Description>
+    <Mission>Our Mission is to unite communities through engaging events that drive awareness
+      and raise critical funding for local animal rescue organizations.</Mission>
+  
+
+  <Duties>
+    <Duty>Setup</Duty>
+    <Duty>Registration desk</Duty>
+    <Duty>Cleanup</Duty>
+    <Duty>General help</Duty>
+    <Duty>Photography</Duty>
+  </Duties>
+
+  <Events>
+
+    <Event date="Saturday, November 7, 2026" time="11 AM - 1 PM Bingo Brunch" name="Mrs. Roper Romp -Preview Party" >
+      <Location>Pomona Kitchen, 717 Lake Ave, Lake Worth Beach FL.</Location>
+      <Description>Come brunch with us to meet our great Romp for the Rescues crew.  FREE BINGO!
+       costumes optional (Mrs. Roper - wigs and kaftans encouraged!), and great prizes.
+        Reservations are recommended at https://www.pomonakitchen.com.</Description>
+      <Included>free bingo cards</Included>
+      <Included>Happy Hour drinks</Included>
+      <Included>Prizes</Included>
+      <Picture>images/bingobrunch.jpg</Picture>
+    </Event>
+
+    <Event date="February 6, 2027" time="4-7PM Pub Crawl, 7PM-til - F'Ness Band" name="Mrs. Roper Romp &amp; Pub Crawl" >
+      <Location>Pomona Kitchen, 717 Lake Ave, Lake Worth Beach FL.</Location>
+      <Location>Lilo's Street Food and Bar, 701 Lake Ave, Lake Worth Beach, Fl.</Location>
+      <Location>Bamboo Room, 25 S. J Street, Lake Worth Beach FL.</Location>
+      <Description>A fun-filled evening of raffles, music, and mingling; 
+        costumes optional (Mrs. Roper - wigs and kaftans encouraged!), and great prizes.
+      </Description>
+      <Charity>Blessed Paws Animal Rescue</Charity>
+      <Charity>Wild Whiskers</Charity>
+      <Duty>Bingo caller</Duty>
+      <Duty>Prize distribution</Duty>
+      <Duty>Setup</Duty>
+      <Duty>General help</Duty>
+      <Picture>images/roperromp.png</Picture>
+    </Event>
+  </Events>
+
+  <Charities>
+    <Charity name="Blessed Paws Animal Rescue">
+      <Description>Blessed Paws Animal Rescue saves dogs of all ages, sizes, and breeds, to protect them from the life of being abandoned, abused or neglected. We strive to provide a positive change for animal welfare in a variety of ways. We are 100% volunteer and foster based!</Description>
+      <Website>https://www.blessedpawsanimalrescue.com</Website>
+      <PayLink>https://www.blessedpawsanimalrescue.com/why-donate</PayLink>
+    </Charity>
+    <Charity name="Wild Whiskers">
+      <Description>We rewrite futures through Trap-Neuter-Vaccinate-Return, creating thriving neighborhoods for cats and people alike. Founded by passionate advocate Brittany Mason, we believe Trap-Neuter-Vaccinate-Return (TNVR) is the only compassionate and effective solution for these cats.</Description>
+      <Website>https://www.wildwhiskers.org</Website>
+      <PayLink>https://www.wildwhiskers.org/how-to-help</PayLink>
+    </Charity>
+  </Charities>
+
+</Record>

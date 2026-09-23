@@ -1,0 +1,213 @@
+:root {
+  --pink: #ff6b9d;
+  --pink-light: #ff9ecb;
+  --turquoise: #40e0d0;
+  --turquoise-dark: #00ced1;
+  --banner-teal: #3dc8cb;
+  --page-gradient: linear-gradient(90deg, #ff69b4, #40e0d0);
+  --text: #333;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, 'Poppins', sans-serif;
+  background: var(--page-gradient);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.banner {
+  width: 100%;
+  line-height: 0;
+  background: var(--banner-teal);
+  display: flex;
+  justify-content: center;
+}
+
+.banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .banner img {
+    width: auto;
+    max-width: 100%;
+    max-height: 35vh;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+header {
+  text-align: center;
+  padding: 1.2rem 1rem 0.8rem;
+  background: linear-gradient(135deg, #ff6b9d, #40e0d0);
+  color: white;
+}
+
+#tagline {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  color: black;
+}
+
+.subtitle {
+  margin: -0.5rem 0 1rem;
+  color: black;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+header nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.6rem 1rem 0.4rem;
+  flex-wrap: wrap;
+}
+
+header nav a {
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1.3rem;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: all 0.25s;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+header nav a:hover {
+  background: white;
+  color: #e91e63;
+}
+
+main { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+section { margin-bottom: 3rem; }
+h2 { color: black; border-bottom: 3px solid var(--turquoise); padding-bottom: 0.3rem; margin-bottom: 1rem; }
+
+.event-card, .charity-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 12px rgba(255,107,157,0.15);
+  border-left: 6px solid var(--turquoise);
+}
+
+.event-card h3 { color: var(--pink); }
+
+.event-card-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 280px);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.event-picture img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .event-card-content {
+    grid-template-columns: 1fr;
+  }
+
+  .event-picture {
+    max-width: 280px;
+  }
+}
+
+.locations p, .included ul {
+  margin: 0.25rem 0;
+}
+
+.included ul {
+  margin-left: 1.2rem;
+  margin-top: 0.4rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0.4rem 0.4rem 0 0;
+  color: white;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.btn-pink { background: var(--pink); }
+.btn-turquoise { background: var(--turquoise-dark); }
+.btn:hover { opacity: 0.9; }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 420px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--pink);
+}
+
+.form-group { margin-bottom: 0.9rem; }
+.form-group label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid var(--turquoise);
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.message {
+  margin-top: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  display: none;
+}
+
+.message.success { display: block; background: #e0ffff; color: #00695c; }
+.message.error { display: block; background: #fce4ec; color: #c2185b; }
+
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+  background: linear-gradient(90deg, var(--turquoise), var(--pink));
+  color: white;
+  margin-top: 2rem;
+}
+
+footer p { margin: 0.3rem 0; }
