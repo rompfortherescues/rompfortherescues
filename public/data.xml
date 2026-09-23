@@ -11,13 +11,29 @@
   </Duties>
 
   <Events>
-    <Event date="February 6, 2027" time="4 PM" type="Pub Crawl" name="Mrs. Roper Romp" fee="$10.00">
-      <Location>Mary's Restaurant on Main Street, Lake Worth Beach FL.</Location>
-      <Location>Sam's Bar on Main Street, Lake Worth Beach FL.</Location>
-      <Description>A fun-filled evening of partying, raffles and more, costumes optional (Mrs. Roper style encouraged!), and great prizes.</Description>
+
+    <Event date="Saturday, November 7, 2026" time="11 AM - 1 PM Bingo Brunch" type="tba" name="Mrs. Roper Romp -Preview Party" >
+      <Location>Pomona Kitchen, 717 Lake Ave, Lake Worth Beach FL.</Location>
+      <Description>Come brunch with us to meet our great Romp for the Rescues crew.  FREE BINGO!</Description>
+      <Included>free bingo cards</Included>
+      <Included>Happy Hour drinks</Included>
+      <Included>Prizes</Included>
+      <Included>Bagel Bar</Included>
+      <Picture>images/A34E9B0C-FC82-4070-A0B8-861B35527C0E.PNG</Picture>
+    </Event>
+
+    <Event date="February 6, 2027" time="4=7 Pub Crawl, 7-? PM Band" type="tba" name="Mrs. Roper Romp & Pub Crawl" fee="$10.00">
+      <Location>Pomona Kitchen, 717 Lake Ave, Lake Worth Beach FL.</Location>
+      <Location>Lilo's Street Food and Bar, 701 Lake Ave, Lake Worth Beach, Fl.</Location>
+      <Location>Bamboo Room, 25 S. J Street, Lake Worth Beach FL.</Location>
+      <Description>A fun-filled evening of raffles, music, and mingling; 
+        costumes optional (Mrs. Roper - wigs and kaftans encouraged!), and great prizes.
+        Reservations are recommended at https://www.pamonakitchen.com.</Description>
       <Charity>Blessed Paws Animal Rescue</Charity>
+      <Charity>Wild Whiskers</Charity>
       <Included>5 free bingo cards</Included>
       <Included>2 raffle tickets</Included>
+      <Duty>Bingo caller</Duty>
       <Duty>Prize distribution</Duty>
       <Duty>Setup</Duty>
       <Duty>General help</Duty>
