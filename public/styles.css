@@ -49,10 +49,10 @@ header {
 }
 
 #tagline {
-  font-weight: 300;
+  font-weight: 700;
   font-size: 1.1rem;
   margin: 0 0 1rem 0;
-  opacity: 0.95;
+  color: black;
 }
 
 header nav {

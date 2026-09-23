@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Record name="Romp for the Rescues">
-  <Description>Fun events that raise funds for animal charities.</Description>
+  <Description>"Romp" - (verb) To play or frolic in a lively or, loud and happy way.</Description>
+  <Mission>Our Mission is to unite communities through engaging events that drive awareness
+  and raise critical funding for local animal rescue organizations.</Mission>
 
   <Duties>
     <Duty>Setup</Duty>
