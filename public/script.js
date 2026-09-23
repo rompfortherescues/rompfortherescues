@@ -1,5 +1,21 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
+function linkifyText(text) {
+  const escapedText = text.replace(/[&<>'"]/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  })[character]);
+
+  return escapedText.replace(/https?:\/\/[^\s<]+/g, url => {
+    const trailingPunctuation = url.match(/[.,;:!?)]*$/)?.[0] || '';
+    const link = url.slice(0, url.length - trailingPunctuation.length);
+    return `<a href="${link}" target="_blank" rel="noopener">${link}</a>${trailingPunctuation}`;
+  });
+}
+
 async function loadData() {
   try {
     const res = await fetch('/data.xml');
@@ -62,7 +78,7 @@ async function loadData() {
             <h3>${name}</h3>
             <p><strong>${date}</strong> · ${time} · ${type}</p>
             <div class="locations">${locHtml}</div>
-            <p>${description}</p>
+            <p>${linkifyText(description)}</p>
             ${inclHtml}
             ${detailsHtml ? `<p>${detailsHtml}</p>` : ''}
             ${registerHtml}
