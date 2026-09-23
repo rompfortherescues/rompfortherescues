@@ -36,8 +36,8 @@
       <Duty>Prize distribution</Duty>
       <Duty>Setup</Duty>
       <Duty>General help</Duty>
-    </Event>
       <Picture>images/roperromp.png</Picture>
+    </Event>
   </Events>
 
   <Charities>
