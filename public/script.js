@@ -40,6 +40,13 @@ async function loadData() {
       const inclHtml = included.length
         ? `<div class="included"><strong>Included with registration:</strong><ul>${included.map(i => `<li>${i}</li>`).join('')}</ul></div>`
         : '';
+      const detailsHtml = [
+        charity ? `Supports: <em>${charity}</em>` : '',
+        fee ? `Fee: ${fee}${forWhom ? ` (${forWhom})` : ''}` : ''
+      ].filter(Boolean).join(' · ');
+      const registerHtml = fee
+        ? '<button class="btn btn-pink register-btn">Register</button>'
+        : '';
 
       const card = document.createElement('div');
       card.className = 'event-card';
@@ -49,11 +56,11 @@ async function loadData() {
         <div class="locations">${locHtml}</div>
         <p>${description}</p>
         ${inclHtml}
-        <p>Supports: <em>${charity}</em> · Fee: ${fee}${forWhom ? ` (${forWhom})` : ''}</p>
-        <button class="btn btn-pink register-btn">Register</button>
+        ${detailsHtml ? `<p>${detailsHtml}</p>` : ''}
+        ${registerHtml}
         <button class="btn btn-turquoise volunteer-btn">Volunteer for this Event</button>
       `;
-      card.querySelector('.register-btn').addEventListener('click', () => openRegister(eventObj));
+      card.querySelector('.register-btn')?.addEventListener('click', () => openRegister(eventObj));
       card.querySelector('.volunteer-btn').addEventListener('click', () => openSpecificVolunteer(eventObj));
       eventsList.appendChild(card);
     });
