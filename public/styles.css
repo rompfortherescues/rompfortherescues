@@ -95,6 +95,30 @@ h2 { color: black; border-bottom: 3px solid var(--turquoise); padding-bottom: 0.
 
 .event-card h3 { color: var(--pink); }
 
+.event-card-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 280px);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.event-picture img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .event-card-content {
+    grid-template-columns: 1fr;
+  }
+
+  .event-picture {
+    max-width: 280px;
+  }
+}
+
 .locations p, .included ul {
   margin: 0.25rem 0;
 }

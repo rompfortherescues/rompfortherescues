@@ -28,6 +28,7 @@ async function loadData() {
       const forWhom = ev.getAttribute('for') || '';
       const locations = Array.from(ev.querySelectorAll('Location')).map(l => l.textContent.trim());
       const description = ev.querySelector('Description')?.textContent?.trim() || '';
+      const picture = ev.querySelector('Picture')?.textContent?.trim() || '';
       const charities = Array.from(ev.querySelectorAll('Charity'))
         .map(charity => charity.textContent.trim())
         .filter(Boolean);
@@ -35,7 +36,7 @@ async function loadData() {
 
       const eventObj = {
         name, date, time, type, fee, for: forWhom,
-        locations, description, charities, included
+        locations, description, picture, charities, included
       };
 
       const locHtml = locations.map(l => `<p>${l}</p>`).join('');
@@ -49,18 +50,26 @@ async function loadData() {
       const registerHtml = fee
         ? '<button class="btn btn-pink register-btn">Register</button>'
         : '';
+      const pictureHtml = picture
+        ? `<div class="event-picture"><img src="${picture}" alt="${name}"></div>`
+        : '';
 
       const card = document.createElement('div');
       card.className = 'event-card';
       card.innerHTML = `
-        <h3>${name}</h3>
-        <p><strong>${date}</strong> · ${time} · ${type}</p>
-        <div class="locations">${locHtml}</div>
-        <p>${description}</p>
-        ${inclHtml}
-        ${detailsHtml ? `<p>${detailsHtml}</p>` : ''}
-        ${registerHtml}
-        <button class="btn btn-turquoise volunteer-btn">Volunteer for this Event</button>
+        <div class="event-card-content">
+          <div class="event-details">
+            <h3>${name}</h3>
+            <p><strong>${date}</strong> · ${time} · ${type}</p>
+            <div class="locations">${locHtml}</div>
+            <p>${description}</p>
+            ${inclHtml}
+            ${detailsHtml ? `<p>${detailsHtml}</p>` : ''}
+            ${registerHtml}
+            <button class="btn btn-turquoise volunteer-btn">Volunteer for this Event</button>
+          </div>
+          ${pictureHtml}
+        </div>
       `;
       card.querySelector('.register-btn')?.addEventListener('click', () => openRegister(eventObj));
       card.querySelector('.volunteer-btn').addEventListener('click', () => openSpecificVolunteer(eventObj));
