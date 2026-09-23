@@ -28,12 +28,14 @@ async function loadData() {
       const forWhom = ev.getAttribute('for') || '';
       const locations = Array.from(ev.querySelectorAll('Location')).map(l => l.textContent.trim());
       const description = ev.querySelector('Description')?.textContent?.trim() || '';
-      const charity = ev.querySelector('Charity')?.textContent?.trim() || '';
+      const charities = Array.from(ev.querySelectorAll('Charity'))
+        .map(charity => charity.textContent.trim())
+        .filter(Boolean);
       const included = Array.from(ev.querySelectorAll('Included')).map(i => i.textContent.trim());
 
       const eventObj = {
         name, date, time, type, fee, for: forWhom,
-        locations, description, charity, included
+        locations, description, charities, included
       };
 
       const locHtml = locations.map(l => `<p>${l}</p>`).join('');
@@ -41,7 +43,7 @@ async function loadData() {
         ? `<div class="included"><strong>Included with registration:</strong><ul>${included.map(i => `<li>${i}</li>`).join('')}</ul></div>`
         : '';
       const detailsHtml = [
-        charity ? `Supports: <em>${charity}</em>` : '',
+        charities.length ? `Supports: <em>${charities.join(', ')}</em>` : '',
         fee ? `Fee: ${fee}${forWhom ? ` (${forWhom})` : ''}` : ''
       ].filter(Boolean).join(' · ');
       const registerHtml = fee
@@ -85,15 +87,6 @@ async function loadData() {
         </p>
       `;
       charitiesList.appendChild(card);
-    });
-
-    // Payment methods
-    const methods = document.getElementById('payment-methods');
-    methods.innerHTML = '';
-    xml.querySelectorAll('PaymentMethods > Method').forEach(m => {
-      const li = document.createElement('li');
-      li.textContent = m.textContent.trim();
-      methods.appendChild(li);
     });
   } catch (err) {
     console.error('Failed to load data.xml', err);
