@@ -154,7 +154,9 @@ function openSpecificVolunteer(eventData) {
   document.getElementById('vol-event-info').textContent =
     `${eventData.name} – ${eventData.date} ${eventData.time}`;
   document.getElementById('vol-spec-event-data').value = JSON.stringify(eventData);
-  populateDutyOptions('vol-spec-duty', eventData.duties || []);
+  const duties = eventData.duties || [];
+  document.getElementById('vol-spec-duty-group').style.display = duties.length ? '' : 'none';
+  populateDutyOptions('vol-spec-duty', duties);
   document.getElementById('vol-modal').style.display = 'block';
   document.getElementById('vol-spec-message').textContent = '';
   document.getElementById('vol-spec-message').className = 'message';
