@@ -1,6 +1,9 @@
 {
   "name": "rompfortherescues",
   "private": true,
+  "scripts": {
+    "build": "node scripts/generate-slideshow-images.js"
+  },
   "dependencies": {
     "resend": "^4.0.0",
     "stripe": "^16.0.0"

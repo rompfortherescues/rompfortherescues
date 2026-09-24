@@ -7,7 +7,7 @@ Static site + Cloudflare Pages Functions. Domain: RompfortheRescues.org
 1. Create a GitHub repo and push this project (do **not** commit `.dev.vars`).
 2. In Cloudflare Dashboard → Pages → Create project → Connect to Git → select the repo.
    - Framework preset: None
-   - Build command: (leave empty)
+   - Build command: `npm run build`
    - Build output directory: `/`
 3. After first deploy, go to Settings → Variables and Secrets and add:
    - `RESEND_API_KEY`

@@ -36,7 +36,8 @@ async function loadData() {
     if (missionEl) missionEl.textContent = mission;
 
     // General volunteer duties
-    const recordDuties = Array.from(record.querySelectorAll(':scope > Duties > Duty')).map(d => d.textContent.trim());
+    const recordDuties = Array.from(record.querySelector('Duties')?.querySelectorAll('Duty') || [])
+      .map(d => d.textContent.trim());
     populateDutyOptions('vol-duty', recordDuties);
 
     // Events

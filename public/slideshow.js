@@ -34,18 +34,11 @@ nextBtn.addEventListener('click', () => {
   resetAutoTimer();
 });
 
-async function loadSlides() {
-  try {
-    const res = await fetch(SLIDE_FOLDER + 'manifest.json');
-    const data = await res.json();
-    slides = Array.isArray(data.images) ? data.images : [];
-  } catch (err) {
-    console.error('Failed to load slideshow manifest', err);
-    slides = [];
-  }
+function loadSlides() {
+  slides = Array.isArray(window.SLIDESHOW_IMAGES) ? window.SLIDESHOW_IMAGES : [];
 
   if (slides.length === 0) {
-    slideshowEl.innerHTML = '<p class="empty-message">No photos yet. Add images to images/slideshow and list their filenames in images/slideshow/manifest.json.</p>';
+    slideshowEl.innerHTML = '<p class="empty-message">No photos yet. Add images to images/slideshow and run "npm run build" to update the gallery.</p>';
     prevBtn.disabled = true;
     nextBtn.disabled = true;
     return;
