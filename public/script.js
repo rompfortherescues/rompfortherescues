@@ -38,7 +38,7 @@ async function loadData() {
     // General volunteer duties
     const recordDuties = Array.from(record.querySelector('Duties')?.querySelectorAll('Duty') || [])
       .map(d => d.textContent.trim());
-    populateDutyOptions('vol-duty', recordDuties);
+    populateDutyOptions('vol-duty', recordDuties, 'General help');
 
     // Events
     const eventsList = document.getElementById('events-list');
@@ -136,7 +136,7 @@ function openRegister(eventData) {
   document.getElementById('reg-message').className = 'message';
 }
 
-function populateDutyOptions(selectId, duties) {
+function populateDutyOptions(selectId, duties, defaultValue) {
   const select = document.getElementById(selectId);
   if (!select) return;
   select.innerHTML = duties.length
@@ -148,6 +148,7 @@ function populateDutyOptions(selectId, duties) {
     option.textContent = duty;
     select.appendChild(option);
   });
+  if (defaultValue && duties.includes(defaultValue)) select.value = defaultValue;
 }
 
 function openSpecificVolunteer(eventData) {
