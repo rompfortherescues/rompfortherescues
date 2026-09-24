@@ -35,6 +35,10 @@ async function loadData() {
     const missionEl = document.getElementById('mission');
     if (missionEl) missionEl.textContent = mission;
 
+    // General volunteer duties
+    const recordDuties = Array.from(record.querySelectorAll(':scope > Duties > Duty')).map(d => d.textContent.trim());
+    populateDutyOptions('vol-duty', recordDuties);
+
     // Events
     const eventsList = document.getElementById('events-list');
     eventsList.innerHTML = '';
@@ -52,10 +56,11 @@ async function loadData() {
         .map(charity => charity.textContent.trim())
         .filter(Boolean);
       const included = Array.from(ev.querySelectorAll('Included')).map(i => i.textContent.trim());
+      const duties = Array.from(ev.querySelectorAll('Duty')).map(d => d.textContent.trim());
 
       const eventObj = {
         name, date, time, type, fee, for: forWhom,
-        locations, description, picture, charities, included
+        locations, description, picture, charities, included, duties
       };
 
       const locHtml = locations.map(l => `<p>${l}</p>`).join('');
@@ -130,10 +135,25 @@ function openRegister(eventData) {
   document.getElementById('reg-message').className = 'message';
 }
 
+function populateDutyOptions(selectId, duties) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.innerHTML = duties.length
+    ? '<option value="">-- Select a duty (optional) --</option>'
+    : '<option value="">No specific duties listed</option>';
+  duties.forEach(duty => {
+    const option = document.createElement('option');
+    option.value = duty;
+    option.textContent = duty;
+    select.appendChild(option);
+  });
+}
+
 function openSpecificVolunteer(eventData) {
   document.getElementById('vol-event-info').textContent =
     `${eventData.name} – ${eventData.date} ${eventData.time}`;
   document.getElementById('vol-spec-event-data').value = JSON.stringify(eventData);
+  populateDutyOptions('vol-spec-duty', eventData.duties || []);
   document.getElementById('vol-modal').style.display = 'block';
   document.getElementById('vol-spec-message').textContent = '';
   document.getElementById('vol-spec-message').className = 'message';
