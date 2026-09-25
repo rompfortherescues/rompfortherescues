@@ -34,11 +34,19 @@ nextBtn.addEventListener('click', () => {
   resetAutoTimer();
 });
 
-function loadSlides() {
-  slides = Array.isArray(window.SLIDESHOW_IMAGES) ? window.SLIDESHOW_IMAGES : [];
+async function loadSlides() {
+  try {
+    const res = await fetch('/api/slideshow-list');
+    if (!res.ok) throw new Error('Failed to load slideshow list');
+    const data = await res.json();
+    slides = Array.isArray(data.images) ? data.images : [];
+  } catch (err) {
+    console.error(err);
+    slides = [];
+  }
 
   if (slides.length === 0) {
-    slideshowEl.innerHTML = '<p class="empty-message">No photos yet. Add images to images/slideshow and run "npm run build" to update the gallery.</p>';
+    slideshowEl.innerHTML = '<p class="empty-message">No photos yet.</p>';
     prevBtn.disabled = true;
     nextBtn.disabled = true;
     return;
