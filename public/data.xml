@@ -26,7 +26,7 @@
       <Picture>images/bingobrunch.jpg</Picture>
     </Event>
 
-    <Event date="February 6, 2027" time="4-7PM Pub Crawl, 7PM-til - F'Ness Band" name="Mrs. Roper Romp &amp; Pub Crawl" >
+    <Event date="February 6, 2027" time="4-7PM Pub Crawl, 7PM-til - F'Ness Band" name="Mrs. Roper Romp &amp; Pub Crawl" fee="$10.00" >
       <Location>Pomona Kitchen, 717 Lake Ave, Lake Worth Beach FL.</Location>
       <Location>Lilo's Street Food and Bar, 701 Lake Ave, Lake Worth Beach, Fl.</Location>
       <Location>Bamboo Room, 25 S. J Street, Lake Worth Beach FL.</Location>
