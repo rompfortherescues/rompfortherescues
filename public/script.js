@@ -16,6 +16,16 @@ function linkifyText(text) {
   });
 }
 
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'block';
+}
+
 async function loadData() {
   try {
     const res = await fetch('/data.xml');
@@ -131,7 +141,7 @@ function openRegister(eventData) {
   document.getElementById('reg-event-info').textContent =
     `${eventData.name} – ${eventData.date} ${eventData.time} · Fee ${eventData.fee}`;
   document.getElementById('reg-event-data').value = JSON.stringify(eventData);
-  document.getElementById('register-modal').style.display = 'block';
+  openModal('register-modal');
   document.getElementById('reg-message').textContent = '';
   document.getElementById('reg-message').className = 'message';
 }
@@ -158,9 +168,20 @@ function openSpecificVolunteer(eventData) {
   const duties = eventData.duties || [];
   document.getElementById('vol-spec-duty-group').style.display = duties.length ? '' : 'none';
   populateDutyOptions('vol-spec-duty', duties);
-  document.getElementById('vol-modal').style.display = 'block';
+  openModal('vol-modal');
   document.getElementById('vol-spec-message').textContent = '';
   document.getElementById('vol-spec-message').className = 'message';
+}
+
+function openSupportForm() {
+  const form = document.getElementById('support-form');
+  if (form) form.reset();
+  const msg = document.getElementById('support-message');
+  if (msg) {
+    msg.textContent = '';
+    msg.className = 'message';
+  }
+  openModal('support-modal');
 }
 
 document.querySelectorAll('.close').forEach(el => {
@@ -172,10 +193,13 @@ window.addEventListener('click', e => {
   if (e.target.classList.contains('modal')) e.target.style.display = 'none';
 });
 
+document.getElementById('nav-support').addEventListener('click', openSupportForm);
+
 document.getElementById('register-form').addEventListener('submit', async e => {
   e.preventDefault();
   const eventData = JSON.parse(document.getElementById('reg-event-data').value);
   const payload = {
+    type: 'registration',
     event: eventData,
     name: document.getElementById('reg-name').value.trim(),
     email: document.getElementById('reg-email').value.trim(),
@@ -195,6 +219,40 @@ document.getElementById('register-form').addEventListener('submit', async e => {
     });
     const data = await res.json();
     if (data.url) {
+      window.location.href = data.url;
+    } else {
+      msg.textContent = data.error || 'Checkout failed';
+      msg.className = 'message error';
+    }
+  } catch (err) {
+    msg.textContent = 'Network error – please try again';
+    msg.className = 'message error';
+  }
+});
+
+document.getElementById('support-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const amount = parseFloat(document.getElementById('support-amount').value);
+  const payload = {
+    type: 'donation',
+    name: document.getElementById('support-name').value.trim(),
+    email: document.getElementById('support-email').value.trim(),
+    amount
+  };
+
+  const msg = document.getElementById('support-message');
+  msg.textContent = 'Creating secure checkout…';
+  msg.className = 'message';
+
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.url) {
+      closeModal('support-modal');
       window.location.href = data.url;
     } else {
       msg.textContent = data.error || 'Checkout failed';
@@ -264,6 +322,8 @@ async function submitVolunteer(payload, msgId, form) {
 if (new URLSearchParams(location.search).get('payment') === 'success') {
   alert('Payment successful! Check your email for the receipt.');
   history.replaceState({}, '', location.pathname);
+  closeModal('support-modal');
+  closeModal('register-modal');
 }
 
 loadData();

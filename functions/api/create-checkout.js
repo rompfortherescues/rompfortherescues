@@ -8,8 +8,60 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { event, name, email, quantity = 1, phone } = body;
-    if (!event || !name || !email) {
+    const type = body.type || (body.event ? 'registration' : 'donation');
+    const { name, email, phone } = body;
+
+    if (!name || !email) {
+      return json({ error: 'Missing fields' }, 400);
+    }
+
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+      httpClient: Stripe.createFetchHttpClient(),
+      apiVersion: '2024-06-20'
+    });
+
+    const origin = new URL(request.url).origin;
+
+    if (type === 'donation') {
+      const amount = Number(body.amount);
+      const unitAmount = Math.round(amount * 100);
+      if (!unitAmount || unitAmount < 50) {
+        return json({ error: 'Enter an amount of at least $0.50' }, 400);
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        customer_email: email,
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Romp for the Rescues – Administrative support',
+              description: 'Not a tax-deductible donation. Helps cover administrative costs.'
+            },
+            unit_amount: unitAmount
+          },
+          quantity: 1
+        }],
+        metadata: {
+          type: 'donation',
+          donor_name: name,
+          donor_email: email,
+          amount: String(amount)
+        },
+        success_url: `${origin}/?payment=success`,
+        cancel_url: `${origin}/`,
+        payment_intent_data: {
+          receipt_email: email
+        }
+      });
+
+      return json({ url: session.url });
+    }
+
+    const { event, quantity = 1 } = body;
+    if (!event) {
       return json({ error: 'Missing fields' }, 400);
     }
 
@@ -19,12 +71,6 @@ export async function onRequestPost(context) {
       return json({ error: 'Invalid fee' }, 400);
     }
 
-    const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-      httpClient: Stripe.createFetchHttpClient(),
-      apiVersion: '2024-06-20'
-    });
-
-    const origin = new URL(request.url).origin;
     const locStr = Array.isArray(event.locations) ? event.locations.join(' | ') : (event.location || '');
 
     const session = await stripe.checkout.sessions.create({
