@@ -71,7 +71,8 @@ header nav {
   flex-wrap: wrap;
 }
 
-header nav a {
+header nav a,
+header nav .nav-support {
   text-decoration: none;
   color: white;
   font-weight: 600;
@@ -80,9 +81,13 @@ header nav a {
   background: rgba(255, 255, 255, 0.18);
   transition: all 0.25s;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
 }
 
-header nav a:hover {
+header nav a:hover,
+header nav .nav-support:hover {
   background: white;
   color: #e91e63;
 }
@@ -183,12 +188,18 @@ h2 { color: black; border-bottom: 3px solid var(--turquoise); padding-bottom: 0.
 .form-group label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: 0.5rem;
   border: 2px solid var(--turquoise);
   border-radius: 6px;
   font-family: inherit;
+}
+
+.support-disclaimer {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
 }
 
 .message {
