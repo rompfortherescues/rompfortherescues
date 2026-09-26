@@ -23,7 +23,7 @@
       <Included>free bingo cards</Included>
       <Included>Happy Hour drinks</Included>
       <Included>Prizes</Included>
-      <Picture>images/bingobrunch.jpg</Picture>
+      <Picture>/r2-images/bingobrunch.jpg</Picture>
     </Event>
 
     <Event date="February 6, 2027" time="4-7PM Pub Crawl, 7PM-til - F'Ness Band" name="Mrs. Roper Romp &amp; Pub Crawl" fee="$10.00" >
@@ -35,7 +35,7 @@
       </Description>
       <Charity>Blessed Paws Animal Rescue</Charity>
       <Charity>Wild Whiskers</Charity>
-      <Picture>images/roperromp.png</Picture>
+      <Picture>/r2-images/roperromp.png</Picture>
     </Event>
   </Events>
 
