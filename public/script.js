@@ -28,7 +28,7 @@ function openModal(id) {
 
 async function loadData() {
   try {
-    const res = await fetch('/data.xml');
+    const res = await fetch('/xml-data/data.xml');
     const text = await res.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'application/xml');
@@ -133,7 +133,7 @@ async function loadData() {
       charitiesList.appendChild(card);
     });
   } catch (err) {
-    console.error('Failed to load data.xml', err);
+    console.error('Failed to load XML data from R2', err);
   }
 }
 

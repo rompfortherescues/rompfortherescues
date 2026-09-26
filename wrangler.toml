@@ -11,6 +11,10 @@ bucket_name = "slideshowpictures"
 binding = "EVENT_PICTURES_BUCKET"
 bucket_name = "eventpictures"
 
+[[r2_buckets]]
+binding = "XML_DATA_BUCKET"
+bucket_name = "xmldata"
+
 [vars]
 # Non-secret config
 FROM_EMAIL  = "donotreply@rompfortherescues.org"
