@@ -1,4 +1,4 @@
-const SLIDE_FOLDER = 'images/slideshow/';
+const SLIDE_FOLDER = '/images/slideshow/';
 const AUTO_ADVANCE_MS = 5000;
 
 let slides = [];
