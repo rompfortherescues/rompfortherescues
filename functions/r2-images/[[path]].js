@@ -18,7 +18,7 @@ export async function onRequestGet({ params, env }) {
   const ext = key.split('.').pop().toLowerCase();
   const headers = new Headers();
   headers.set('Content-Type', object.httpMetadata?.contentType || CONTENT_TYPES[ext] || 'application/octet-stream');
-  headers.set('Cache-Control', 'public, max-age=3600');
+  headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
   headers.set('ETag', object.httpEtag);
 
   return new Response(object.body, { headers });

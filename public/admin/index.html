@@ -18,7 +18,10 @@
     <p class="subtitle">Content management</p>
     <nav>
       <a href="#events">Events</a>
+      <a href="#charities">Charities</a>
       <a href="#duties">Duties</a>
+      <a href="#record-description">Description</a>
+      <a href="#pictures">Pictures</a>
       <a href="/">View public site</a>
     </nav>
   </header>
@@ -37,6 +40,13 @@
 
     <p id="status-message" class="admin-status" role="status" aria-live="polite">Loading data.xml...</p>
 
+    <section class="admin-section" id="record-description">
+      <h2>Record description</h2>
+      <p class="section-note">This edits the top-level &lt;Description&gt; in data.xml.</p>
+      <label class="sr-only" for="record-description-input">Record description</label>
+      <textarea id="record-description-input" class="description-input" rows="3" maxlength="4000"></textarea>
+    </section>
+
     <section class="admin-section" id="events">
       <div class="section-heading">
         <div>
@@ -46,6 +56,17 @@
         <button type="button" class="btn btn-turquoise" id="add-event">Add event</button>
       </div>
       <div id="events-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="charities">
+      <div class="section-heading">
+        <div>
+          <h2>Charities</h2>
+          <p class="section-note">Manage charity names, descriptions, websites, and donation links.</p>
+        </div>
+        <button type="button" class="btn btn-turquoise" id="add-charity">Add charity</button>
+      </div>
+      <div id="charities-list" class="admin-list" aria-live="polite"></div>
     </section>
 
     <section class="admin-section" id="duties">
@@ -58,15 +79,29 @@
       </div>
       <div id="duties-list" class="admin-list" aria-live="polite"></div>
     </section>
+
+    <section class="admin-section" id="pictures">
+      <div class="section-heading">
+        <div>
+          <h2>Event pictures</h2>
+          <p class="section-note">Upload a picture or overwrite one by uploading a file with the same name. Assign it from an event's Picture detail.</p>
+        </div>
+        <div>
+          <input id="picture-file" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp" hidden>
+          <button type="button" class="btn btn-turquoise" id="upload-picture">Upload picture</button>
+        </div>
+      </div>
+      <div id="pictures-list" class="picture-library" aria-live="polite"></div>
+    </section>
   </main>
 
   <dialog id="event-editor" class="editor-dialog">
     <form id="event-form" method="dialog">
       <div class="dialog-heading">
-        <h2 id="event-editor-title">Edit event</h2>
+        <h2 id="event-editor-title">Edit item</h2>
         <button type="button" class="icon-button" data-close-dialog="event-editor" aria-label="Close">&times;</button>
       </div>
-      <p class="section-note">Edit the event's XML attributes and detail fields. Repeated fields such as locations and charities are kept separate.</p>
+        <p id="item-editor-note" class="section-note">Edit XML attributes and detail fields.</p>
       <div id="event-attributes" class="editor-fields"></div>
       <div class="field-list-heading">
         <h3>Attributes</h3>
@@ -75,11 +110,12 @@
       <div class="field-list-heading">
         <h3>Details</h3>
         <button type="button" class="btn btn-turquoise" id="add-event-field">Add detail</button>
+        <button type="button" class="btn btn-turquoise" id="add-picture-field">Add picture</button>
       </div>
       <div id="event-elements" class="event-elements"></div>
       <div class="dialog-actions">
         <button type="button" class="btn btn-turquoise" data-close-dialog="event-editor">Cancel</button>
-        <button type="submit" class="btn btn-pink">Apply event changes</button>
+        <button type="submit" class="btn btn-pink">Apply changes</button>
       </div>
     </form>
   </dialog>
