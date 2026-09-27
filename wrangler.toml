@@ -9,11 +9,13 @@ bucket_name = "slideshowpictures"
 
 [[r2_buckets]]
 binding = "EVENT_PICTURES_BUCKET"
-bucket_name = "eventpictures"
+bucket_name = "prod-eventpictures"
+preview_bucket_name = "dev-eventpictures"
 
 [[r2_buckets]]
 binding = "XML_DATA_BUCKET"
-bucket_name = "xmldata"
+bucket_name = "prod-xmldata"
+preview_bucket_name = "dev-xmldata"
 
 [vars]
 # Non-secret config
