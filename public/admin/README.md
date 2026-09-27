@@ -1,58 +1,65 @@
-# Admin editor setup
+# Admin Editor: Remaining Setup
 
-The admin page manages the `data.xml` object in the `xmldata` R2 bucket and event images in the `eventpictures` R2 bucket. XML changes are staged in the page until **Save changes** is selected. Picture uploads and deletions affect R2 immediately.
+The admin page and Pages Functions are implemented. Event, charity, duty, and Record Description edits are saved to `data.xml`; picture uploads and deletions operate on R2 immediately.
 
-## Cloudflare setup
+## Already configured in the repository
 
-### 1. Check the R2 buckets and Pages bindings
+The updated `wrangler.toml` declares:
 
-The repository's `wrangler.toml` already declares these bindings:
+- `XML_DATA_BUCKET`: `prod-xmldata` in production and `dev-xmldata` in preview.
+- `EVENT_PICTURES_BUCKET`: `prod-eventpictures` in production and `dev-eventpictures` in preview.
 
-- `XML_DATA_BUCKET` -> `xmldata`
-- `EVENT_PICTURES_BUCKET` -> `eventpictures`
+No further Wrangler binding changes are required. The existing `SLIDESHOW_BUCKET` is unrelated to event picture storage.
 
-In Cloudflare, confirm that both R2 buckets exist and that the Pages project has these bindings in its production and preview environments. `data.xml` must exist in `xmldata`. Event image files are stored at the root of `eventpictures`; uploading a filename already in use overwrites that object.
+## Remaining Cloudflare setup
 
-No extra binding is needed for these admin features. The existing `/r2-images/*` Pages Function serves image objects from `EVENT_PICTURES_BUCKET` and now requires image revalidation so overwrites appear on the public site.
+### 1. Confirm R2 resources and content
 
-### 2. Protect the admin page and API with Access
+In **R2 Object Storage**, confirm that all four bucket names above exist. Confirm that `data.xml` is present and contains the correct data in both `prod-xmldata` and `dev-xmldata`. Keep production and preview content separate as intended.
 
-Use a custom domain attached to the Pages project. In **Cloudflare Zero Trust > Access > Applications**, create two **Self-hosted** applications using that hostname:
+Event images are stored at the root of the corresponding event-pictures bucket. The editor accepts JPEG, PNG, GIF, WebP, and AVIF files up to 12 MB. Uploading an existing filename overwrites that object. The public `/r2-images/*` route serves the object and revalidates its cache so an overwrite is visible.
 
-- Path `/admin/*` to protect the admin interface.
-- Path `/api/admin/*` to protect its data and picture APIs.
+### 2. Create Cloudflare Access applications
 
-Add an Allow policy to both applications for only the email addresses or identity groups that may administer the site. Leave unmatched users denied. If administrators use `/admin` without the trailing slash, make sure that exact path is also covered by the UI application's path configuration; the page itself is served at `/admin/`.
+Use a custom hostname attached to the Pages project. In **Cloudflare Zero Trust > Access > Applications**, create Self-hosted applications for the hostname and these paths:
 
-Record the **Application Audience (AUD) Tag** shown for each application. The application tags are different, so configure both as a comma-separated list. Access must proxy requests to the Pages hostname so it supplies the `CF-Access-Jwt-Assertion` header; the API independently verifies the token signature, issuer, expiry, and audience.
+- `/admin/*` for the admin page.
+- `/api/admin/*` for the XML and picture management API.
 
-### 3. Configure Pages environment variables
+Add an Allow policy to each application for only the administrators' email addresses or identity groups. Leave other users denied. If users can visit `/admin` without the trailing slash, cover that exact path as well; the page is served at `/admin/`.
 
-In **Workers & Pages > rompfortherescues > Settings > Variables and Secrets**, add these plain-text variables for every environment that will run the admin editor:
+Record each application's **Application Audience (AUD) Tag**. The two tags are different. If preview uses a separate hostname, create and protect matching applications for it too, or disable public access to that preview. Do not expose an unprotected preview admin.
 
-- `CF_ACCESS_TEAM_DOMAIN`: your Access team domain, such as `your-team.cloudflareaccess.com` (without a path).
-- `CF_ACCESS_AUD`: the UI and API audience tags separated by a comma, for example `ui-audience-tag,api-audience-tag`.
+### 3. Set Pages environment variables
 
-Use the appropriate audience tags for each environment. If preview deployments are accessible to administrators, create matching Access applications and policies for the preview hostname and set that environment's audience tags too. Do not leave an unprotected preview admin available publicly.
+In **Workers & Pages > rompfortherescues > Settings > Variables and Secrets**, set these plain-text variables for each deployed environment that will use the editor:
 
-Redeploy the Pages project after changing bindings or environment variables so its Functions receive the new configuration.
+- `CF_ACCESS_TEAM_DOMAIN`: the Access team domain, e.g. `your-team.cloudflareaccess.com` (no path).
+- `CF_ACCESS_AUD`: both path-application audience tags, comma-separated, e.g. `admin-ui-aud,admin-api-aud`.
 
-### 4. Verify deployment and permissions
+Use the audience tags for the hostname/environment being configured. The Pages Functions verify the Access JWT signature, issuer, expiry, and audience on every admin API request. Missing variables cause API requests to fail closed.
 
-1. Visit `https://<your-host>/admin/` while signed in as an allowed administrator. An unauthorized identity should be blocked by Access.
-2. Confirm the page loads events, charities, duties, the Record Description, and the picture library.
-3. Upload a small JPEG, PNG, GIF, WebP, or AVIF image (maximum 12 MB). Uploading a filename that already exists asks for confirmation and overwrites the object.
-4. Edit an event and select the image from its `Picture` detail, then save XML changes. The event XML stores a `/r2-images/<filename>` URL.
-5. Try deleting a picture that is still referenced by saved XML. The API refuses; first change or remove that reference and save the XML, then delete the unused file.
-6. Edit a charity or the Record Description, save, and verify the public page reflects the XML update.
+### 4. Deploy
 
-## Editor behavior
+Deploy the Pages project after setting the Access policies and variables. Confirm the deployed production and preview environments use the matching R2 bucket bindings from `wrangler.toml` and the matching Access audience tags.
 
-- Event, charity, duty, and Record Description changes are held in the browser until **Save changes**. A stale XML version is rejected rather than overwriting someone else's newer save; reload and reapply the change.
-- Picture uploads overwrite by filename and are stored immediately. Uploading a file does not automatically assign it to an event; choose it from that event's `Picture` detail and save the XML.
-- Picture deletion is immediate and is blocked while any saved `<Picture>` field references the filename.
-- Event pictures may use repeated `<Picture>` fields. Charities use the `<Charities><Charity name="...">` structure, with editable child details such as `<Description>`, `<Website>`, and `<PayLink>`.
+## Production verification checklist
+
+1. Open `https://<your-host>/admin/` as an allowed administrator; verify a disallowed account is blocked.
+2. Confirm the page loads events, charities, duties, the Record Description, and the image library.
+3. Edit an event, charity, duty, and Record Description; select **Save changes**, reload, and confirm the changes persisted.
+4. Upload an image, assign it through an event's `<Picture>` detail, save, and confirm it renders on the public site.
+5. Upload a replacement with the same filename; confirm it overwrites the object and the public site shows the replacement.
+6. Attempt to delete an image referenced by saved XML; deletion should be refused. Change or remove the reference, save the XML, then delete the unused image.
+7. Repeat checks on preview if it is enabled, confirming it changes only the `dev-*` buckets.
 
 ## Local development
 
-Run the Pages development server from the repository root so the Pages Functions and R2 bindings are available. Provide the two Access variables in the local Wrangler environment only when testing authenticated API requests. A plain static file server does not implement the XML or picture APIs.
+Run the Pages dev server from the repository root so the Pages Functions and configured R2 bindings are available. A plain static file server cannot serve the XML or picture APIs. The admin API requires a valid Cloudflare Access JWT, so use the deployed Access-protected hostname for end-to-end admin verification.
+
+## Saving behavior
+
+- XML edits remain in the page until **Save changes**. A stale version is rejected instead of replacing a newer save; reload and reapply your edits.
+- Picture uploads and deletions happen immediately. Uploading does not assign an image to an event; choose it in the event's `<Picture>` field and save the XML.
+- Deletion is blocked while any saved `<Picture>` field references that filename.
+- Charities use `<Charities><Charity name="...">` with editable child details such as `<Description>`, `<Website>`, and `<PayLink>`.
