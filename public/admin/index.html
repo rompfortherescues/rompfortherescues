@@ -3,144 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Romp for the Rescues</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Admin | Romp for the Rescues</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/admin/admin.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- First item: banner picture (includes org name). Aspect ratio preserved. -->
   <div class="banner">
     <img src="/r2-images/banners.jpg" alt="Romp for the Rescues – Fun events that raise funds for animal charities" id="banner-img">
   </div>
 
   <header>
-    <p id="tagline">Fun events that help raise funds for animal charities.</p>
-    <p id="mission" class="subtitle"></p>
+    <p id="tagline">Romp for the Rescues</p>
+    <p class="subtitle">Content management</p>
     <nav>
       <a href="#events">Events</a>
-      <a href="#charities">Charities</a>
       <a href="#duties">Duties</a>
+      <a href="/">View public site</a>
     </nav>
   </header>
 
-  <main>
-    <section id="events">
-      <h2>Upcoming Events</h2>
-      <div id="events-list" class="cards"></div>
+  <main class="admin-main">
+    <div class="admin-heading">
+      <div>
+        <p class="admin-eyebrow">Administration</p>
+        <h1>Events and duties</h1>
+      </div>
+      <div class="admin-toolbar">
+        <button type="button" class="btn btn-turquoise" id="reload-data">Reload</button>
+        <button type="button" class="btn btn-pink" id="save-data" disabled>Save changes</button>
+      </div>
+    </div>
+
+    <p id="status-message" class="admin-status" role="status" aria-live="polite">Loading data.xml...</p>
+
+    <section class="admin-section" id="events">
+      <div class="section-heading">
+        <div>
+          <h2>Events</h2>
+          <p class="section-note">Select an event to edit its attributes and details.</p>
+        </div>
+        <button type="button" class="btn btn-turquoise" id="add-event">Add event</button>
+      </div>
+      <div id="events-list" class="admin-list" aria-live="polite"></div>
     </section>
 
-    <section id="charities">
-      <h2>Affiliated Charities</h2>
-      <p>Each event supports one or more of these organizations. Donate directly via their links. You can also support Romp for the Rescues administration.</p>
-      <div id="charities-list" class="cards"></div>
-    </section>
-
-    <section id="duties">
-      <h2>The things people can help with for multiple events</h2>
-      
+    <section class="admin-section" id="duties">
+      <div class="section-heading">
+        <div>
+          <h2>Duties</h2>
+          <p class="section-note">Manage the reusable volunteer duty list.</p>
+        </div>
+        <button type="button" class="btn btn-turquoise" id="add-duty">Add duty</button>
+      </div>
+      <div id="duties-list" class="admin-list" aria-live="polite"></div>
     </section>
   </main>
 
-  <!-- Register Modal -->
-  <div id="register-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" data-modal="register-modal">&times;</span>
-      <h2>Register for Event</h2>
-      <p id="reg-event-info"></p>
-      <form id="register-form">
-        <input type="hidden" id="reg-event-data">
-        <div class="form-group">
-          <label for="reg-name">Full Name *</label>
-          <input type="text" id="reg-name" required>
-        </div>
-        <div class="form-group">
-          <label for="reg-email">Email *</label>
-          <input type="email" id="reg-email" required>
-        </div>
-        <div class="form-group">
-          <label for="reg-phone">Telephone (optional)</label>
-          <input type="tel" id="reg-phone">
-        </div>
-        <div class="form-group">
-          <label for="reg-qty">Number of Tickets *</label>
-          <input type="number" id="reg-qty" min="1" value="1" required>
-        </div>
-        <button type="submit" class="btn btn-pink">Proceed to Payment (Stripe)</button>
-      </form>
-      <div id="reg-message" class="message"></div>
-    </div>
-  </div>
+  <dialog id="event-editor" class="editor-dialog">
+    <form id="event-form" method="dialog">
+      <div class="dialog-heading">
+        <h2 id="event-editor-title">Edit event</h2>
+        <button type="button" class="icon-button" data-close-dialog="event-editor" aria-label="Close">&times;</button>
+      </div>
+      <p class="section-note">Edit the event's XML attributes and detail fields. Repeated fields such as locations and charities are kept separate.</p>
+      <div id="event-attributes" class="editor-fields"></div>
+      <div class="field-list-heading">
+        <h3>Attributes</h3>
+        <button type="button" class="btn btn-turquoise" id="add-event-attribute">Add attribute</button>
+      </div>
+      <div class="field-list-heading">
+        <h3>Details</h3>
+        <button type="button" class="btn btn-turquoise" id="add-event-field">Add detail</button>
+      </div>
+      <div id="event-elements" class="event-elements"></div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="event-editor">Cancel</button>
+        <button type="submit" class="btn btn-pink">Apply event changes</button>
+      </div>
+    </form>
+  </dialog>
 
-  <!-- Specific Volunteer Modal (phone optional) -->
-  <div id="vol-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" data-modal="vol-modal">&times;</span>
-      <h2>Volunteer for Event</h2>
-      <p id="vol-event-info"></p>
-      <form id="vol-specific-form">
-        <input type="hidden" id="vol-spec-event-data">
-        <div class="form-group">
-          <label for="vol-spec-name">Full Name *</label>
-          <input type="text" id="vol-spec-name" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-email">Email *</label>
-          <input type="email" id="vol-spec-email" required>
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-phone">Telephone (optional)</label>
-          <input type="tel" id="vol-spec-phone">
-        </div>
-        <div class="form-group" id="vol-spec-duty-group">
-          <label for="vol-spec-duty">Preferred Duty</label>
-          <select id="vol-spec-duty">
-            <option value="">-- Select a duty (optional) --</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="vol-spec-notes">Notes (optional)</label>
-          <textarea id="vol-spec-notes" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-turquoise">Submit Volunteer Registration</button>
-      </form>
-      <div id="vol-spec-message" class="message"></div>
-    </div>
-  </div>
-
-  <!-- Support / admin contribution modal. Hidden until "Support us" is clicked. -->
-  <div id="support-modal" class="modal">
-    <div class="modal-content">
-      <span class="close" data-modal="support-modal">&times;</span>
-      <h2>Support Romp for the Rescues</h2>
-      <p class="support-disclaimer">
-        Romp for the Rescues is <strong>NOT</strong> a tax deductible donation.
-        Any donation to help us cover administrative costs is greatly appreciated.
-      </p>
-      <form id="support-form">
-        <div class="form-group">
-          <label for="support-name">Full Name *</label>
-          <input type="text" id="support-name" required>
-        </div>
-        <div class="form-group">
-          <label for="support-email">Email *</label>
-          <input type="email" id="support-email" required>
-        </div>
-        <div class="form-group">
-          <label for="support-amount">Amount (USD) *</label>
-          <input type="number" id="support-amount" min="1" step="0.01" placeholder="25.00" required>
-        </div>
-        <button type="submit" class="btn btn-pink">Pay with Card (Stripe)</button>
-      </form>
-      <div id="support-message" class="message"></div>
-    </div>
-  </div>
+  <dialog id="duty-editor" class="editor-dialog">
+    <form id="duty-form" method="dialog">
+      <div class="dialog-heading">
+        <h2 id="duty-editor-title">Edit duty</h2>
+        <button type="button" class="icon-button" data-close-dialog="duty-editor" aria-label="Close">&times;</button>
+      </div>
+      <label class="form-group" for="duty-name">Duty name</label>
+      <input id="duty-name" name="duty-name" type="text" required maxlength="160">
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="duty-editor">Cancel</button>
+        <button type="submit" class="btn btn-pink">Apply duty changes</button>
+      </div>
+    </form>
+  </dialog>
 
   <footer>
-    <p>&copy; <span id="year"></span> Romp for the Rescues. Supporting animal charities through fun events.</p>
-    <p><a href="/privacy-policy.html"  target="_blank" rel="noopener noreferrer" class="btn btn-pink">Privacy Policy</a></p>
-    <p>Contact: RompfortheRescues@gmail.com</p>
+    <p>Romp for the Rescues administration</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="/admin/admin.js" defer></script>
 </body>
 </html>
