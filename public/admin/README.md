@@ -4,12 +4,13 @@ The admin page and Pages Functions are implemented. Event, charity, duty, and Re
 
 ## Already configured in the repository
 
-The updated `wrangler.toml` declares:
+The updated `wrangler.toml` declares the production buckets at the top level and explicitly overrides the preview environment:
 
-- `XML_DATA_BUCKET`: `prod-xmldata` in production and `dev-xmldata` in preview.
-- `EVENT_PICTURES_BUCKET`: `prod-eventpictures` in production and `dev-eventpictures` in preview.
+- Production `XML_DATA_BUCKET` -> `prod-xmldata`; preview -> `dev-xmldata`.
+- Production `EVENT_PICTURES_BUCKET` -> `prod-eventpictures`; preview -> `dev-eventpictures`.
+- `SLIDESHOW_BUCKET` remains `slideshowpictures` in both environments.
 
-No further Wrangler binding changes are required. The existing `SLIDESHOW_BUCKET` is unrelated to event picture storage.
+The top-level `preview_bucket_name` values select local development buckets; deployed Pages previews use the explicit `[env.preview.r2_buckets]` bindings. No further Wrangler binding changes are required.
 
 ## Remaining Cloudflare setup
 

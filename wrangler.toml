@@ -25,3 +25,22 @@ FROM_NAME   = "rompfortherescues.org"
 REPLY_TO    = "rompfortherescues@gmail.com"
 BCC_EMAIL   = "rogerdtinsley@gmail.com"
 
+[env.preview.vars]
+FROM_EMAIL  = "donotreply@rompfortherescues.org"
+CC_EMAIL    = "rompfortherescues@gmail.com"
+FROM_NAME   = "rompfortherescues.org"
+REPLY_TO    = "rompfortherescues@gmail.com"
+BCC_EMAIL   = "rogerdtinsley@gmail.com"
+
+[[env.preview.r2_buckets]]
+binding = "SLIDESHOW_BUCKET"
+bucket_name = "slideshowpictures"
+
+[[env.preview.r2_buckets]]
+binding = "EVENT_PICTURES_BUCKET"
+bucket_name = "dev-eventpictures"
+
+[[env.preview.r2_buckets]]
+binding = "XML_DATA_BUCKET"
+bucket_name = "dev-xmldata"
+
