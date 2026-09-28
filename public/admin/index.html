@@ -84,10 +84,14 @@
       <div class="section-heading">
         <div>
           <h2>Event pictures</h2>
-          <p class="section-note">Upload a picture or overwrite one by uploading a file with the same name. Assign it from an event's Picture detail.</p>
+          <p class="section-note">Choose an event to assign a new picture. Replacements are stored as new WebP files.</p>
         </div>
         <div>
-          <input id="picture-file" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp" hidden>
+          <label for="picture-event">Assign to event</label>
+          <select id="picture-event" class="picture-select" aria-label="Event for uploaded picture">
+            <option value="">Choose an event</option>
+          </select>
+          <input id="picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" hidden>
           <button type="button" class="btn btn-turquoise" id="upload-picture">Upload picture</button>
         </div>
       </div>

@@ -66,8 +66,10 @@
       const pictureError = await loadPictures();
       status(pictureError || `Loaded ${eventNodes().length} events, ${state.xml.querySelectorAll('Charities > Charity').length} charities, and ${dutyNodes().length} duties.`,
         pictureError ? 'error' : 'info');
+      return true;
     } catch (error) {
       status(error.message || 'Could not load data.xml.', 'error');
+      return false;
     } finally {
       byId('reload-data').disabled = false;
       byId('save-data').disabled = !state.dirty;
@@ -89,6 +91,7 @@
     const list = byId('events-list');
     list.replaceChildren();
     const events = eventNodes();
+    renderPictureEventOptions(events);
     if (!events.length) {
       setEmptyState(list, 'No events in data.xml yet. Add an event to get started.');
       return;
@@ -114,6 +117,16 @@
       );
       row.append(copy, actions);
       list.append(row);
+    });
+  }
+
+  function renderPictureEventOptions(events = eventNodes()) {
+    const select = byId('picture-event');
+    select.replaceChildren(new Option('Choose an event', ''));
+    events.forEach((eventNode, index) => {
+      const name = eventNode.getAttribute('name') || 'Untitled event';
+      const date = eventNode.getAttribute('date');
+      select.add(new Option(date ? `${name} (${date})` : name, String(index)));
     });
   }
 
@@ -235,16 +248,64 @@
     });
   }
 
+  async function convertToWebp(file) {
+    const bitmap = await createImageBitmap(file);
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext('2d').drawImage(bitmap, 0, 0);
+      const blob = await new Promise((resolve, reject) => {
+        canvas.toBlob((result) => result ? resolve(result) : reject(new Error('This browser could not convert the picture to WebP.')), 'image/webp', 0.9);
+      });
+      if (blob.type !== 'image/webp') throw new Error('This browser does not support WebP image conversion.');
+      if (blob.size > 1024 * 1024) throw new Error('The converted WebP exceeds the 1 MB upload limit.');
+      return blob;
+    } finally {
+      bitmap.close();
+    }
+  }
+
+  function setEventPicture(eventNode, url) {
+    const pictureElements = Array.from(eventNode.children).filter((child) => child.tagName === 'Picture');
+    if (pictureElements.length) pictureElements.forEach((picture) => { picture.textContent = url; });
+    else {
+      const picture = state.xml.createElement('Picture');
+      picture.textContent = url;
+      eventNode.append(picture);
+    }
+  }
+
   async function uploadPicture(file) {
     if (!file) return;
-    const existing = state.pictures.find((picture) => picture.key === file.name);
-    if (existing && !window.confirm(`A file named ${file.name} already exists. Overwrite it?`)) return;
+    if (!/\.(?:jpe?g|png|webp|gif)$/i.test(file.name)) {
+      status('Choose a JPG, JPEG, PNG, WebP, or GIF image.', 'error');
+      return;
+    }
 
-    const form = new FormData();
-    form.append('file', file, file.name);
+    const targetIndex = byId('picture-event').value;
+    const targetEvent = targetIndex === '' ? null : eventNodes()[Number(targetIndex)];
+    if (!targetEvent) {
+      status('Choose an event before uploading its picture.', 'error');
+      return;
+    }
+
+    const oldValue = targetEvent.querySelector('Picture')?.textContent || '';
+    const oldKey = oldValue ? pictureKeyFromValue(oldValue) : '';
+    const existing = state.pictures.find((picture) => picture.key === oldKey);
+    if (existing && state.dirty) {
+      status('Save or discard your current data.xml changes before replacing an event picture.', 'error');
+      return;
+    }
+    if (existing && !window.confirm(`Replace ${oldKey} for ${targetEvent.getAttribute('name') || 'this event'}?`)) return;
+
     byId('upload-picture').disabled = true;
-    status(`Uploading ${file.name}...`);
+    status(`Converting and uploading ${file.name}...`);
     try {
+      const webp = await convertToWebp(file);
+      const key = `event-${crypto.randomUUID()}.webp`;
+      const form = new FormData();
+      form.append('file', webp, key);
       const response = await fetch('/api/admin/pictures', {
         method: 'POST',
         credentials: 'same-origin',
@@ -252,11 +313,27 @@
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || `Upload failed (${response.status}).`);
-      const pictureError = await loadPictures();
-      status(pictureError || `${file.name} is stored in the eventpictures bucket. Assign it to an event from its Picture detail.`,
-        pictureError ? 'error' : 'info');
+      const newPictureKey = result.picture?.key || key;
+      if (existing) {
+        const deleteResponse = await fetch(`/api/admin/pictures?name=${encodeURIComponent(oldKey)}&replacement=${encodeURIComponent(newPictureKey)}`, {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+        const deleteResult = await deleteResponse.json().catch(() => ({}));
+        if (!deleteResponse.ok) throw new Error(deleteResult.error || `Could not replace ${oldKey} (${deleteResponse.status}).`);
+        const loaded = await loadData(true);
+        if (!loaded) throw new Error('Picture replacement succeeded, but data.xml could not be reloaded. Reload data before making further changes.');
+        status(`${oldKey} was replaced with ${newPictureKey}; the new file is stored in eventpictures.`);
+      } else {
+        setEventPicture(targetEvent, `/r2-images/${encodeURIComponent(newPictureKey)}`);
+        markDirty();
+        const pictureError = await loadPictures();
+        status(pictureError || `${newPictureKey} is assigned to ${targetEvent.getAttribute('name') || 'the selected event'}. Save changes to write the Picture detail to data.xml.`,
+          pictureError ? 'error' : 'dirty');
+      }
     } catch (error) {
       status(error.message || 'Could not upload picture.', 'error');
+      await loadPictures();
     } finally {
       byId('upload-picture').disabled = false;
       byId('picture-file').value = '';

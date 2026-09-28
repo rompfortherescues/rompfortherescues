@@ -18,7 +18,7 @@ The top-level `preview_bucket_name` values select local development buckets; dep
 
 In **R2 Object Storage**, confirm that all four bucket names above exist. Confirm that `data.xml` is present and contains the correct data in both `prod-xmldata` and `dev-xmldata`. Keep production and preview content separate as intended.
 
-Event images are stored at the root of the corresponding event-pictures bucket. The editor accepts JPEG, PNG, GIF, WebP, and AVIF files up to 12 MB. Uploading an existing filename overwrites that object. The public `/r2-images/*` route serves the object and revalidates its cache so an overwrite is visible.
+Event images are stored at the root of the corresponding event-pictures bucket. The editor accepts JPG, JPEG, PNG, WebP, and GIF images, converts each upload to WebP, rejects converted files larger than 1 MB, and stores accepted files under a generated filename. Uploading for an event with an existing picture first stores the new file, then updates all matching `<Picture>` references in `data.xml` and removes the old object. The public `/r2-images/*` route serves the files and revalidates its cache.
 
 ### 2. Create Cloudflare Access applications
 
@@ -50,7 +50,7 @@ Deploy the Pages project after setting the Access policies and variables. Confir
 2. Confirm the page loads events, charities, duties, the Record Description, and the image library.
 3. Edit an event, charity, duty, and Record Description; select **Save changes**, reload, and confirm the changes persisted.
 4. Upload an image, assign it through an event's `<Picture>` detail, save, and confirm it renders on the public site.
-5. Upload a replacement with the same filename; confirm it overwrites the object and the public site shows the replacement.
+5. Choose an event with a picture and upload a replacement; confirm a new WebP file is added, the old file is removed, and the public site shows the replacement.
 6. Attempt to delete an image referenced by saved XML; deletion should be refused. Change or remove the reference, save the XML, then delete the unused image.
 7. Repeat checks on preview if it is enabled, confirming it changes only the `dev-*` buckets.
 
