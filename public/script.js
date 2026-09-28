@@ -28,7 +28,7 @@ function openModal(id) {
 
 async function loadData() {
   try {
-    const res = await fetch('/xml-data/data.xml');
+    const res = await fetch(`/xml-data/data.xml?v=${Date.now()}`, { cache: 'no-store' });
     const text = await res.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'application/xml');

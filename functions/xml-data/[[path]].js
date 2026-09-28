@@ -7,7 +7,7 @@ export async function onRequestGet({ params, env }) {
 
   const headers = new Headers();
   headers.set('Content-Type', object.httpMetadata?.contentType || 'application/xml');
-  headers.set('Cache-Control', 'public, max-age=300');
+  headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
   headers.set('ETag', object.httpEtag);
 
   return new Response(object.body, { headers });

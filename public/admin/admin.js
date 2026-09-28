@@ -50,7 +50,7 @@
     byId('save-data').disabled = true;
     status('Loading data.xml...');
     try {
-      const response = await fetch('/xml-data/data.xml', { cache: 'no-store', credentials: 'same-origin' });
+      const response = await fetch(`/xml-data/data.xml?v=${Date.now()}`, { cache: 'no-store', credentials: 'same-origin' });
       if (!response.ok) throw new Error(`Could not load data.xml (${response.status}).`);
 
       const source = await response.text();
