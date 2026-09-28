@@ -9,7 +9,16 @@ bucket_name = "slideshowpictures"
 
 [[r2_buckets]]
 binding = "EVENT_PICTURES_BUCKET"
-bucket_name = "eventpictures"
+bucket_name = "prod-eventpictures"
+preview_bucket_name = "dev-eventpictures"
+
+[[env.preview.r2_buckets]]
+binding = "SLIDESHOW_BUCKET"
+bucket_name = "slideshowpictures"
+
+[[env.preview.r2_buckets]]
+binding = "EVENT_PICTURES_BUCKET"
+bucket_name = "dev-eventpictures"
 
 [vars]
 # Non-secret config
