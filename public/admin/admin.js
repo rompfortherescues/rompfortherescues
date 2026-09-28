@@ -84,7 +84,41 @@
   }
 
   function renderRecordDescription() {
-    byId('record-description-input').value = state.xml.querySelector('Record > Description')?.textContent || '';
+    byId('record-description-input').value = elementEditorValue(state.xml.querySelector('Record > Description'));
+    byId('record-mission-input').value = elementEditorValue(state.xml.querySelector('Record > Mission'));
+  }
+
+  function elementEditorValue(element) {
+    if (!element) return '';
+    if (element.tagName !== 'Description' && element.tagName !== 'Mission') return element.textContent;
+    const serializer = new XMLSerializer();
+    return Array.from(element.childNodes).map((node) => {
+      if (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.CDATA_SECTION_NODE) return node.nodeValue;
+      return serializer.serializeToString(node);
+    }).join('');
+  }
+
+  function setElementEditorValue(element, value) {
+    element.replaceChildren();
+    if ((element.tagName === 'Description' || element.tagName === 'Mission') && /<\/?[A-Za-z][^>]*>/.test(value)) {
+      const parsed = new DOMParser().parseFromString(`<div>${value}</div>`, 'text/html');
+      const wrapper = parsed.body.firstElementChild;
+      Array.from(wrapper.childNodes).forEach((node) => element.append(state.xml.importNode(node, true)));
+      return;
+    }
+    element.textContent = value;
+  }
+
+  function updateRecordTextField(name, value) {
+    let element = state.xml.querySelector(`Record > ${name}`);
+    if (!element) {
+      element = state.xml.createElement(name);
+      const description = state.xml.querySelector('Record > Description');
+      if (name === 'Mission' && description) description.after(element);
+      else state.xml.documentElement.insertBefore(element, state.xml.documentElement.firstChild);
+    }
+    setElementEditorValue(element, value);
+    markDirty();
   }
 
   function renderEvents() {
@@ -457,7 +491,7 @@
     byId('event-elements').replaceChildren();
 
     Array.from(eventNode.attributes).forEach((attribute) => addAttributeRow(attribute.name, attribute.value));
-    Array.from(eventNode.children).forEach((child) => addElementRow(child.tagName, child.textContent));
+    Array.from(eventNode.children).forEach((child) => addElementRow(child.tagName, elementEditorValue(child)));
     byId('event-editor').showModal();
   }
 
@@ -560,13 +594,12 @@
 
   byId('record-description-input').addEventListener('input', (event) => {
     if (!state.xml) return;
-    let description = state.xml.querySelector('Record > Description');
-    if (!description) {
-      description = state.xml.createElement('Description');
-      state.xml.documentElement.insertBefore(description, state.xml.documentElement.firstChild);
-    }
-    description.textContent = event.target.value;
-    markDirty();
+    updateRecordTextField('Description', event.target.value);
+  });
+
+  byId('record-mission-input').addEventListener('input', (event) => {
+    if (!state.xml) return;
+    updateRecordTextField('Mission', event.target.value);
   });
 
   byId('event-form').addEventListener('submit', (event) => {
@@ -609,7 +642,7 @@
     updatedAttributes.forEach((value, name) => node.setAttribute(name, value));
     node.replaceChildren(...details.map((detail) => {
       const child = state.xml.createElement(detail.name);
-      child.textContent = detail.value;
+      setElementEditorValue(child, detail.value);
       return child;
     }));
 
