@@ -192,6 +192,15 @@
       title.textContent = `${eventNode.getAttribute('name') || 'Untitled event'} - ${eventNode.getAttribute('date') || 'No date set'}`;
       copy.append(title);
 
+      const picture = eventNode.querySelector('Picture')?.textContent.trim();
+      const picturePreview = picture ? document.createElement('img') : null;
+      if (picturePreview) {
+        picturePreview.className = 'event-row-picture';
+        picturePreview.src = picture;
+        picturePreview.alt = `${eventNode.getAttribute('name') || 'Event'} picture`;
+        picturePreview.loading = 'lazy';
+      }
+
       const actions = document.createElement('div');
       actions.className = 'row-actions';
       actions.append(
@@ -203,7 +212,9 @@
         createButton('Edit', 'btn-turquoise', () => openEventEditor(eventNode)),
         createButton('Delete', 'btn-danger', () => deleteEvent(eventNode))
       );
-      row.append(copy, actions);
+      row.append(copy);
+      if (picturePreview) row.append(picturePreview);
+      row.append(actions);
       list.append(row);
     });
   }
@@ -633,6 +644,7 @@
   byId('add-charity').addEventListener('click', () => {
     const charityNode = state.xml.createElement('Charity');
     charityNode.setAttribute('name', '');
+    ['Description', 'Website', 'PayLink'].forEach((name) => charityNode.append(state.xml.createElement(name)));
     openEventEditor(charityNode, true, 'charity');
   });
   byId('add-duty').addEventListener('click', () => {
