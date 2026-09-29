@@ -18,7 +18,8 @@ function linkifyText(text) {
 
 function appendSafeInline(target, source) {
   if (source.nodeType === Node.TEXT_NODE) {
-    target.append(document.createTextNode(source.nodeValue));
+    const linkedText = new DOMParser().parseFromString(linkifyText(source.nodeValue), 'text/html');
+    Array.from(linkedText.body.childNodes).forEach((child) => target.append(document.importNode(child, true)));
     return;
   }
   if (source.nodeType !== Node.ELEMENT_NODE) return;
@@ -38,15 +39,19 @@ function appendSafeInline(target, source) {
   if (container !== target) target.append(container);
 }
 
+function renderDescriptionMarkup(target, element) {
+  const markup = Array.from(element.childNodes).map((child) =>
+    child.nodeType === Node.ELEMENT_NODE ? new XMLSerializer().serializeToString(child) : child.nodeValue || ''
+  ).join('');
+  const parsed = new DOMParser().parseFromString(markup, 'text/html');
+  Array.from(parsed.body.childNodes).forEach((child) => appendSafeInline(target, child));
+}
+
 function renderRecordParagraphs(record, name, container) {
   container.replaceChildren();
   Array.from(record.children).filter((child) => child.tagName === name).forEach((element) => {
     const paragraph = document.createElement('p');
-    const markup = Array.from(element.childNodes).map((child) =>
-      child.nodeType === Node.ELEMENT_NODE ? new XMLSerializer().serializeToString(child) : child.nodeValue || ''
-    ).join('');
-    const parsed = new DOMParser().parseFromString(markup, 'text/html');
-    Array.from(parsed.body.childNodes).forEach((child) => appendSafeInline(paragraph, child));
+    renderDescriptionMarkup(paragraph, element);
     container.append(paragraph);
   });
 }
@@ -130,7 +135,7 @@ async function loadData() {
             <h3>${name}</h3>
             <p><strong>${date}</strong> · ${time} · ${type}</p>
             <div class="locations">${locHtml}</div>
-            <p>${linkifyText(description)}</p>
+            <div class="event-descriptions"></div>
             ${inclHtml}
             ${detailsHtml ? `<p>${detailsHtml}</p>` : ''}
             ${registerHtml}
@@ -139,6 +144,7 @@ async function loadData() {
           ${pictureHtml}
         </div>
       `;
+      renderRecordParagraphs(ev, 'Description', card.querySelector('.event-descriptions'));
       card.querySelector('.register-btn')?.addEventListener('click', () => openRegister(eventObj));
       card.querySelector('.volunteer-btn').addEventListener('click', () => openSpecificVolunteer(eventObj));
       eventsList.appendChild(card);
@@ -149,7 +155,6 @@ async function loadData() {
     charitiesList.innerHTML = '';
     xml.querySelectorAll('Charities > Charity').forEach(ch => {
       const name = ch.getAttribute('name') || '';
-      const desc = ch.querySelector('Description')?.textContent?.trim() || '';
       const website = ch.querySelector('Website')?.textContent?.trim() || '#';
       const payLink = ch.querySelector('PayLink')?.textContent?.trim() || '#';
 
@@ -157,12 +162,13 @@ async function loadData() {
       card.className = 'charity-card';
       card.innerHTML = `
         <h3>${name}</h3>
-        <p>${desc}</p>
+        <div class="charity-descriptions"></div>
         <p>
           <a href="${website}" target="_blank" rel="noopener">Website</a> ·
           <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink" style="padding:0.3rem 0.8rem;font-size:0.9rem;">Donate</a>
         </p>
       `;
+      renderRecordParagraphs(ch, 'Description', card.querySelector('.charity-descriptions'));
       charitiesList.appendChild(card);
     });
   } catch (err) {

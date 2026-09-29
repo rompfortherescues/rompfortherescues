@@ -592,6 +592,35 @@
     renderDuties();
   }
 
+  function indentXmlElement(element, depth, document) {
+    if (element.tagName === 'Description' || element.tagName === 'Mission') return;
+
+    const children = Array.from(element.childNodes);
+    const hasTextContent = children.some((child) =>
+      (child.nodeType === Node.TEXT_NODE && child.nodeValue.trim()) || child.nodeType === Node.CDATA_SECTION_NODE);
+    if (hasTextContent) return;
+
+    const indentable = children.filter((child) =>
+      child.nodeType === Node.ELEMENT_NODE || child.nodeType === Node.COMMENT_NODE);
+    if (!indentable.length) return;
+
+    indentable.forEach((child) => {
+      if (child.nodeType === Node.ELEMENT_NODE) indentXmlElement(child, depth + 1, document);
+    });
+    children.filter((child) => child.nodeType === Node.TEXT_NODE && !child.nodeValue.trim())
+      .forEach((child) => child.remove());
+    indentable.forEach((child) => {
+      element.insertBefore(document.createTextNode(`\n${'  '.repeat(depth + 1)}`), child);
+    });
+    element.append(document.createTextNode(`\n${'  '.repeat(depth)}`));
+  }
+
+  function serializeIndentedXml(xml) {
+    const formatted = xml.cloneNode(true);
+    indentXmlElement(formatted.documentElement, 0, formatted);
+    return new XMLSerializer().serializeToString(formatted);
+  }
+
   async function saveData() {
     if (!state.dirty && !state.pendingPictureDeletions.size) return;
     const button = byId('save-data');
@@ -599,7 +628,7 @@
     status('Saving data.xml...');
     try {
       if (state.dirty) {
-        const xmlText = new XMLSerializer().serializeToString(state.xml);
+        const xmlText = serializeIndentedXml(state.xml);
         const response = await fetch('/api/admin/data', {
           method: 'POST',
           credentials: 'same-origin',
