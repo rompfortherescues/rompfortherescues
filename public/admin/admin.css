@@ -110,12 +110,17 @@
 
 .row-copy {
   min-width: 0;
-  overflow-wrap: anywhere;
+  flex: 1 1 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .row-copy h3 {
   color: #333;
   font-size: 1.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .row-copy p {
@@ -333,6 +338,11 @@ select:focus-visible {
   .admin-row {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .row-copy {
+    width: 100%;
+    flex: 0 1 auto;
   }
 
   .row-actions {

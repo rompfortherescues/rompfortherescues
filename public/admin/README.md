@@ -60,7 +60,7 @@ Run the Pages dev server from the repository root so the Pages Functions and con
 
 ## Saving behavior
 
-- XML edits remain in the page until **Save changes**. A stale version is rejected instead of replacing a newer save; reload and reapply your edits.
+- XML edits remain in the page until **Save changes**. Saving replaces the stored XML with the current editor contents; reload before editing if someone else may have made changes.
 - Top-level `<Description>` and `<Mission>` elements can repeat. Each has its own View, Edit, and Delete actions; Add opens an editor. The public page presents each element as a separate paragraph. Other XML fields keep their existing structure.
 - Picture uploads and deletions happen immediately. Uploading does not assign an image to an event; choose it in the event's `<Picture>` field and save the XML.
 - Deletion is blocked while any saved `<Picture>` field references that filename.

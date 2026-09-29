@@ -2,7 +2,6 @@
   const byId = (id) => document.getElementById(id);
   const state = {
     xml: null,
-    etag: null,
     pictures: [],
     dirty: false,
     recordEditing: null,
@@ -62,7 +61,6 @@
       }
 
       state.xml = xml;
-      state.etag = response.headers.get('ETag');
       state.dirty = false;
       renderLists();
       const pictureError = await loadPictures();
@@ -104,8 +102,7 @@
       row.className = 'admin-row';
       const preview = document.createElement('p');
       preview.className = 'row-copy';
-      const text = node.textContent.trim();
-      preview.textContent = text.length > 120 ? `${text.slice(0, 120)}...` : text || '(empty)';
+      preview.textContent = node.textContent.trim().replace(/\s+/g, ' ') || '(empty)';
       const actions = document.createElement('div');
       actions.className = 'row-actions';
       actions.append(
@@ -178,16 +175,8 @@
       const copy = document.createElement('div');
       copy.className = 'row-copy';
       const title = document.createElement('h3');
-      title.textContent = eventNode.getAttribute('name') || 'Untitled event';
-      const date = document.createElement('p');
-      date.textContent = eventNode.getAttribute('date') || 'No date set';
-      copy.append(title, date);
-      const description = eventNode.querySelector('Description')?.textContent.trim();
-      if (description) {
-        const preview = document.createElement('p');
-        preview.textContent = description.length > 120 ? `${description.slice(0, 120)}...` : description;
-        copy.append(preview);
-      }
+      title.textContent = `${eventNode.getAttribute('name') || 'Untitled event'} - ${eventNode.getAttribute('date') || 'No date set'}`;
+      copy.append(title);
 
       const actions = document.createElement('div');
       actions.className = 'row-actions';
@@ -230,7 +219,7 @@
       const copy = document.createElement('div');
       copy.className = 'row-copy';
       const title = document.createElement('h3');
-      title.textContent = dutyNode.textContent.trim() || 'Unnamed duty';
+      title.textContent = dutyNode.textContent.trim().replace(/\s+/g, ' ') || 'Unnamed duty';
       copy.append(title);
 
       const actions = document.createElement('div');
@@ -260,9 +249,7 @@
       copy.className = 'row-copy';
       const title = document.createElement('h3');
       title.textContent = charityNode.getAttribute('name') || 'Unnamed charity';
-      const description = document.createElement('p');
-      description.textContent = charityNode.querySelector('Description')?.textContent.trim() || 'No description';
-      copy.append(title, description);
+      copy.append(title);
 
       const actions = document.createElement('div');
       actions.className = 'row-actions';
@@ -589,7 +576,7 @@
   }
 
   async function saveData() {
-    if (!state.dirty || !state.etag) return;
+    if (!state.dirty) return;
     const button = byId('save-data');
     button.disabled = true;
     status('Saving data.xml...');
@@ -599,18 +586,13 @@
         method: 'POST',
         credentials: 'same-origin',
         headers: {
-          'Content-Type': 'application/xml; charset=utf-8',
-          'If-Match': state.etag
+          'Content-Type': 'application/xml; charset=utf-8'
         },
         body: xmlText
       });
       const result = await response.json().catch(() => ({}));
-      if (response.status === 409) {
-        throw new Error('data.xml changed since you loaded it. Reload before saving to avoid overwriting someone else\'s edits.');
-      }
       if (!response.ok) throw new Error(result.error || `Save failed (${response.status}).`);
 
-      state.etag = response.headers.get('ETag') || result.etag || state.etag;
       state.dirty = false;
       status('Changes saved to data.xml.');
     } catch (error) {
