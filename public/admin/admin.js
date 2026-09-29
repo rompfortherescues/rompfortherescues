@@ -5,6 +5,8 @@
     etag: null,
     pictures: [],
     dirty: false,
+    recordEditing: null,
+    recordKind: null,
     eventEditing: null,
     eventIsNew: false,
     eventKind: 'event',
@@ -77,15 +79,65 @@
   }
 
   function renderLists() {
-    renderRecordDescription();
+    renderRecordTexts('Description');
+    renderRecordTexts('Mission');
     renderEvents();
     renderCharities();
     renderDuties();
   }
 
-  function renderRecordDescription() {
-    byId('record-description-input').value = elementEditorValue(state.xml.querySelector('Record > Description'));
-    byId('record-mission-input').value = elementEditorValue(state.xml.querySelector('Record > Mission'));
+  function recordTextNodes(name) {
+    return Array.from(state.xml.documentElement.children).filter((child) => child.tagName === name);
+  }
+
+  function renderRecordTexts(name) {
+    const list = byId(name === 'Description' ? 'descriptions-list' : 'missions-list');
+    list.replaceChildren();
+    const nodes = recordTextNodes(name);
+    if (!nodes.length) {
+      setEmptyState(list, `No ${name.toLowerCase()}s yet.`);
+      return;
+    }
+
+    nodes.forEach((node) => {
+      const row = document.createElement('article');
+      row.className = 'admin-row';
+      const preview = document.createElement('p');
+      preview.className = 'row-copy';
+      const text = node.textContent.trim();
+      preview.textContent = text.length > 120 ? `${text.slice(0, 120)}...` : text || '(empty)';
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+      actions.append(
+        createButton('View', 'btn-turquoise', () => showItem(name, elementEditorValue(node))),
+        createButton('Edit', 'btn-turquoise', () => openRecordTextEditor(name, node)),
+        createButton('Delete', 'btn-danger', () => deleteRecordText(name, node))
+      );
+      row.append(preview, actions);
+      list.append(row);
+    });
+  }
+
+  function showItem(title, content) {
+    byId('item-view-title').textContent = title;
+    byId('item-view-content').textContent = content;
+    byId('item-view').showModal();
+  }
+
+  function openRecordTextEditor(name, node = null) {
+    state.recordKind = name;
+    state.recordEditing = node;
+    byId('record-text-title').textContent = `${node ? 'Edit' : 'Add'} ${name.toLowerCase()}`;
+    byId('record-text-input').value = elementEditorValue(node);
+    byId('record-text-editor').showModal();
+    byId('record-text-input').focus();
+  }
+
+  function deleteRecordText(name, node) {
+    if (!window.confirm(`Delete this ${name.toLowerCase()}? This will be included when you save changes.`)) return;
+    node.remove();
+    markDirty();
+    renderRecordTexts(name);
   }
 
   function elementEditorValue(element) {
@@ -109,18 +161,6 @@
     element.textContent = value;
   }
 
-  function updateRecordTextField(name, value) {
-    let element = state.xml.querySelector(`Record > ${name}`);
-    if (!element) {
-      element = state.xml.createElement(name);
-      const description = state.xml.querySelector('Record > Description');
-      if (name === 'Mission' && description) description.after(element);
-      else state.xml.documentElement.insertBefore(element, state.xml.documentElement.firstChild);
-    }
-    setElementEditorValue(element, value);
-    markDirty();
-  }
-
   function renderEvents() {
     const list = byId('events-list');
     list.replaceChildren();
@@ -142,10 +182,21 @@
       const date = document.createElement('p');
       date.textContent = eventNode.getAttribute('date') || 'No date set';
       copy.append(title, date);
+      const description = eventNode.querySelector('Description')?.textContent.trim();
+      if (description) {
+        const preview = document.createElement('p');
+        preview.textContent = description.length > 120 ? `${description.slice(0, 120)}...` : description;
+        copy.append(preview);
+      }
 
       const actions = document.createElement('div');
       actions.className = 'row-actions';
       actions.append(
+        createButton('View', 'btn-turquoise', () => showItem(
+          eventNode.getAttribute('name') || 'Event',
+          [...Array.from(eventNode.attributes).map((attribute) => `${attribute.name}: ${attribute.value}`),
+            ...Array.from(eventNode.children).map((child) => `${child.tagName}: ${elementEditorValue(child)}`)].join('\n\n')
+        )),
         createButton('Edit', 'btn-turquoise', () => openEventEditor(eventNode)),
         createButton('Delete', 'btn-danger', () => deleteEvent(eventNode))
       );
@@ -592,14 +643,26 @@
   byId('upload-picture').addEventListener('click', () => byId('picture-file').click());
   byId('picture-file').addEventListener('change', (event) => uploadPicture(event.target.files[0]));
 
-  byId('record-description-input').addEventListener('input', (event) => {
-    if (!state.xml) return;
-    updateRecordTextField('Description', event.target.value);
-  });
-
-  byId('record-mission-input').addEventListener('input', (event) => {
-    if (!state.xml) return;
-    updateRecordTextField('Mission', event.target.value);
+  byId('add-description').addEventListener('click', () => openRecordTextEditor('Description'));
+  byId('add-mission').addEventListener('click', () => openRecordTextEditor('Mission'));
+  byId('record-text-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = state.recordKind;
+    const value = byId('record-text-input').value;
+    if (!value.trim()) return;
+    const node = state.recordEditing || state.xml.createElement(name);
+    setElementEditorValue(node, value);
+    if (!state.recordEditing) {
+      const lastOfKind = recordTextNodes(name).at(-1);
+      if (lastOfKind) lastOfKind.after(node);
+      else if (name === 'Mission' && recordTextNodes('Description').length) recordTextNodes('Description').at(-1).after(node);
+      else state.xml.documentElement.prepend(node);
+    }
+    byId('record-text-editor').close();
+    state.recordEditing = null;
+    state.recordKind = null;
+    markDirty();
+    renderRecordTexts(name);
   });
 
   byId('event-form').addEventListener('submit', (event) => {

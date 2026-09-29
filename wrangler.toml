@@ -24,7 +24,7 @@ CC_EMAIL    = "rompfortherescues@gmail.com"
 FROM_NAME   = "rompfortherescues.org"
 REPLY_TO    = "rompfortherescues@gmail.com"
 BCC_EMAIL   = "rogerdtinsley@gmail.com"
-CF_ACCESS_TEAM_DOMAIN = "xxx"
+CF_ACCESS_TEAM_DOMAIN = "rompfortherescues.cloudflareaccess.com"
 PRODUCTION_BRANCH = "main"
 ADMIN_ACCESS_PREVIEW_BYPASS = "false"
 

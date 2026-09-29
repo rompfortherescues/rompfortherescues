@@ -20,7 +20,8 @@
       <a href="#events">Events</a>
       <a href="#charities">Charities</a>
       <a href="#duties">Duties</a>
-      <a href="#record-description">Description</a>
+      <a href="#record-description">Descriptions</a>
+      <a href="#record-mission">Missions</a>
       <a href="#pictures">Pictures</a>
       <a href="/">View public site</a>
     </nav>
@@ -30,7 +31,7 @@
     <div class="admin-heading">
       <div>
         <p class="admin-eyebrow">Administration</p>
-        <h1>Events and duties</h1>
+        <h1>Edit data.xml</h1>
       </div>
       <div class="admin-toolbar">
         <button type="button" class="btn btn-turquoise" id="reload-data">Reload</button>
@@ -41,12 +42,19 @@
     <p id="status-message" class="admin-status" role="status" aria-live="polite">Loading data.xml...</p>
 
     <section class="admin-section" id="record-description">
-      <h2>Record description</h2>
-      <p class="section-note">Edit the top-level &lt;Description&gt; and &lt;Mission&gt; in data.xml. Embedded HTML is preserved.</p>
-      <label class="sr-only" for="record-description-input">Record description</label>
-      <textarea id="record-description-input" class="description-input" rows="3" maxlength="4000"></textarea>
-      <label for="record-mission-input">Mission</label>
-      <textarea id="record-mission-input" class="description-input" rows="4" maxlength="4000"></textarea>
+      <div class="section-heading">
+        <h2>Descriptions</h2>
+        <button type="button" class="btn btn-turquoise" id="add-description">Add description</button>
+      </div>
+      <div id="descriptions-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="record-mission">
+      <div class="section-heading">
+        <h2>Missions</h2>
+        <button type="button" class="btn btn-turquoise" id="add-mission">Add mission</button>
+      </div>
+      <div id="missions-list" class="admin-list" aria-live="polite"></div>
     </section>
 
     <section class="admin-section" id="events">
@@ -100,6 +108,32 @@
       <div id="pictures-list" class="picture-library" aria-live="polite"></div>
     </section>
   </main>
+
+  <dialog id="record-text-editor" class="editor-dialog">
+    <form id="record-text-form" method="dialog">
+      <div class="dialog-heading">
+        <h2 id="record-text-title">Edit text</h2>
+        <button type="button" class="icon-button" data-close-dialog="record-text-editor" aria-label="Close">&times;</button>
+      </div>
+      <label for="record-text-input">Content</label>
+      <textarea id="record-text-input" class="description-input" rows="7" maxlength="4000" required></textarea>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="record-text-editor">Cancel</button>
+        <button type="submit" class="btn btn-pink">Apply changes</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="item-view" class="editor-dialog">
+    <div class="dialog-heading">
+      <h2 id="item-view-title">View item</h2>
+      <button type="button" class="icon-button" data-close-dialog="item-view" aria-label="Close">&times;</button>
+    </div>
+    <pre id="item-view-content" class="item-view-content"></pre>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-turquoise" data-close-dialog="item-view">Close</button>
+    </div>
+  </dialog>
 
   <dialog id="event-editor" class="editor-dialog">
     <form id="event-form" method="dialog">

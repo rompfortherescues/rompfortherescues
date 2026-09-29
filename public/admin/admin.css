@@ -125,6 +125,13 @@
 
 .row-actions {
   flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.item-view-content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
 }
 
 .btn-danger {

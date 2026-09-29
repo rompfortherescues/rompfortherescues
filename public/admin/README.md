@@ -1,6 +1,6 @@
 # Admin Editor: Remaining Setup
 
-The admin page and Pages Functions are implemented. Event, charity, duty, and Record Description edits are saved to `data.xml`; picture uploads and deletions operate on R2 immediately.
+The admin page and Pages Functions are implemented. Description, Mission, event, charity, and duty edits are saved to `data.xml`; picture uploads and deletions operate on R2 immediately.
 
 ## Already configured in the repository
 
@@ -48,7 +48,7 @@ Deploy the Pages project after setting the production Access policies and variab
 
 1. Open `https://<your-host>/admin/` as an allowed administrator; verify a disallowed account is blocked.
 2. Confirm the page loads events, charities, duties, the Record Description, and the image library.
-3. Edit an event, charity, duty, and Record Description; select **Save changes**, reload, and confirm the changes persisted.
+3. Add or edit top-level descriptions and missions, then edit an event, charity, and duty; select **Save changes**, reload, and confirm the changes persisted.
 4. Upload an image, assign it through an event's `<Picture>` detail, save, and confirm it renders on the public site.
 5. Choose an event with a picture and upload a replacement; confirm a new WebP file is added, the old file is removed, and the public site shows the replacement.
 6. Attempt to delete an image referenced by saved XML; deletion should be refused. Change or remove the reference, save the XML, then delete the unused image.
@@ -61,6 +61,7 @@ Run the Pages dev server from the repository root so the Pages Functions and con
 ## Saving behavior
 
 - XML edits remain in the page until **Save changes**. A stale version is rejected instead of replacing a newer save; reload and reapply your edits.
+- Top-level `<Description>` and `<Mission>` elements can repeat. Each has its own View, Edit, and Delete actions; Add opens an editor. The public page presents each element as a separate paragraph. Other XML fields keep their existing structure.
 - Picture uploads and deletions happen immediately. Uploading does not assign an image to an event; choose it in the event's `<Picture>` field and save the XML.
 - Deletion is blocked while any saved `<Picture>` field references that filename.
 - Charities use `<Charities><Charity name="...">` with editable child details such as `<Description>`, `<Website>`, and `<PayLink>`.

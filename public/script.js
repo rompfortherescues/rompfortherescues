@@ -16,6 +16,41 @@ function linkifyText(text) {
   });
 }
 
+function appendSafeInline(target, source) {
+  if (source.nodeType === Node.TEXT_NODE) {
+    target.append(document.createTextNode(source.nodeValue));
+    return;
+  }
+  if (source.nodeType !== Node.ELEMENT_NODE) return;
+
+  const tag = source.tagName.toLowerCase();
+  if (['script', 'style', 'iframe', 'svg', 'object'].includes(tag)) return;
+  const allowed = ['strong', 'em', 'b', 'i', 'u', 'a', 'br', 'span', 'code'];
+  const container = allowed.includes(tag) ? document.createElement(tag) : target;
+  if (tag === 'a' && container !== target) {
+    const href = source.getAttribute('href');
+    if (href && /^(https?:\/\/|mailto:)/i.test(href)) {
+      container.href = href;
+      container.rel = 'noopener noreferrer';
+    }
+  }
+  Array.from(source.childNodes).forEach((child) => appendSafeInline(container, child));
+  if (container !== target) target.append(container);
+}
+
+function renderRecordParagraphs(record, name, container) {
+  container.replaceChildren();
+  Array.from(record.children).filter((child) => child.tagName === name).forEach((element) => {
+    const paragraph = document.createElement('p');
+    const markup = Array.from(element.childNodes).map((child) =>
+      child.nodeType === Node.ELEMENT_NODE ? new XMLSerializer().serializeToString(child) : child.nodeValue || ''
+    ).join('');
+    const parsed = new DOMParser().parseFromString(markup, 'text/html');
+    Array.from(parsed.body.childNodes).forEach((child) => appendSafeInline(paragraph, child));
+    container.append(paragraph);
+  });
+}
+
 function closeModal(id) {
   const el = document.getElementById(id);
   if (el) el.style.display = 'none';
@@ -38,12 +73,10 @@ async function loadData() {
     }
 
     const record = xml.querySelector('Record');
-    const tagline = record.querySelector('Description')?.textContent || '';
     const tagEl = document.getElementById('tagline');
-    if (tagEl) tagEl.textContent = tagline;
-    const mission = record.querySelector('Mission')?.textContent?.trim() || '';
+    if (tagEl) renderRecordParagraphs(record, 'Description', tagEl);
     const missionEl = document.getElementById('mission');
-    if (missionEl) missionEl.textContent = mission;
+    if (missionEl) renderRecordParagraphs(record, 'Mission', missionEl);
 
     // General volunteer duties
     const recordDuties = Array.from(record.querySelector('Duties')?.querySelectorAll('Duty') || [])
