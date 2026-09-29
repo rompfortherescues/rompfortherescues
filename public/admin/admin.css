@@ -139,6 +139,14 @@
   font: inherit;
 }
 
+.item-view-image:not([hidden]) {
+  display: block;
+  max-width: 100%;
+  max-height: 50vh;
+  margin: 0 auto 1rem;
+  object-fit: contain;
+}
+
 .btn-danger {
   background: #a72c49;
 }
@@ -149,48 +157,6 @@
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.65);
   color: #555;
-}
-
-.picture-library {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.8rem;
-}
-
-.picture-row {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 0.55rem;
-  min-width: 0;
-  padding: 0.65rem;
-  border-radius: 5px;
-  background: #fff;
-  box-shadow: 0 3px 10px rgba(44, 70, 70, 0.12);
-}
-
-.picture-thumb {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background: #f2f6f5;
-}
-
-.picture-name {
-  overflow-wrap: anywhere;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.picture-select {
-  width: 100%;
-  min-width: 0;
-  padding: 0.55rem;
-  border: 1px solid #83c9c4;
-  border-radius: 4px;
-  background: #fff;
-  color: #222;
-  font: inherit;
 }
 
 .editor-dialog {
@@ -230,39 +196,32 @@
   cursor: pointer;
 }
 
-.editor-fields,
-.event-elements {
+.editor-fields {
   display: grid;
   gap: 0.7rem;
   margin: 1rem 0;
 }
 
-.attribute-row,
-.element-row {
+.event-field-group {
   display: grid;
-  grid-template-columns: minmax(110px, 0.65fr) minmax(0, 1.5fr) auto;
-  align-items: start;
-  gap: 0.65rem;
-  padding: 0.75rem;
-  border-radius: 5px;
+  gap: 0.4rem;
+}
+
+.event-field-group .field-list-heading {
+  margin-top: 0.4rem;
+}
+
+.event-field-group .admin-row {
+  padding: 0.55rem 0.75rem;
+  border-left-width: 3px;
   background: #f6fbfa;
+  box-shadow: none;
 }
 
-.element-row {
-  grid-template-columns: minmax(110px, 0.55fr) minmax(0, 1.8fr) auto;
+#event-editor-message:empty {
+  display: none;
 }
 
-.attribute-row label,
-.element-row label {
-  padding-top: 0.45rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.attribute-row input,
-.element-row input,
-.element-row textarea,
-.element-row select,
 #duty-name {
   width: 100%;
   min-width: 0;
@@ -272,22 +231,6 @@
   background: #fff;
   color: #222;
   font: inherit;
-}
-
-.element-row textarea {
-  min-height: 4.5rem;
-  resize: vertical;
-}
-
-.remove-field {
-  min-height: 2.5rem;
-  padding: 0.4rem 0.65rem;
-  border: 1px solid #a72c49;
-  border-radius: 4px;
-  background: #fff;
-  color: #8a1240;
-  font: inherit;
-  cursor: pointer;
 }
 
 .field-list-heading {
@@ -352,30 +295,5 @@ select:focus-visible {
   .row-actions .btn {
     flex: 1;
     margin-right: 0;
-  }
-
-  .attribute-row,
-  .element-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .attribute-row label,
-  .element-row label {
-    grid-column: 1 / -1;
-    padding-top: 0;
-  }
-
-  .attribute-row input:nth-of-type(2),
-  .element-row textarea {
-    grid-column: 1;
-  }
-
-  .attribute-row input:first-of-type {
-    grid-column: 1;
-  }
-
-  .remove-field {
-    grid-column: 2;
-    grid-row: 2;
   }
 }

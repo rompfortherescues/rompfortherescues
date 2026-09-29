@@ -1,6 +1,6 @@
 # Admin Editor: Remaining Setup
 
-The admin page and Pages Functions are implemented. Description, Mission, event, charity, and duty edits are saved to `data.xml`; picture uploads and deletions operate on R2 immediately.
+The admin page and Pages Functions are implemented. Description, Mission, event, charity, and duty edits are saved to `data.xml`; event picture uploads happen immediately, while old pictures are removed after the XML save succeeds.
 
 ## Already configured in the repository
 
@@ -18,7 +18,7 @@ The top-level `preview_bucket_name` values select local development buckets; dep
 
 In **R2 Object Storage**, confirm that all four bucket names above exist. Confirm that `data.xml` is present and contains the correct data in both `prod-xmldata` and `dev-xmldata`. Keep production and preview content separate as intended.
 
-Event images are stored at the root of the corresponding event-pictures bucket. The editor accepts JPG, JPEG, PNG, WebP, and GIF images, converts each upload to WebP, rejects converted files larger than 1 MB, and stores accepted files under a generated filename. Uploading for an event with an existing picture first stores the new file, then updates all matching `<Picture>` references in `data.xml` and removes the old object. The public `/r2-images/*` route serves the files and revalidates its cache.
+Event images are stored at the root of the corresponding event-pictures bucket. The event editor accepts JPG, JPEG, PNG, WebP, and GIF images, converts each upload to WebP, rejects converted files larger than 1 MB, and stores accepted files under a generated filename. A new picture is uploaded first; after event changes are applied and `data.xml` is saved, the previous picture is deleted if no other saved event refers to it. Cancelling an unsaved upload attempts to remove that unused object. The public `/r2-images/*` route serves the files and revalidates its cache.
 
 ### 2. Create Cloudflare Access applications
 
@@ -47,11 +47,11 @@ Deploy the Pages project after setting the production Access policies and variab
 ## Production verification checklist
 
 1. Open `https://<your-host>/admin/` as an allowed administrator; verify a disallowed account is blocked.
-2. Confirm the page loads events, charities, duties, the Record Description, and the image library.
+2. Confirm the page loads events, charities, duties, descriptions, and missions.
 3. Add or edit top-level descriptions and missions, then edit an event, charity, and duty; select **Save changes**, reload, and confirm the changes persisted.
-4. Upload an image, assign it through an event's `<Picture>` detail, save, and confirm it renders on the public site.
+4. Upload an image within an event, apply event changes, save, and confirm it renders on the public site.
 5. Choose an event with a picture and upload a replacement; confirm a new WebP file is added, the old file is removed, and the public site shows the replacement.
-6. Attempt to delete an image referenced by saved XML; deletion should be refused. Change or remove the reference, save the XML, then delete the unused image.
+6. Remove an event picture, apply event changes, and save; confirm the old file is removed only when no other event still references it. A failed XML save must leave the old file intact.
 7. Repeat checks on preview if it is enabled, confirming it changes only the `dev-*` buckets.
 
 ## Local development
@@ -62,6 +62,6 @@ Run the Pages dev server from the repository root so the Pages Functions and con
 
 - XML edits remain in the page until **Save changes**. Saving replaces the stored XML with the current editor contents; reload before editing if someone else may have made changes.
 - Top-level `<Description>` and `<Mission>` elements can repeat. Each has its own View, Edit, and Delete actions; Add opens an editor. The public page presents each element as a separate paragraph. Other XML fields keep their existing structure.
-- Picture uploads and deletions happen immediately. Uploading does not assign an image to an event; choose it in the event's `<Picture>` field and save the XML.
-- Deletion is blocked while any saved `<Picture>` field references that filename.
+- Event fields are grouped under headings discovered from all loaded events; `fee` is always listed. Each value is opened for editing by a button. Name and date are required; other attributes and details can be removed.
+- Uploads happen immediately; replacements and removals of old pictures are completed only after the new XML is saved. A shared picture stays in the bucket while another event refers to it.
 - Charities use `<Charities><Charity name="...">` with editable child details such as `<Description>`, `<Website>`, and `<PayLink>`.

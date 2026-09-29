@@ -7,8 +7,15 @@
     recordEditing: null,
     recordKind: null,
     eventEditing: null,
+    eventDraft: null,
     eventIsNew: false,
     eventKind: 'event',
+    eventField: null,
+    eventExtraAttributes: new Set(),
+    eventExtraElements: new Set(),
+    pendingEventPicture: null,
+    pendingPictureDeletions: new Set(),
+    pictureUploading: false,
     dutyEditing: null,
     dutyIsNew: false
   };
@@ -117,8 +124,16 @@
 
   function showItem(title, content) {
     byId('item-view-title').textContent = title;
+    byId('item-view-image').hidden = true;
     byId('item-view-content').textContent = content;
     byId('item-view').showModal();
+  }
+
+  function showPicture(value) {
+    showItem('Picture', pictureKeyFromValue(value));
+    const image = byId('item-view-image');
+    image.src = value;
+    image.hidden = false;
   }
 
   function openRecordTextEditor(name, node = null) {
@@ -162,7 +177,6 @@
     const list = byId('events-list');
     list.replaceChildren();
     const events = eventNodes();
-    renderPictureEventOptions(events);
     if (!events.length) {
       setEmptyState(list, 'No events in data.xml yet. Add an event to get started.');
       return;
@@ -191,16 +205,6 @@
       );
       row.append(copy, actions);
       list.append(row);
-    });
-  }
-
-  function renderPictureEventOptions(events = eventNodes()) {
-    const select = byId('picture-event');
-    select.replaceChildren(new Option('Choose an event', ''));
-    events.forEach((eventNode, index) => {
-      const name = eventNode.getAttribute('name') || 'Untitled event';
-      const date = eventNode.getAttribute('date');
-      select.add(new Option(date ? `${name} (${date})` : name, String(index)));
     });
   }
 
@@ -272,52 +276,17 @@
     }
   }
 
-  function pictureUrl(picture) {
-    const base = `/r2-images/${encodeURIComponent(picture.key)}`;
-    return picture.uploaded ? `${base}?v=${encodeURIComponent(picture.uploaded)}` : base;
-  }
-
   async function loadPictures() {
-    const list = byId('pictures-list');
     try {
       const response = await fetch('/api/admin/pictures', { cache: 'no-store', credentials: 'same-origin' });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || `Could not load pictures (${response.status}).`);
       state.pictures = result.pictures || [];
-      renderPictures();
       return null;
     } catch (error) {
       state.pictures = [];
-      list.replaceChildren();
-      setEmptyState(list, error.message || 'Could not load pictures.');
       return error.message || 'Picture library unavailable.';
     }
-  }
-
-  function renderPictures() {
-    const list = byId('pictures-list');
-    list.replaceChildren();
-    if (!state.pictures.length) {
-      setEmptyState(list, 'No event pictures stored yet.');
-      return;
-    }
-
-    state.pictures.forEach((picture) => {
-      const row = document.createElement('article');
-      row.className = 'picture-row';
-      const image = document.createElement('img');
-      image.className = 'picture-thumb';
-      image.src = pictureUrl(picture);
-      image.alt = picture.key;
-      const name = document.createElement('p');
-      name.className = 'picture-name';
-      name.textContent = picture.key;
-      const actions = document.createElement('div');
-      actions.className = 'row-actions';
-      actions.append(createButton('Delete file', 'btn-danger', () => deletePicture(picture)));
-      row.append(image, name, actions);
-      list.append(row);
-    });
   }
 
   async function convertToWebp(file) {
@@ -351,27 +320,15 @@
   async function uploadPicture(file) {
     if (!file) return;
     if (!/\.(?:jpe?g|png|webp|gif)$/i.test(file.name)) {
-      status('Choose a JPG, JPEG, PNG, WebP, or GIF image.', 'error');
+      byId('event-editor-message').textContent = 'Choose a JPG, JPEG, PNG, WebP, or GIF image.';
       return;
     }
 
-    const targetIndex = byId('picture-event').value;
-    const targetEvent = targetIndex === '' ? null : eventNodes()[Number(targetIndex)];
-    if (!targetEvent) {
-      status('Choose an event before uploading its picture.', 'error');
-      return;
-    }
-
-    const oldValue = targetEvent.querySelector('Picture')?.textContent || '';
-    const oldKey = oldValue ? pictureKeyFromValue(oldValue) : '';
-    const existing = state.pictures.find((picture) => picture.key === oldKey);
-    if (existing && state.dirty) {
-      status('Save or discard your current data.xml changes before replacing an event picture.', 'error');
-      return;
-    }
-    if (existing && !window.confirm(`Replace ${oldKey} for ${targetEvent.getAttribute('name') || 'this event'}?`)) return;
-
-    byId('upload-picture').disabled = true;
+    const targetDraft = state.eventDraft;
+    const button = byId('event-picture-upload');
+    button.disabled = true;
+    byId('event-form').querySelector('[type="submit"]').disabled = true;
+    state.pictureUploading = true;
     status(`Converting and uploading ${file.name}...`);
     try {
       const webp = await convertToWebp(file);
@@ -386,150 +343,199 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || `Upload failed (${response.status}).`);
       const newPictureKey = result.picture?.key || key;
-      if (existing) {
-        const deleteResponse = await fetch(`/api/admin/pictures?name=${encodeURIComponent(oldKey)}&replacement=${encodeURIComponent(newPictureKey)}`, {
-          method: 'DELETE',
-          credentials: 'same-origin'
-        });
-        const deleteResult = await deleteResponse.json().catch(() => ({}));
-        if (!deleteResponse.ok) throw new Error(deleteResult.error || `Could not replace ${oldKey} (${deleteResponse.status}).`);
-        const loaded = await loadData(true);
-        if (!loaded) throw new Error('Picture replacement succeeded, but data.xml could not be reloaded. Reload data before making further changes.');
-        status(`${oldKey} was replaced with ${newPictureKey}; the new file is stored in eventpictures.`);
-      } else {
-        setEventPicture(targetEvent, `/r2-images/${encodeURIComponent(newPictureKey)}`);
-        markDirty();
-        const pictureError = await loadPictures();
-        status(pictureError || `${newPictureKey} is assigned to ${targetEvent.getAttribute('name') || 'the selected event'}. Save changes to write the Picture detail to data.xml.`,
-          pictureError ? 'error' : 'dirty');
+      state.pictures.push(result.picture || { key: newPictureKey });
+      if (state.eventDraft !== targetDraft || !byId('event-editor').open) {
+        await deleteStoredPicture(newPictureKey);
+        state.pictures = state.pictures.filter((picture) => picture.key !== newPictureKey);
+        status('Canceled upload removed from eventpictures.');
+        return;
       }
+      const previousUpload = state.pendingEventPicture;
+      state.pendingEventPicture = newPictureKey;
+      setEventPicture(state.eventDraft, `/r2-images/${encodeURIComponent(newPictureKey)}`);
+      renderEventFields();
+      if (previousUpload) {
+        await deleteStoredPicture(previousUpload);
+        state.pictures = state.pictures.filter((picture) => picture.key !== previousUpload);
+      }
+      status(`${newPictureKey} is ready. Apply event changes, then Save changes to update data.xml.`, 'dirty');
     } catch (error) {
       status(error.message || 'Could not upload picture.', 'error');
-      await loadPictures();
+      if (byId('event-editor').open) byId('event-editor-message').textContent = error.message || 'Could not upload picture.';
     } finally {
-      byId('upload-picture').disabled = false;
+      state.pictureUploading = false;
+      const currentButton = byId('event-picture-upload');
+      if (currentButton) currentButton.disabled = false;
+      if (state.eventDraft === targetDraft && byId('event-editor').open) {
+        byId('event-form').querySelector('[type="submit"]').disabled = false;
+      }
       byId('picture-file').value = '';
     }
   }
 
-  async function deletePicture(picture) {
-    if (!window.confirm(`Permanently delete ${picture.key} from eventpictures?`)) return;
-    try {
-      const response = await fetch(`/api/admin/pictures?name=${encodeURIComponent(picture.key)}`, {
-        method: 'DELETE',
-        credentials: 'same-origin'
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || `Delete failed (${response.status}).`);
-      await loadPictures();
-      status(`${picture.key} was deleted from the eventpictures bucket.`);
-    } catch (error) {
-      status(error.message || 'Could not delete picture.', 'error');
+  async function deleteStoredPicture(key) {
+    const response = await fetch(`/api/admin/pictures?name=${encodeURIComponent(key)}`, {
+      method: 'DELETE',
+      credentials: 'same-origin'
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(result.error || `Could not delete ${key} (${response.status}).`);
+      error.status = response.status;
+      throw error;
     }
   }
 
-  function addAttributeRow(name = '', value = '') {
-    const row = document.createElement('div');
-    row.className = 'attribute-row';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.className = 'attribute-name';
-    nameInput.value = name;
-    nameInput.placeholder = 'Attribute name';
-    nameInput.setAttribute('aria-label', 'Attribute name');
-    nameInput.required = !name;
-
-    const valueInput = document.createElement('input');
-    valueInput.type = 'text';
-    valueInput.className = 'attribute-value';
-    valueInput.value = value;
-    valueInput.placeholder = 'Value';
-    valueInput.setAttribute('aria-label', `${name || 'New'} attribute value`);
-    if (name === 'name' || name === 'date') valueInput.required = true;
-
-    row.append(nameInput, valueInput);
-    if (name !== 'name' && name !== 'date') {
-      const remove = document.createElement('button');
-      remove.type = 'button';
-      remove.className = 'remove-field';
-      remove.textContent = 'Remove';
-      remove.setAttribute('aria-label', `Remove ${name || 'new'} attribute`);
-      remove.addEventListener('click', () => row.remove());
-      row.append(remove);
+  function eventFieldNames(kind) {
+    const nodes = state.eventKind === 'event' ? eventNodes() : [state.eventDraft];
+    const names = kind === 'attribute'
+      ? new Set(state.eventKind === 'event' ? ['name', 'date', 'fee'] : ['name'])
+      : new Set();
+    const extras = kind === 'attribute' ? state.eventExtraAttributes : state.eventExtraElements;
+    for (const node of [...nodes, state.eventDraft]) {
+      const fields = kind === 'attribute' ? Array.from(node.attributes) : Array.from(node.children);
+      fields.forEach((field) => names.add(kind === 'attribute' ? field.name : field.tagName));
     }
-    byId('event-attributes').append(row);
+    extras.forEach((name) => names.add(name));
+    if (kind === 'element' && state.eventKind === 'event') names.delete('Picture');
+    return names;
   }
 
-  function addElementRow(name = '', value = '') {
-    const row = document.createElement('div');
-    row.className = 'element-row';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.value = name;
-    nameInput.placeholder = 'XML tag';
-    nameInput.setAttribute('aria-label', 'Detail tag name');
-    nameInput.required = true;
+  function openEventFieldEditor(kind, name, element = null) {
+    state.eventField = { kind, name, element };
+    byId('event-field-title').textContent = `${element || (kind === 'attribute' && state.eventDraft.hasAttribute(name)) ? 'Edit' : 'Add'} ${name}`;
+    byId('event-field-value').value = kind === 'attribute'
+      ? state.eventDraft.getAttribute(name) || ''
+      : element ? elementEditorValue(element) : '';
+    byId('event-field-value').setCustomValidity('');
+    byId('event-field-editor').showModal();
+    byId('event-field-value').focus();
+  }
 
-    let valueInput;
-    if (name === 'Picture') {
-      valueInput = document.createElement('select');
-      valueInput.className = 'picture-select';
-      valueInput.setAttribute('aria-label', 'Event picture');
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = state.pictures.length ? 'Choose a stored picture' : 'Upload a picture first';
-      valueInput.append(placeholder);
+  function renderFieldGroup(container, kind, name) {
+    const group = document.createElement('section');
+    group.className = 'event-field-group';
+    const heading = document.createElement('div');
+    heading.className = 'field-list-heading';
+    const title = document.createElement('h3');
+    title.textContent = name;
+    heading.append(title);
+    const elements = kind === 'element'
+      ? Array.from(state.eventDraft.children).filter((child) => child.tagName === name)
+      : state.eventDraft.hasAttribute(name) ? [null] : [];
+    if (kind === 'element' || !elements.length) {
+      heading.append(createButton(`Add ${name}`, 'btn-turquoise', () => openEventFieldEditor(kind, name)));
+    }
+    group.append(heading);
 
-      const currentKey = pictureKeyFromValue(value);
-      let selectedUrl = '';
-      state.pictures.forEach((picture) => {
-        const option = document.createElement('option');
-        option.value = pictureUrl(picture);
-        option.dataset.key = picture.key;
-        option.textContent = picture.key;
-        if (picture.key === currentKey) selectedUrl = option.value;
-        valueInput.append(option);
-      });
-      if (currentKey && !selectedUrl) {
-        const current = document.createElement('option');
-        current.value = value;
-        current.dataset.key = currentKey;
-        current.textContent = `${currentKey} (not in bucket)`;
-        valueInput.append(current);
-        selectedUrl = value;
+    elements.forEach((element) => {
+      const value = kind === 'attribute' ? state.eventDraft.getAttribute(name) : elementEditorValue(element);
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      const preview = document.createElement('p');
+      preview.className = 'row-copy';
+      preview.textContent = value.replace(/\s+/g, ' ').trim() || '(empty)';
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+      actions.append(
+        createButton('View', 'btn-turquoise', () => showItem(name, value)),
+        createButton('Edit', 'btn-turquoise', () => openEventFieldEditor(kind, name, element))
+      );
+      if (kind === 'element' || (name !== 'name' && name !== 'date')) {
+        actions.append(createButton('Remove', 'btn-danger', () => {
+          if (kind === 'attribute') state.eventDraft.removeAttribute(name);
+          else element.remove();
+          renderEventFields();
+        }));
       }
-      valueInput.value = selectedUrl;
-    } else {
-      valueInput = document.createElement('textarea');
-      valueInput.value = value;
-      valueInput.placeholder = 'Detail text';
-      valueInput.setAttribute('aria-label', `${name || 'New'} detail text`);
+      row.append(preview, actions);
+      group.append(row);
+    });
+    container.append(group);
+  }
+
+  function addNamedEventField(kind) {
+    const name = window.prompt(`Name of the new ${kind === 'attribute' ? 'attribute' : 'detail'}:`)?.trim();
+    if (name === undefined || name === '') return;
+    if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(name) || (kind === 'element' && name === 'Picture')) {
+      status('Enter a valid XML name. Use the Picture controls for pictures.', 'error');
+      return;
+    }
+    const extras = kind === 'attribute' ? state.eventExtraAttributes : state.eventExtraElements;
+    extras.add(name);
+    renderEventFields();
+    openEventFieldEditor(kind, name);
+  }
+
+  function renderEventFields() {
+    for (const kind of ['attribute', 'element']) {
+      const container = byId(kind === 'attribute' ? 'event-attributes' : 'event-elements');
+      container.replaceChildren();
+      const heading = document.createElement('div');
+      heading.className = 'field-list-heading';
+      const title = document.createElement('h3');
+      title.textContent = kind === 'attribute' ? 'Attributes' : 'Details';
+      heading.append(title, createButton(kind === 'attribute' ? 'Add attribute' : 'Add detail', 'btn-turquoise', () => addNamedEventField(kind)));
+      container.append(heading);
+      eventFieldNames(kind).forEach((name) => renderFieldGroup(container, kind, name));
     }
 
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'remove-field';
-    remove.textContent = 'Remove';
-    remove.setAttribute('aria-label', `Remove ${name || 'new'} detail`);
-    remove.addEventListener('click', () => row.remove());
-    row.append(nameInput, valueInput, remove);
-    byId('event-elements').append(row);
+    const pictureContainer = byId('event-picture');
+    pictureContainer.replaceChildren();
+    if (state.eventKind !== 'event') return;
+    const heading = document.createElement('div');
+    heading.className = 'field-list-heading';
+    const title = document.createElement('h3');
+    title.textContent = 'Picture';
+    const upload = createButton('Upload picture', 'btn-turquoise', () => byId('picture-file').click());
+    upload.id = 'event-picture-upload';
+    upload.disabled = state.pictureUploading;
+    heading.append(title, upload);
+    pictureContainer.append(heading);
+    const picture = state.eventDraft.querySelector('Picture');
+    if (picture) {
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      const name = document.createElement('p');
+      name.className = 'row-copy';
+      name.textContent = pictureKeyFromValue(picture.textContent);
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+      actions.append(createButton('View', 'btn-turquoise', () => showPicture(picture.textContent)));
+      actions.append(createButton('Remove', 'btn-danger', async () => {
+        if (state.pendingEventPicture) {
+          try {
+            await deleteStoredPicture(state.pendingEventPicture);
+            state.pictures = state.pictures.filter((stored) => stored.key !== state.pendingEventPicture);
+            state.pendingEventPicture = null;
+          } catch (error) {
+            status(error.message, 'error');
+            return;
+          }
+        }
+        Array.from(state.eventDraft.children).filter((child) => child.tagName === 'Picture').forEach((child) => child.remove());
+        renderEventFields();
+      }));
+      row.append(name, actions);
+      pictureContainer.append(row);
+    }
   }
 
   function openEventEditor(eventNode, isNew = false, kind = 'event') {
     state.eventEditing = eventNode;
+    state.eventDraft = eventNode.cloneNode(true);
     state.eventIsNew = isNew;
     state.eventKind = kind;
+    state.eventExtraAttributes.clear();
+    state.eventExtraElements.clear();
+    state.pendingEventPicture = null;
+    byId('event-editor-message').textContent = '';
     const label = kind === 'charity' ? 'charity' : 'event';
     byId('event-editor-title').textContent = isNew ? `Add ${label}` : `Edit ${eventNode.getAttribute('name') || label}`;
-    byId('item-editor-note').textContent = kind === 'charity'
-      ? 'Edit the charity name and details. Use Description, Website, and PayLink fields as needed.'
-      : 'Edit event attributes and details. Repeated fields such as locations and charities are kept separate.';
-    byId('event-attributes').replaceChildren();
-    byId('event-elements').replaceChildren();
-
-    Array.from(eventNode.attributes).forEach((attribute) => addAttributeRow(attribute.name, attribute.value));
-    Array.from(eventNode.children).forEach((child) => addElementRow(child.tagName, elementEditorValue(child)));
+    const apply = byId('event-form').querySelector('[type="submit"]');
+    apply.textContent = `Apply ${label} changes`;
+    apply.disabled = state.pictureUploading;
+    renderEventFields();
     byId('event-editor').showModal();
   }
 
@@ -576,29 +582,45 @@
   }
 
   async function saveData() {
-    if (!state.dirty) return;
+    if (!state.dirty && !state.pendingPictureDeletions.size) return;
     const button = byId('save-data');
     button.disabled = true;
     status('Saving data.xml...');
     try {
-      const xmlText = new XMLSerializer().serializeToString(state.xml);
-      const response = await fetch('/api/admin/data', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/xml; charset=utf-8'
-        },
-        body: xmlText
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || `Save failed (${response.status}).`);
+      if (state.dirty) {
+        const xmlText = new XMLSerializer().serializeToString(state.xml);
+        const response = await fetch('/api/admin/data', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/xml; charset=utf-8' },
+          body: xmlText
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `Save failed (${response.status}).`);
+        state.dirty = false;
+      }
 
-      state.dirty = false;
-      status('Changes saved to data.xml.');
+      const failures = [];
+      const shared = [];
+      for (const key of state.pendingPictureDeletions) {
+        try {
+          await deleteStoredPicture(key);
+          state.pendingPictureDeletions.delete(key);
+        } catch (error) {
+          if (error.status === 409 || error.status === 404) {
+            state.pendingPictureDeletions.delete(key);
+            if (error.status === 409) shared.push(key);
+          } else failures.push(error.message);
+        }
+      }
+      await loadPictures();
+      status(failures.length ? `data.xml saved, but old picture cleanup failed: ${failures.join(' ')}`
+        : shared.length ? `Changes saved. ${shared.join(', ')} remains stored because another event still uses it.` : 'Changes saved to data.xml.',
+        failures.length ? 'error' : 'info');
     } catch (error) {
       status(error.message || 'Could not save data.xml.', 'error');
     } finally {
-      button.disabled = !state.dirty;
+      button.disabled = !state.dirty && !state.pendingPictureDeletions.size;
     }
   }
 
@@ -606,8 +628,6 @@
   byId('save-data').addEventListener('click', saveData);
   byId('add-event').addEventListener('click', () => {
     const eventNode = state.xml.createElement('Event');
-    eventNode.setAttribute('name', '');
-    eventNode.setAttribute('date', '');
     openEventEditor(eventNode, true);
   });
   byId('add-charity').addEventListener('click', () => {
@@ -619,11 +639,42 @@
     const dutyNode = state.xml.createElement('Duty');
     openDutyEditor(dutyNode, true);
   });
-  byId('add-event-attribute').addEventListener('click', () => addAttributeRow());
-  byId('add-event-field').addEventListener('click', () => addElementRow());
-  byId('add-picture-field').addEventListener('click', () => addElementRow('Picture'));
-  byId('upload-picture').addEventListener('click', () => byId('picture-file').click());
   byId('picture-file').addEventListener('change', (event) => uploadPicture(event.target.files[0]));
+
+  byId('event-field-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const { kind, name, element } = state.eventField;
+    const value = byId('event-field-value').value;
+    if (kind === 'attribute') {
+      if ((name === 'name' || name === 'date') && !value.trim()) {
+        byId('event-field-value').setCustomValidity(`${name} is required.`);
+        byId('event-field-value').reportValidity();
+        return;
+      }
+      state.eventDraft.setAttribute(name, value);
+    } else {
+      const child = element || state.xml.createElement(name);
+      setElementEditorValue(child, value);
+      if (!element) state.eventDraft.append(child);
+    }
+    byId('event-field-editor').close();
+    state.eventField = null;
+    renderEventFields();
+  });
+  byId('event-field-value').addEventListener('input', () => byId('event-field-value').setCustomValidity(''));
+
+  byId('event-editor').addEventListener('close', async () => {
+    if (!state.pendingEventPicture) return;
+    const key = state.pendingEventPicture;
+    state.pendingEventPicture = null;
+    try {
+      await deleteStoredPicture(key);
+      state.pictures = state.pictures.filter((picture) => picture.key !== key);
+      status('Canceled upload removed from eventpictures.');
+    } catch (error) {
+      status(`The unused upload ${key} could not be removed: ${error.message}`, 'error');
+    }
+  });
 
   byId('add-description').addEventListener('click', () => openRecordTextEditor('Description'));
   byId('add-mission').addEventListener('click', () => openRecordTextEditor('Mission'));
@@ -649,51 +700,23 @@
 
   byId('event-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    const attributes = Array.from(byId('event-attributes').querySelectorAll('.attribute-row'));
-    const updatedAttributes = new Map();
-    for (const row of attributes) {
-      const name = row.querySelector('.attribute-name').value.trim();
-      const value = row.querySelector('.attribute-value').value.trim();
-      if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(name)) {
-        status(`Invalid XML attribute name: ${name || '(empty)'}.`, 'error');
-        return;
-      }
-      if (updatedAttributes.has(name)) {
-        status(`Duplicate XML attribute: ${name}.`, 'error');
-        return;
-      }
-      updatedAttributes.set(name, value);
-    }
-    if (!updatedAttributes.get('name') || (state.eventKind === 'event' && !updatedAttributes.get('date'))) {
-      status(state.eventKind === 'event' ? 'Event name and date are required.' : 'Charity name is required.', 'error');
+    const node = state.eventDraft;
+    if (!node.getAttribute('name')?.trim() || (state.eventKind === 'event' && !node.getAttribute('date')?.trim())) {
+      byId('event-editor-message').textContent = state.eventKind === 'event' ? 'Event name and date are required.' : 'Charity name is required.';
       return;
     }
-
-    const details = Array.from(byId('event-elements').querySelectorAll('.element-row')).map((row) => ({
-      name: row.querySelector('input').value.trim(),
-      value: row.querySelector('textarea, select').value
-    }));
-    if (details.some((detail) => !/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(detail.name))) {
-      status('Each event detail needs a valid XML tag name.', 'error');
-      return;
+    const oldPicture = state.eventEditing.querySelector('Picture')?.textContent || '';
+    const newPicture = node.querySelector('Picture')?.textContent || '';
+    const oldKey = oldPicture ? pictureKeyFromValue(oldPicture) : '';
+    if (state.eventKind === 'event' && oldPicture !== newPicture && state.pictures.some((picture) => picture.key === oldKey)) {
+      state.pendingPictureDeletions.add(oldKey);
     }
-    if (details.some((detail) => detail.name === 'Picture' && !detail.value.trim())) {
-      status('Choose a stored picture or remove the empty Picture detail.', 'error');
-      return;
-    }
-
-    const node = state.eventEditing;
-    Array.from(node.attributes).forEach((attribute) => node.removeAttribute(attribute.name));
-    updatedAttributes.forEach((value, name) => node.setAttribute(name, value));
-    node.replaceChildren(...details.map((detail) => {
-      const child = state.xml.createElement(detail.name);
-      setElementEditorValue(child, detail.value);
-      return child;
-    }));
-
     if (state.eventIsNew) getContainer(state.eventKind === 'charity' ? 'Charities' : 'Events').append(node);
+    else state.eventEditing.replaceWith(node);
+    state.pendingEventPicture = null;
     byId('event-editor').close();
     state.eventEditing = null;
+    state.eventDraft = null;
     state.eventIsNew = false;
     markDirty();
     if (state.eventKind === 'charity') renderCharities();
@@ -722,7 +745,7 @@
   });
 
   window.addEventListener('beforeunload', (event) => {
-    if (!state.dirty) return;
+    if (!state.dirty && !state.pendingEventPicture) return;
     event.preventDefault();
     event.returnValue = '';
   });

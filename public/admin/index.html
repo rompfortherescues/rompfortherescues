@@ -22,7 +22,6 @@
       <a href="#duties">Duties</a>
       <a href="#record-description">Descriptions</a>
       <a href="#record-mission">Missions</a>
-      <a href="#pictures">Pictures</a>
       <a href="/">View public site</a>
     </nav>
   </header>
@@ -90,23 +89,6 @@
       <div id="duties-list" class="admin-list" aria-live="polite"></div>
     </section>
 
-    <section class="admin-section" id="pictures">
-      <div class="section-heading">
-        <div>
-          <h2>Event pictures</h2>
-          <p class="section-note">Choose an event to assign a new picture. Replacements are stored as new WebP files.</p>
-        </div>
-        <div>
-          <label for="picture-event">Assign to event</label>
-          <select id="picture-event" class="picture-select" aria-label="Event for uploaded picture">
-            <option value="">Choose an event</option>
-          </select>
-          <input id="picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" hidden>
-          <button type="button" class="btn btn-turquoise" id="upload-picture">Upload picture</button>
-        </div>
-      </div>
-      <div id="pictures-list" class="picture-library" aria-live="polite"></div>
-    </section>
   </main>
 
   <dialog id="record-text-editor" class="editor-dialog">
@@ -129,6 +111,7 @@
       <h2 id="item-view-title">View item</h2>
       <button type="button" class="icon-button" data-close-dialog="item-view" aria-label="Close">&times;</button>
     </div>
+    <img id="item-view-image" class="item-view-image" alt="Event picture" hidden>
     <pre id="item-view-content" class="item-view-content"></pre>
     <div class="dialog-actions">
       <button type="button" class="btn btn-turquoise" data-close-dialog="item-view">Close</button>
@@ -141,24 +124,33 @@
         <h2 id="event-editor-title">Edit item</h2>
         <button type="button" class="icon-button" data-close-dialog="event-editor" aria-label="Close">&times;</button>
       </div>
-        <p id="item-editor-note" class="section-note">Edit XML attributes and detail fields.</p>
+      <p id="event-editor-message" class="section-note" role="status" aria-live="polite"></p>
       <div id="event-attributes" class="editor-fields"></div>
-      <div class="field-list-heading">
-        <h3>Attributes</h3>
-        <button type="button" class="btn btn-turquoise" id="add-event-attribute">Add attribute</button>
-      </div>
-      <div class="field-list-heading">
-        <h3>Details</h3>
-        <button type="button" class="btn btn-turquoise" id="add-event-field">Add detail</button>
-        <button type="button" class="btn btn-turquoise" id="add-picture-field">Add picture</button>
-      </div>
-      <div id="event-elements" class="event-elements"></div>
+      <div id="event-elements" class="editor-fields"></div>
+      <div id="event-picture" class="editor-fields"></div>
       <div class="dialog-actions">
         <button type="button" class="btn btn-turquoise" data-close-dialog="event-editor">Cancel</button>
-        <button type="submit" class="btn btn-pink">Apply changes</button>
+        <button type="submit" class="btn btn-pink">Apply event changes</button>
       </div>
     </form>
   </dialog>
+
+  <dialog id="event-field-editor" class="editor-dialog">
+    <form id="event-field-form" method="dialog">
+      <div class="dialog-heading">
+        <h2 id="event-field-title">Edit field</h2>
+        <button type="button" class="icon-button" data-close-dialog="event-field-editor" aria-label="Close">&times;</button>
+      </div>
+      <label for="event-field-value">Value</label>
+      <textarea id="event-field-value" class="description-input" rows="5"></textarea>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="event-field-editor">Cancel</button>
+        <button type="submit" class="btn btn-pink">Apply field</button>
+      </div>
+    </form>
+  </dialog>
+
+  <input id="picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" hidden>
 
   <dialog id="duty-editor" class="editor-dialog">
     <form id="duty-form" method="dialog">
