@@ -27,22 +27,22 @@ Use a custom hostname attached to the Pages project. In **Cloudflare Zero Trust 
 - `/admin/*` for the admin page.
 - `/api/admin/*` for the XML and picture management API.
 
-Add an Allow policy to each application for only the administrators' email addresses or identity groups. Leave other users denied. If users can visit `/admin` without the trailing slash, cover that exact path as well; the page is served at `/admin/`.
+Add an Allow policy to each production application for only the administrators' email addresses or identity groups. Leave other users denied. If users can visit `/admin` without the trailing slash, cover that exact path as well; the page is served at `/admin/`.
 
-Record each application's **Application Audience (AUD) Tag**. The two tags are different. If preview uses a separate hostname, create and protect matching applications for it too, or disable public access to that preview. Do not expose an unprotected preview admin.
+Record each production application's **Application Audience (AUD) Tag**. The admin UI and API apps have different tags. The preview environment is intentionally unauthenticated for focus-group testing and uses the `dev-*` R2 buckets. Anyone with the preview URL can edit or delete preview data and images; do not store production data there. Keep the preview branch name different from the configured production branch.
 
 ### 3. Set Pages environment variables
 
-In **Workers & Pages > rompfortherescues > Settings > Variables and Secrets**, set these plain-text variables for each deployed environment that will use the editor:
+In **Workers & Pages > rompfortherescues > Settings > Variables and Secrets**, set these plain-text variables for production:
 
 - `CF_ACCESS_TEAM_DOMAIN`: the Access team domain, e.g. `your-team.cloudflareaccess.com` (no path).
 - `CF_ACCESS_AUD`: both path-application audience tags, comma-separated, e.g. `admin-ui-aud,admin-api-aud`.
 
-Use the audience tags for the hostname/environment being configured. The Pages Functions verify the Access JWT signature, issuer, expiry, and audience on every admin API request. Missing variables cause API requests to fail closed.
+Use the audience tags for the production hostname. The Pages Functions verify the Access JWT signature, issuer, expiry, and audience on every production admin API request. Missing variables cause production API requests to fail closed. Preview bypass is enabled only when `ADMIN_ACCESS_PREVIEW_BYPASS` is `true` and `CF_PAGES_BRANCH` differs from `PRODUCTION_BRANCH` (`main` by default).
 
 ### 4. Deploy
 
-Deploy the Pages project after setting the Access policies and variables. Confirm the deployed production and preview environments use the matching R2 bucket bindings from `wrangler.toml` and the matching Access audience tags.
+Deploy the Pages project after setting the production Access policies and variables. Confirm the deployed production and preview environments use the matching R2 bucket bindings from `wrangler.toml`. Do not attach a Cloudflare Access application to the focus-group preview hostname if participants should reach it without login.
 
 ## Production verification checklist
 

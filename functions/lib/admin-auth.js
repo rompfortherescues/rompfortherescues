@@ -55,6 +55,15 @@ async function verifyAccessToken(request, env) {
 }
 
 export async function requireAdminAccess(request, env) {
+  const previewBranch = env.CF_PAGES_BRANCH;
+  const productionBranch = env.PRODUCTION_BRANCH;
+  if (
+    env.ADMIN_ACCESS_PREVIEW_BYPASS === 'true'
+    && previewBranch
+    && productionBranch
+    && previewBranch !== productionBranch
+  ) return null;
+
   if (!env.CF_ACCESS_TEAM_DOMAIN || !env.CF_ACCESS_AUD) {
     return jsonResponse({ error: 'Admin saving is not configured. Set CF_ACCESS_TEAM_DOMAIN and CF_ACCESS_AUD.' }, 503);
   }
