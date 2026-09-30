@@ -315,6 +315,16 @@ document.getElementById('volunteer-form').addEventListener('submit', async e => 
   }, 'vol-message', e.target);
 });
 
+document.querySelector('nav a[href="#volunteer"]').addEventListener('click', () => {
+  const volunteerSection = document.getElementById('volunteer');
+  const volunteerForm = document.getElementById('volunteer-form');
+  const message = document.getElementById('vol-message');
+  volunteerSection.hidden = false;
+  volunteerForm.hidden = false;
+  message.textContent = '';
+  message.className = 'message';
+});
+
 document.getElementById('vol-specific-form').addEventListener('submit', async e => {
   e.preventDefault();
   const eventData = JSON.parse(document.getElementById('vol-spec-event-data').value || '{}');
@@ -344,6 +354,7 @@ async function submitVolunteer(payload, msgId, form) {
       msg.textContent = 'Thank you! Confirmation email sent.';
       msg.className = 'message success';
       form.reset();
+      if (form.id === 'volunteer-form') form.hidden = true;
       setTimeout(() => {
         const modal = document.getElementById('vol-modal');
         if (modal) modal.style.display = 'none';
