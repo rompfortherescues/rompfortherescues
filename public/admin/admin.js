@@ -415,6 +415,15 @@
     return names;
   }
 
+  function linkExampleUrl(name, value) {
+    if (state.eventKind !== 'charity' || !['Website', 'PayLink'].includes(name)) return value;
+    const parsed = new DOMParser().parseFromString(value, 'text/html');
+    const link = parsed.body.firstElementChild;
+    return link?.tagName === 'A' && parsed.body.children.length === 1
+      ? link.getAttribute('href') || value
+      : value;
+  }
+
   function openEventFieldEditor(kind, name, element = null) {
     state.eventField = { kind, name, element };
     byId('event-field-title').textContent = `${element || (kind === 'attribute' && state.eventDraft.hasAttribute(name)) ? 'Edit' : 'Add'} ${name}`;
@@ -445,6 +454,13 @@
         field.required = name === 'name' || (state.eventKind === 'event' && name === 'date');
       } else {
         field.rows = 3;
+        if (state.eventKind === 'charity') {
+          const examples = {
+            Website: '<a href="https://example.com">Website</a>',
+            PayLink: '<a href="https://example.com">Donate</a>'
+          };
+          field.value = examples[name] || '';
+        }
       }
       group.append(label, field);
       container.append(group);
@@ -781,9 +797,10 @@
       });
       Array.from(node.children).filter((child) => child.tagName !== 'Picture').forEach((child) => child.remove());
       byId('event-editor').querySelectorAll('[data-add-field-kind="element"]').forEach((field) => {
-        if (!field.value.trim()) return;
+        const value = linkExampleUrl(field.dataset.addFieldName, field.value);
+        if (!value.trim()) return;
         const child = state.xml.createElement(field.dataset.addFieldName);
-        setElementEditorValue(child, field.value);
+        setElementEditorValue(child, value);
         node.append(child);
       });
     }
