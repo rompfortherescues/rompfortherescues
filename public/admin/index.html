@@ -131,8 +131,9 @@
         <h2 id="event-field-title">Edit field</h2>
         <button type="button" class="icon-button" data-close-dialog="event-field-editor" aria-label="Close">&times;</button>
       </div>
-      <label for="event-field-value">Value</label>
+      <label id="event-field-value-label" for="event-field-value">Value</label>
       <textarea id="event-field-value" class="description-input" rows="5"></textarea>
+      <select id="event-field-charity" class="event-field-select" hidden></select>
       <div class="dialog-actions">
         <button type="button" class="btn btn-turquoise" data-close-dialog="event-field-editor">Cancel</button>
         <button type="submit" class="btn btn-pink">Apply field</button>

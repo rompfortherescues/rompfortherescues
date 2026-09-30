@@ -424,15 +424,44 @@
       : value;
   }
 
+  function populateCharityOptions(select, selectedValue = '') {
+    select.replaceChildren();
+    const noCharity = document.createElement('option');
+    noCharity.value = '';
+    noCharity.textContent = 'No charity';
+    select.append(noCharity);
+    const names = Array.from(state.xml.querySelectorAll('Charities > Charity'))
+      .map((charity) => charity.getAttribute('name')?.trim())
+      .filter(Boolean);
+    if (selectedValue && !names.includes(selectedValue)) names.unshift(selectedValue);
+    [...new Set(names)].forEach((name) => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      select.append(option);
+    });
+    select.value = selectedValue;
+  }
+
   function openEventFieldEditor(kind, name, element = null) {
     state.eventField = { kind, name, element };
     byId('event-field-title').textContent = `${element || (kind === 'attribute' && state.eventDraft.hasAttribute(name)) ? 'Edit' : 'Add'} ${name}`;
-    byId('event-field-value').value = kind === 'attribute'
+    const isCharitySelect = kind === 'element' && state.eventKind === 'event' && name === 'Charity';
+    const valueField = byId('event-field-value');
+    const charityField = byId('event-field-charity');
+    const label = byId('event-field-value-label');
+    valueField.hidden = isCharitySelect;
+    charityField.hidden = !isCharitySelect;
+    label.htmlFor = isCharitySelect ? charityField.id : valueField.id;
+    label.textContent = isCharitySelect ? 'Charity' : 'Value';
+    const value = kind === 'attribute'
       ? state.eventDraft.getAttribute(name) || ''
       : element ? elementEditorValue(element) : '';
+    if (isCharitySelect) populateCharityOptions(charityField, value.trim());
+    else valueField.value = value;
     byId('event-field-value').setCustomValidity('');
     byId('event-field-editor').showModal();
-    byId('event-field-value').focus();
+    (isCharitySelect ? charityField : valueField).focus();
   }
 
   function renderFieldGroup(container, kind, name) {
@@ -456,18 +485,7 @@
         field.type = 'text';
         field.required = name === 'name' || (state.eventKind === 'event' && name === 'date');
       } else if (isEventCharity) {
-        const noCharity = document.createElement('option');
-        noCharity.value = '';
-        noCharity.textContent = 'No charity';
-        field.append(noCharity);
-        state.xml.querySelectorAll('Charities > Charity').forEach((charity) => {
-          const charityName = charity.getAttribute('name')?.trim();
-          if (!charityName) return;
-          const option = document.createElement('option');
-          option.value = charityName;
-          option.textContent = charityName;
-          field.append(option);
-        });
+        populateCharityOptions(field);
       } else {
         field.rows = 3;
         if (state.eventKind === 'charity') {
@@ -745,7 +763,9 @@
   byId('event-field-form').addEventListener('submit', (event) => {
     event.preventDefault();
     const { kind, name, element } = state.eventField;
-    const value = byId('event-field-value').value;
+    const value = (kind === 'element' && state.eventKind === 'event' && name === 'Charity'
+      ? byId('event-field-charity')
+      : byId('event-field-value')).value;
     if (kind === 'attribute') {
       if ((name === 'name' || name === 'date') && !value.trim()) {
         byId('event-field-value').setCustomValidity(`${name} is required.`);
@@ -754,9 +774,13 @@
       }
       state.eventDraft.setAttribute(name, value);
     } else {
-      const child = element || state.xml.createElement(name);
-      setElementEditorValue(child, value);
-      if (!element) state.eventDraft.append(child);
+      if (name === 'Charity' && state.eventKind === 'event' && !value) {
+        element?.remove();
+      } else {
+        const child = element || state.xml.createElement(name);
+        setElementEditorValue(child, value);
+        if (!element) state.eventDraft.append(child);
+      }
     }
     byId('event-field-editor').close();
     state.eventField = null;

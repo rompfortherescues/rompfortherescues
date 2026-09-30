@@ -79,6 +79,17 @@
   resize: vertical;
 }
 
+.event-field-select {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.7rem;
+  border: 1px solid #83c9c4;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  font: inherit;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
