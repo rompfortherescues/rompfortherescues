@@ -215,6 +215,33 @@
   gap: 0.4rem;
 }
 
+.event-add-field-group {
+  grid-template-columns: minmax(6rem, 1fr) minmax(0, 3fr);
+  align-items: start;
+}
+
+.event-field-group > label {
+  color: #333;
+  font-weight: 600;
+  padding-top: 0.55rem;
+}
+
+.event-add-field {
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem;
+  border: 1px solid #83c9c4;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  font: inherit;
+}
+
+.event-add-field:where(textarea) {
+  min-height: 4rem;
+  resize: vertical;
+}
+
 .event-field-group .field-list-heading {
   margin-top: 0.4rem;
 }

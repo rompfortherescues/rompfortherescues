@@ -399,9 +399,12 @@
 
   function eventFieldNames(kind) {
     const nodes = state.eventKind === 'event' ? eventNodes() : [state.eventDraft];
-    const names = kind === 'attribute'
-      ? new Set(state.eventKind === 'event' ? ['name', 'date', 'fee'] : ['name'])
-      : new Set();
+    const defaults = kind === 'attribute'
+      ? state.eventKind === 'event' ? ['name', 'date', 'fee', 'time'] : ['name']
+      : state.eventKind === 'event' ? ['Location', 'Description', 'Included', 'Charity'] : ['Description', 'Website', 'PayLink'];
+    const names = new Set(state.eventIsNew ? defaults : kind === 'attribute'
+      ? state.eventKind === 'event' ? ['name', 'date', 'fee'] : ['name']
+      : []);
     const extras = kind === 'attribute' ? state.eventExtraAttributes : state.eventExtraElements;
     for (const node of [...nodes, state.eventDraft]) {
       const fields = kind === 'attribute' ? Array.from(node.attributes) : Array.from(node.children);
@@ -426,6 +429,28 @@
   function renderFieldGroup(container, kind, name) {
     const group = document.createElement('section');
     group.className = 'event-field-group';
+    if (state.eventIsNew) {
+      group.classList.add('event-add-field-group');
+      const label = document.createElement('label');
+      const fieldId = `event-add-${kind}-${name}`;
+      label.htmlFor = fieldId;
+      label.textContent = name;
+      const field = kind === 'attribute' ? document.createElement('input') : document.createElement('textarea');
+      field.id = fieldId;
+      field.className = 'event-add-field';
+      field.dataset.addFieldKind = kind;
+      field.dataset.addFieldName = name;
+      if (kind === 'attribute') {
+        field.type = 'text';
+        field.required = name === 'name' || (state.eventKind === 'event' && name === 'date');
+      } else {
+        field.rows = 3;
+      }
+      group.append(label, field);
+      container.append(group);
+      return;
+    }
+
     const heading = document.createElement('div');
     heading.className = 'field-list-heading';
     const title = document.createElement('h3');
@@ -486,7 +511,10 @@
       heading.className = 'field-list-heading';
       const title = document.createElement('h3');
       title.textContent = kind === 'attribute' ? 'Attributes' : 'Details';
-      heading.append(title, createButton(kind === 'attribute' ? 'Add attribute' : 'Add detail', 'btn-turquoise', () => addNamedEventField(kind)));
+      heading.append(title);
+      if (!state.eventIsNew) {
+        heading.append(createButton(kind === 'attribute' ? 'Add attribute' : 'Add detail', 'btn-turquoise', () => addNamedEventField(kind)));
+      }
       container.append(heading);
       eventFieldNames(kind).forEach((name) => renderFieldGroup(container, kind, name));
     }
@@ -742,6 +770,23 @@
   byId('event-form').addEventListener('submit', (event) => {
     event.preventDefault();
     const node = state.eventDraft;
+    if (state.eventIsNew) {
+      byId('event-editor').querySelectorAll('[data-add-field-kind="attribute"]').forEach((field) => {
+        const name = field.dataset.addFieldName;
+        if (field.value.trim() || name === 'name' || (state.eventKind === 'event' && name === 'date')) {
+          node.setAttribute(name, field.value);
+        } else {
+          node.removeAttribute(name);
+        }
+      });
+      Array.from(node.children).filter((child) => child.tagName !== 'Picture').forEach((child) => child.remove());
+      byId('event-editor').querySelectorAll('[data-add-field-kind="element"]').forEach((field) => {
+        if (!field.value.trim()) return;
+        const child = state.xml.createElement(field.dataset.addFieldName);
+        setElementEditorValue(child, field.value);
+        node.append(child);
+      });
+    }
     if (!node.getAttribute('name')?.trim() || (state.eventKind === 'event' && !node.getAttribute('date')?.trim())) {
       byId('event-editor-message').textContent = state.eventKind === 'event' ? 'Event name and date are required.' : 'Charity name is required.';
       return;

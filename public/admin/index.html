@@ -29,8 +29,7 @@
   <main class="admin-main">
     <div class="admin-heading">
       <div>
-        <p class="admin-eyebrow">Administration</p>
-        <h1>Edit data.xml</h1>
+        <h1>Administration</h1>
       </div>
       <div class="admin-toolbar">
         <button type="button" class="btn btn-turquoise" id="reload-data">Reload</button>
@@ -39,6 +38,30 @@
     </div>
 
     <p id="status-message" class="admin-status" role="status" aria-live="polite">Loading data.xml...</p>
+
+    <section class="admin-section" id="events">
+      <div class="section-heading">
+        <h2>Events</h2>
+        <button type="button" class="btn btn-turquoise" id="add-event">Add event</button>
+      </div>
+      <div id="events-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="charities">
+      <div class="section-heading">
+        <h2>Charities</h2>
+        <button type="button" class="btn btn-turquoise" id="add-charity">Add charity</button>
+      </div>
+      <div id="charities-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="duties">
+      <div class="section-heading">
+        <h2>Duties</h2>
+        <button type="button" class="btn btn-turquoise" id="add-duty">Add duty</button>
+      </div>
+      <div id="duties-list" class="admin-list" aria-live="polite"></div>
+    </section>
 
     <section class="admin-section" id="record-description">
       <div class="section-heading">
@@ -54,39 +77,6 @@
         <button type="button" class="btn btn-turquoise" id="add-mission">Add mission</button>
       </div>
       <div id="missions-list" class="admin-list" aria-live="polite"></div>
-    </section>
-
-    <section class="admin-section" id="events">
-      <div class="section-heading">
-        <div>
-          <h2>Events</h2>
-          <p class="section-note">Select an event to edit its attributes and details.</p>
-        </div>
-        <button type="button" class="btn btn-turquoise" id="add-event">Add event</button>
-      </div>
-      <div id="events-list" class="admin-list" aria-live="polite"></div>
-    </section>
-
-    <section class="admin-section" id="charities">
-      <div class="section-heading">
-        <div>
-          <h2>Charities</h2>
-          <p class="section-note">Manage charity names, descriptions, websites, and donation links.</p>
-        </div>
-        <button type="button" class="btn btn-turquoise" id="add-charity">Add charity</button>
-      </div>
-      <div id="charities-list" class="admin-list" aria-live="polite"></div>
-    </section>
-
-    <section class="admin-section" id="duties">
-      <div class="section-heading">
-        <div>
-          <h2>Duties</h2>
-          <p class="section-note">Manage the reusable volunteer duty list.</p>
-        </div>
-        <button type="button" class="btn btn-turquoise" id="add-duty">Add duty</button>
-      </div>
-      <div id="duties-list" class="admin-list" aria-live="polite"></div>
     </section>
 
   </main>
