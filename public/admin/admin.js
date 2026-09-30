@@ -444,7 +444,10 @@
       const fieldId = `event-add-${kind}-${name}`;
       label.htmlFor = fieldId;
       label.textContent = name;
-      const field = kind === 'attribute' ? document.createElement('input') : document.createElement('textarea');
+      const isEventCharity = kind === 'element' && state.eventKind === 'event' && name === 'Charity';
+      const field = kind === 'attribute'
+        ? document.createElement('input')
+        : isEventCharity ? document.createElement('select') : document.createElement('textarea');
       field.id = fieldId;
       field.className = 'event-add-field';
       field.dataset.addFieldKind = kind;
@@ -452,6 +455,19 @@
       if (kind === 'attribute') {
         field.type = 'text';
         field.required = name === 'name' || (state.eventKind === 'event' && name === 'date');
+      } else if (isEventCharity) {
+        const noCharity = document.createElement('option');
+        noCharity.value = '';
+        noCharity.textContent = 'No charity';
+        field.append(noCharity);
+        state.xml.querySelectorAll('Charities > Charity').forEach((charity) => {
+          const charityName = charity.getAttribute('name')?.trim();
+          if (!charityName) return;
+          const option = document.createElement('option');
+          option.value = charityName;
+          option.textContent = charityName;
+          field.append(option);
+        });
       } else {
         field.rows = 3;
         if (state.eventKind === 'charity') {
@@ -699,7 +715,7 @@
       }
       await loadPictures();
       status(failures.length ? `data.xml saved, but old picture cleanup failed: ${failures.join(' ')}`
-        : shared.length ? `Changes saved. ${shared.join(', ')} remains stored because another event still uses it.` : 'Changes saved to data.xml.',
+        : shared.length ? `Changes saved. ${shared.join(', ')} remains stored because another event still uses it.` : 'Changes Saved',
         failures.length ? 'error' : 'info');
     } catch (error) {
       status(error.message || 'Could not save data.xml.', 'error');
