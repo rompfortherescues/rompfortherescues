@@ -110,7 +110,24 @@ h2 { color: black; border-bottom: 3px solid var(--turquoise); padding-bottom: 0.
   border-left: 6px solid var(--turquoise);
 }
 
-.event-card h3 { color: var(--pink); }
+.event-card h3,
+.charity-card h3 { color: var(--pink); }
+
+.event-card > summary,
+.charity-card > summary {
+  cursor: pointer;
+}
+
+.event-card > summary h3,
+.event-card > summary p,
+.charity-card > summary h3 {
+  display: inline;
+  margin: 0;
+}
+
+.event-card > summary p {
+  margin-left: 1rem;
+}
 
 .event-card-content {
   display: grid;

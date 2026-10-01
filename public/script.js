@@ -127,13 +127,16 @@ async function loadData() {
         ? `<div class="event-picture"><img src="${picture}" alt="${name}"></div>`
         : '';
 
-      const card = document.createElement('div');
+      const card = document.createElement('details');
       card.className = 'event-card';
       card.innerHTML = `
+        <summary>
+          <h3>${name}</h3>
+          <p><strong>${date}</strong></p>
+        </summary>
         <div class="event-card-content">
           <div class="event-details">
-            <h3>${name}</h3>
-            <p><strong>${date}</strong> · ${time} · ${type}</p>
+            <p>${time} · ${type}</p>
             <div class="locations">${locHtml}</div>
             <div class="event-descriptions"></div>
             ${inclHtml}
@@ -158,15 +161,17 @@ async function loadData() {
       const website = ch.querySelector('Website')?.textContent?.trim() || '#';
       const payLink = ch.querySelector('PayLink')?.textContent?.trim() || '#';
 
-      const card = document.createElement('div');
+      const card = document.createElement('details');
       card.className = 'charity-card';
       card.innerHTML = `
-        <h3>${name}</h3>
-        <div class="charity-descriptions"></div>
-        <p>
-          <a href="${website}" target="_blank" rel="noopener">Website</a> ·
-          <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink" style="padding:0.3rem 0.8rem;font-size:0.9rem;">Donate</a>
-        </p>
+        <summary><h3>${name}</h3></summary>
+        <div class="charity-content">
+          <div class="charity-descriptions"></div>
+          <p>
+            <a href="${website}" target="_blank" rel="noopener">Website</a> ·
+            <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink" style="padding:0.3rem 0.8rem;font-size:0.9rem;">Donate</a>
+          </p>
+        </div>
       `;
       renderRecordParagraphs(ch, 'Description', card.querySelector('.charity-descriptions'));
       charitiesList.appendChild(card);
