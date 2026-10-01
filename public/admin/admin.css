@@ -218,14 +218,14 @@
 }
 
 .event-editor-header {
-  padding: 0.65rem 1rem;
+  padding: 0.45rem 0.9rem;
   border-bottom: 1px solid #ddd;
 }
 
 .event-editor-header > h2 {
-  margin: 0 0 0.45rem;
+  margin: 0 0 0.25rem;
   color: #333;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
 }
 
 .event-editor-toolbar {
@@ -244,7 +244,7 @@
 
 .event-editor-scroll {
   max-height: calc(88vh - 6rem);
-  padding: 1.1rem 1.4rem 1.4rem;
+  padding: 0.8rem 1rem 1rem;
   overflow-y: auto;
 }
 
@@ -276,24 +276,24 @@
 
 .editor-fields {
   display: grid;
-  gap: 0.7rem;
-  margin: 1rem 0;
+  gap: 0.45rem;
+  margin: 0.6rem 0;
 }
 
 #event-attributes {
-  gap: 0.2rem;
-  margin: 0.35rem 0;
+  gap: 0.15rem;
+  margin: 0.2rem 0;
 }
 
 .event-field-group {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
 .event-duty-group {
   display: grid;
-  gap: 0.4rem;
-  margin-bottom: 0.6rem;
+  gap: 0.25rem;
+  margin-bottom: 0.4rem;
 }
 
 .event-duty-group h3 {
@@ -316,7 +316,7 @@
   display: grid;
   grid-template-columns: minmax(6rem, 1fr) minmax(0, 3fr) auto;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.5rem;
 }
 
 .event-field-row label {
@@ -343,7 +343,7 @@
 .event-field-group > label {
   color: #333;
   font-weight: 600;
-  padding-top: 0.55rem;
+  padding-top: 0.25rem;
 }
 
 .event-add-field {

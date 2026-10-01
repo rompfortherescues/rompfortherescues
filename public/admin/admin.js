@@ -201,11 +201,6 @@
       const actions = document.createElement('div');
       actions.className = 'row-actions';
       actions.append(
-        createButton('View', 'btn-turquoise', () => showItem(
-          eventNode.getAttribute('name') || 'Event',
-          [...Array.from(eventNode.attributes).map((attribute) => `${attribute.name}: ${attribute.value}`),
-            ...Array.from(eventNode.children).map((child) => `${child.tagName}: ${elementEditorValue(child)}`)].join('\n\n')
-        )),
         createButton('Edit', 'btn-turquoise', () => openEventEditor(eventNode)),
         createButton('Delete', 'btn-danger', () => deleteEvent(eventNode))
       );
