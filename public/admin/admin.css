@@ -292,8 +292,8 @@
 
 .event-duty-group {
   display: grid;
-  gap: 0.25rem;
-  margin-bottom: 0.4rem;
+  gap: 15px;
+  margin-bottom: 15px;
 }
 
 .event-duty-group h3 {
@@ -321,9 +321,9 @@
 
 .event-field-row label {
   color: #333;
-  font-size: 0.82rem;
-  font-weight: 600;
-  line-height: 1.15;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .event-field-input {
@@ -344,7 +344,8 @@
 
 .event-field-group > label {
   color: #333;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   padding-top: 0.25rem;
 }
 
@@ -396,7 +397,8 @@
 
 .field-list-heading h3 {
   color: #333;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .dialog-actions {
