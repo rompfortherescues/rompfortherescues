@@ -374,11 +374,68 @@
       if (!response.ok) throw new Error(result.error || `Upload failed (${response.status}).`);
       uploadStatus.textContent = `Uploaded ${result.picture.key} to Gallery.`;
       status(`Uploaded ${result.picture.key} to the slideshow gallery.`);
+      await loadSlideshowPictures();
     } catch (error) {
       uploadStatus.textContent = error.message || 'Could not upload picture.';
     } finally {
       submitButton.disabled = false;
       byId('slideshow-picture-file').value = '';
+    }
+  }
+
+  function renderSlideshowPictures(pictures) {
+    const list = byId('slideshow-picture-list');
+    list.replaceChildren();
+    if (!pictures.length) {
+      setEmptyState(list, 'No pictures in the gallery yet.');
+      return;
+    }
+
+    pictures.forEach((picture) => {
+      const row = document.createElement('article');
+      row.className = 'gallery-picture-row';
+      const image = document.createElement('img');
+      image.src = `/images/slideshow/${picture.key.split('/').map(encodeURIComponent).join('/')}`;
+      image.alt = picture.key;
+      image.loading = 'lazy';
+      const name = document.createElement('span');
+      name.className = 'gallery-picture-name';
+      name.textContent = picture.key;
+      const deleteButton = createButton('Delete', 'btn-danger', () => deleteSlideshowPicture(picture.key, deleteButton));
+      row.append(image, name, deleteButton);
+      list.append(row);
+    });
+  }
+
+  async function loadSlideshowPictures() {
+    const list = byId('slideshow-picture-list');
+    list.textContent = 'Loading pictures...';
+    try {
+      const response = await fetch('/api/admin/slideshow-pictures', { cache: 'no-store', credentials: 'same-origin' });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `Could not load pictures (${response.status}).`);
+      renderSlideshowPictures(result.pictures || []);
+    } catch (error) {
+      list.replaceChildren();
+      setEmptyState(list, error.message || 'Could not load gallery pictures.');
+    }
+  }
+
+  async function deleteSlideshowPicture(key, button) {
+    if (!window.confirm(`Delete ${key} from the gallery? This cannot be undone.`)) return;
+    button.disabled = true;
+    try {
+      const response = await fetch(`/api/admin/slideshow-pictures?name=${encodeURIComponent(key)}`, {
+        method: 'DELETE',
+        credentials: 'same-origin'
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `Could not delete picture (${response.status}).`);
+      status(`Deleted ${key} from the slideshow gallery.`);
+      await loadSlideshowPictures();
+    } catch (error) {
+      status(error.message || `Could not delete ${key}.`, 'error');
+      button.disabled = false;
     }
   }
 
@@ -812,6 +869,7 @@
     byId('slideshow-upload-form').reset();
     byId('slideshow-upload-status').textContent = '';
     byId('slideshow-upload-dialog').showModal();
+    loadSlideshowPictures();
   });
   byId('slideshow-upload-form').addEventListener('submit', (event) => {
     event.preventDefault();

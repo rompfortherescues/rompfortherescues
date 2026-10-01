@@ -79,9 +79,10 @@
   <dialog id="slideshow-upload-dialog" class="editor-dialog">
     <form id="slideshow-upload-form">
       <div class="dialog-heading">
-        <h2>Upload to Gallery</h2>
+        <h2>Gallery</h2>
         <button type="button" class="icon-button" data-close-dialog="slideshow-upload-dialog" aria-label="Close">&times;</button>
       </div>
+      <div id="slideshow-picture-list" class="gallery-picture-list" aria-live="polite"></div>
       <label for="slideshow-picture-file">Picture</label>
       <input id="slideshow-picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
       <p id="slideshow-upload-status" class="section-note" role="status" aria-live="polite"></p>
