@@ -10,7 +10,6 @@
     eventDraft: null,
     eventIsNew: false,
     eventKind: 'event',
-    eventField: null,
     eventExtraAttributes: new Set(),
     eventExtraElements: new Set(),
     pendingEventPicture: null,
@@ -551,27 +550,6 @@
     select.value = selectedValue;
   }
 
-  function openEventFieldEditor(kind, name, element = null) {
-    state.eventField = { kind, name, element };
-    byId('event-field-title').textContent = `${element || (kind === 'attribute' && state.eventDraft.hasAttribute(name)) ? 'Edit' : 'Add'} ${name}`;
-    const isCharitySelect = kind === 'element' && state.eventKind === 'event' && name === 'Charity';
-    const valueField = byId('event-field-value');
-    const charityField = byId('event-field-charity');
-    const label = byId('event-field-value-label');
-    valueField.hidden = isCharitySelect;
-    charityField.hidden = !isCharitySelect;
-    label.htmlFor = isCharitySelect ? charityField.id : valueField.id;
-    label.textContent = isCharitySelect ? 'Charity' : 'Value';
-    const value = kind === 'attribute'
-      ? state.eventDraft.getAttribute(name) || ''
-      : element ? elementEditorValue(element) : '';
-    if (isCharitySelect) populateCharityOptions(charityField, value.trim());
-    else valueField.value = value;
-    byId('event-field-value').setCustomValidity('');
-    byId('event-field-editor').showModal();
-    (isCharitySelect ? charityField : valueField).focus();
-  }
-
   function renderFieldGroup(container, kind, name) {
     const group = document.createElement('section');
     group.className = 'event-field-group';
@@ -609,40 +587,36 @@
       return;
     }
 
-    const heading = document.createElement('div');
-    heading.className = 'field-list-heading';
-    const title = document.createElement('h3');
-    title.textContent = name;
-    heading.append(title);
     const elements = kind === 'element'
       ? Array.from(state.eventDraft.children).filter((child) => child.tagName === name)
-      : state.eventDraft.hasAttribute(name) ? [null] : [];
-    if (kind === 'element' || !elements.length) {
-      heading.append(createButton(`Add ${name}`, 'btn-turquoise', () => openEventFieldEditor(kind, name)));
-    }
-    group.append(heading);
+      : [null];
 
-    elements.forEach((element) => {
+    elements.forEach((element, index) => {
       const value = kind === 'attribute' ? state.eventDraft.getAttribute(name) : elementEditorValue(element);
       const row = document.createElement('div');
-      row.className = 'admin-row';
-      const preview = document.createElement('p');
-      preview.className = 'row-copy';
-      preview.textContent = value.replace(/\s+/g, ' ').trim() || '(empty)';
-      const actions = document.createElement('div');
-      actions.className = 'row-actions';
-      actions.append(
-        createButton('View', 'btn-turquoise', () => showItem(name, value)),
-        createButton('Edit', 'btn-turquoise', () => openEventFieldEditor(kind, name, element))
-      );
-      if (kind === 'element' || (name !== 'name' && name !== 'date')) {
-        actions.append(createButton('Remove', 'btn-danger', () => {
-          if (kind === 'attribute') state.eventDraft.removeAttribute(name);
-          else element.remove();
+      row.className = 'event-field-row';
+      const label = document.createElement('label');
+      const field = document.createElement('input');
+      field.type = 'text';
+      field.className = 'event-field-input';
+      field.id = `event-field-${kind}-${name}-${index}`;
+      field.value = value || '';
+      label.htmlFor = field.id;
+      label.textContent = name;
+      field.addEventListener('input', () => {
+        if (kind === 'attribute') {
+          if (field.value || state.eventDraft.hasAttribute(name)) state.eventDraft.setAttribute(name, field.value);
+        } else {
+          setElementEditorValue(element, field.value);
+        }
+      });
+      row.append(label, field);
+      if (kind === 'element') {
+        row.append(createButton('Remove', 'btn-danger', () => {
+          element.remove();
           renderEventFields();
         }));
       }
-      row.append(preview, actions);
       group.append(row);
     });
     container.append(group);
@@ -657,8 +631,14 @@
     }
     const extras = kind === 'attribute' ? state.eventExtraAttributes : state.eventExtraElements;
     extras.add(name);
+    if (kind === 'attribute') {
+      if (!state.eventDraft.hasAttribute(name)) state.eventDraft.setAttribute(name, '');
+    } else {
+      state.eventDraft.append(state.xml.createElement(name));
+    }
     renderEventFields();
-    openEventFieldEditor(kind, name);
+    const field = byId(kind === 'attribute' ? 'event-attributes' : 'event-elements').querySelector('.event-field-row:last-child .event-field-input');
+    field?.focus();
   }
 
   function renderEventFields() {
@@ -680,25 +660,28 @@
     const pictureContainer = byId('event-picture');
     pictureContainer.replaceChildren();
     if (state.eventKind !== 'event') return;
-    const heading = document.createElement('div');
-    heading.className = 'field-list-heading';
-    const title = document.createElement('h3');
-    title.textContent = 'Picture';
+    const picture = state.eventDraft.querySelector('Picture');
+    const row = document.createElement('div');
+    row.className = 'event-field-row';
+    const label = document.createElement('label');
+    label.htmlFor = 'event-picture-url';
+    label.textContent = 'Picture';
+    const field = document.createElement('input');
+    field.type = 'text';
+    field.id = 'event-picture-url';
+    field.className = 'event-field-input';
+    field.value = picture?.textContent.trim() || '';
+    field.addEventListener('input', () => setEventPicture(state.eventDraft, field.value));
+    row.append(label, field);
+    pictureContainer.append(row);
+
+    const actions = document.createElement('div');
+    actions.className = 'row-actions';
     const upload = createButton('Upload picture', 'btn-turquoise', () => byId('picture-file').click());
     upload.id = 'event-picture-upload';
     upload.disabled = state.pictureUploading;
-    heading.append(title, upload);
-    pictureContainer.append(heading);
-    const picture = state.eventDraft.querySelector('Picture');
+    actions.append(upload);
     if (picture) {
-      const row = document.createElement('div');
-      row.className = 'admin-row';
-      const name = document.createElement('p');
-      name.className = 'row-copy';
-      name.textContent = pictureKeyFromValue(picture.textContent);
-      const actions = document.createElement('div');
-      actions.className = 'row-actions';
-      actions.append(createButton('View', 'btn-turquoise', () => showPicture(picture.textContent)));
       actions.append(createButton('Remove', 'btn-danger', async () => {
         if (state.pendingEventPicture) {
           try {
@@ -713,9 +696,8 @@
         Array.from(state.eventDraft.children).filter((child) => child.tagName === 'Picture').forEach((child) => child.remove());
         renderEventFields();
       }));
-      row.append(name, actions);
-      pictureContainer.append(row);
     }
+    pictureContainer.append(actions);
   }
 
   function openEventEditor(eventNode, isNew = false, kind = 'event') {
@@ -877,34 +859,6 @@
     openDutyEditor(dutyNode, true);
   });
   byId('picture-file').addEventListener('change', (event) => uploadPicture(event.target.files[0]));
-
-  byId('event-field-form').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const { kind, name, element } = state.eventField;
-    const value = (kind === 'element' && state.eventKind === 'event' && name === 'Charity'
-      ? byId('event-field-charity')
-      : byId('event-field-value')).value;
-    if (kind === 'attribute') {
-      if ((name === 'name' || name === 'date') && !value.trim()) {
-        byId('event-field-value').setCustomValidity(`${name} is required.`);
-        byId('event-field-value').reportValidity();
-        return;
-      }
-      state.eventDraft.setAttribute(name, value);
-    } else {
-      if (name === 'Charity' && state.eventKind === 'event' && !value) {
-        element?.remove();
-      } else {
-        const child = element || state.xml.createElement(name);
-        setElementEditorValue(child, value);
-        if (!element) state.eventDraft.append(child);
-      }
-    }
-    byId('event-field-editor').close();
-    state.eventField = null;
-    renderEventFields();
-  });
-  byId('event-field-value').addEventListener('input', () => byId('event-field-value').setCustomValidity(''));
 
   byId('event-editor').addEventListener('close', async () => {
     if (!state.pendingEventPicture) return;

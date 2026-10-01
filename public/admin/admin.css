@@ -79,17 +79,6 @@
   resize: vertical;
 }
 
-.event-field-select {
-  width: 100%;
-  margin-top: 0.6rem;
-  padding: 0.7rem;
-  border: 1px solid #83c9c4;
-  border-radius: 4px;
-  background: #fff;
-  color: #222;
-  font: inherit;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -254,6 +243,29 @@
 .event-field-group {
   display: grid;
   gap: 0.4rem;
+}
+
+.event-field-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) minmax(0, 3fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.event-field-row label {
+  color: #333;
+  font-weight: 600;
+}
+
+.event-field-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem;
+  border: 1px solid #83c9c4;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  font: inherit;
 }
 
 .event-add-field-group {
