@@ -154,6 +154,15 @@
   text-overflow: ellipsis;
 }
 
+#missions-list .row-copy,
+#missions-list .row-copy p {
+  color: #333;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: normal;
+}
+
 .row-copy p {
   color: #555;
   font-size: 0.9rem;

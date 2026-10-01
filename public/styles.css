@@ -60,6 +60,16 @@ header {
   margin: 0 0 0.5rem;
 }
 
+#mission {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+#mission p {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 .subtitle {
   margin: -0.5rem 0 1rem;
   color: black;
