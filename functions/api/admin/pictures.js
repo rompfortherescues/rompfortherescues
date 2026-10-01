@@ -163,8 +163,9 @@ export async function onRequestDelete({ request, env }) {
     if (!existing) return jsonResponse({ error: 'Picture not found.' }, 404);
 
     if (replacementKey) {
-      if (!isSupportedKey(replacementKey) || !replacementKey.toLowerCase().endsWith('.webp') || replacementKey === key) {
-        return jsonResponse({ error: 'Choose a different WebP picture as the replacement.' }, 400);
+      const isJpgReplacement = replacementKey.toLowerCase().endsWith('.jpg') || replacementKey.toLowerCase().endsWith('.jpeg');
+      if (!isSupportedKey(replacementKey) || !isJpgReplacement || replacementKey === key) {
+        return jsonResponse({ error: 'Choose a different JPG picture as the replacement.' }, 400);
       }
       if (!await env.EVENT_PICTURES_BUCKET.head(replacementKey)) {
         return jsonResponse({ error: 'The replacement picture must be uploaded before replacing the old picture.' }, 409);

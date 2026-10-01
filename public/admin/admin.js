@@ -300,7 +300,7 @@
     }
   }
 
-  async function convertToWebp(file) {
+  async function convertToJpg(file) {
     const bitmap = await createImageBitmap(file);
     try {
       const canvas = document.createElement('canvas');
@@ -313,11 +313,11 @@
         canvas.height = Math.max(1, Math.round(bitmap.height * scale));
         context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
 
-        for (const quality of [0.9, 0.78, 0.66, 0.54, 0.42, 0.3]) {
+        for (const quality of [0.95, 0.88, 0.78, 0.68, 0.58, 0.48]) {
           const blob = await new Promise((resolve, reject) => {
-            canvas.toBlob((result) => result ? resolve(result) : reject(new Error('This browser could not convert the picture to WebP.')), 'image/webp', quality);
+            canvas.toBlob((result) => result ? resolve(result) : reject(new Error('This browser could not convert the picture to JPG.')), 'image/jpeg', quality);
           });
-          if (blob.type !== 'image/webp') throw new Error('This browser does not support WebP image conversion.');
+          if (blob.type !== 'image/jpeg') throw new Error('This browser does not support JPG image conversion.');
           if (blob.size < 1024 * 1024) return blob;
         }
         scale *= 0.75;
@@ -342,11 +342,11 @@
     const submitButton = form.querySelector('[type="submit"]');
     const uploadStatus = byId('slideshow-upload-status');
     submitButton.disabled = true;
-    uploadStatus.textContent = `Converting ${file.name} to WebP...`;
+    uploadStatus.textContent = `Converting ${file.name} to JPG...`;
     try {
-      const webp = await convertToWebp(file);
+      const jpg = await convertToJpg(file);
       const body = new FormData();
-      body.append('file', webp, 'gallery.webp');
+      body.append('file', jpg, 'gallery.jpg');
       const response = await fetch('/api/admin/slideshow-pictures', {
         method: 'POST',
         credentials: 'same-origin',
@@ -446,14 +446,14 @@
     button.disabled = true;
     byId('event-form').querySelector('[type="submit"]').disabled = true;
     state.pictureUploading = true;
-    status(`Converting and uploading ${file.name}...`);
+    status(`Converting and uploading ${file.name} to JPG...`);
     try {
-      const webp = await convertToWebp(file);
+      const jpg = await convertToJpg(file);
       const sourceName = file.name.replace(/\\/g, '/').split('/').pop().replace(/\.[^.]*$/, '');
       const safeSourceName = sourceName.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64) || 'picture';
-      const key = `event-${safeSourceName}-${crypto.randomUUID()}.webp`;
+      const key = `event-${safeSourceName}-${crypto.randomUUID()}.jpg`;
       const form = new FormData();
-      form.append('file', webp, key);
+      form.append('file', jpg, key);
       const response = await fetch('/api/admin/pictures', {
         method: 'POST',
         credentials: 'same-origin',
