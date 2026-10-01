@@ -10,8 +10,6 @@
     eventDraft: null,
     eventIsNew: false,
     eventKind: 'event',
-    eventExtraAttributes: new Set(),
-    eventExtraElements: new Set(),
     pendingEventPicture: null,
     pendingPictureDeletions: new Set(),
     pictureUploading: false,
@@ -512,13 +510,14 @@
     const names = new Set(state.eventIsNew ? defaults : kind === 'attribute'
       ? state.eventKind === 'event' ? ['name', 'date', 'fee'] : ['name']
       : []);
-    const extras = kind === 'attribute' ? state.eventExtraAttributes : state.eventExtraElements;
     for (const node of [...nodes, state.eventDraft]) {
       const fields = kind === 'attribute' ? Array.from(node.attributes) : Array.from(node.children);
       fields.forEach((field) => names.add(kind === 'attribute' ? field.name : field.tagName));
     }
-    extras.forEach((name) => names.add(name));
-    if (kind === 'element' && state.eventKind === 'event') names.delete('Picture');
+    if (kind === 'element' && state.eventKind === 'event') {
+      names.delete('Picture');
+      names.delete('Duty');
+    }
     return names;
   }
 
@@ -622,40 +621,80 @@
     container.append(group);
   }
 
-  function addNamedEventField(kind) {
-    const name = window.prompt(`Name of the new ${kind === 'attribute' ? 'attribute' : 'detail'}:`)?.trim();
-    if (name === undefined || name === '') return;
-    if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(name) || (kind === 'element' && name === 'Picture')) {
-      status('Enter a valid XML name. Use the Picture controls for pictures.', 'error');
-      return;
-    }
-    const extras = kind === 'attribute' ? state.eventExtraAttributes : state.eventExtraElements;
-    extras.add(name);
-    if (kind === 'attribute') {
-      if (!state.eventDraft.hasAttribute(name)) state.eventDraft.setAttribute(name, '');
-    } else {
-      state.eventDraft.append(state.xml.createElement(name));
-    }
-    renderEventFields();
-    const field = byId(kind === 'attribute' ? 'event-attributes' : 'event-elements').querySelector('.event-field-row:last-child .event-field-input');
-    field?.focus();
-  }
-
   function renderEventFields() {
-    for (const kind of ['attribute', 'element']) {
-      const container = byId(kind === 'attribute' ? 'event-attributes' : 'event-elements');
-      container.replaceChildren();
-      const heading = document.createElement('div');
-      heading.className = 'field-list-heading';
-      const title = document.createElement('h3');
-      title.textContent = kind === 'attribute' ? 'Attributes' : 'Details';
-      heading.append(title);
-      if (!state.eventIsNew) {
-        heading.append(createButton(kind === 'attribute' ? 'Add attribute' : 'Add detail', 'btn-turquoise', () => addNamedEventField(kind)));
-      }
-      container.append(heading);
-      eventFieldNames(kind).forEach((name) => renderFieldGroup(container, kind, name));
+    const attributes = byId('event-attributes');
+    attributes.replaceChildren();
+    const attributeHeading = document.createElement('div');
+    attributeHeading.className = 'field-list-heading';
+    const attributeTitle = document.createElement('h3');
+    attributeTitle.textContent = 'Attributes';
+    attributeHeading.append(attributeTitle);
+    attributes.append(attributeHeading);
+    eventFieldNames('attribute').forEach((name) => renderFieldGroup(attributes, 'attribute', name));
+
+    const elements = byId('event-elements');
+    elements.replaceChildren();
+    if (state.eventKind === 'event') {
+      const dutyGroup = document.createElement('section');
+      dutyGroup.className = 'event-duty-group';
+      const dutyHeading = document.createElement('h3');
+      dutyHeading.textContent = 'Duties';
+      dutyGroup.append(dutyHeading);
+
+      const assignedDuties = Array.from(state.eventDraft.children)
+        .filter((child) => child.tagName === 'Duty');
+      assignedDuties.forEach((duty) => {
+        const row = document.createElement('div');
+        row.className = 'event-field-row';
+        const label = document.createElement('label');
+        label.textContent = 'Duty';
+        const value = document.createElement('span');
+        value.className = 'event-duty-name';
+        value.textContent = duty.textContent.trim();
+        row.append(label, value, createButton('Remove', 'btn-danger', () => {
+          duty.remove();
+          renderEventFields();
+        }));
+        dutyGroup.append(row);
+      });
+
+      const dutyControl = document.createElement('div');
+      dutyControl.className = 'event-duty-control';
+      const dutyInput = document.createElement('input');
+      dutyInput.type = 'text';
+      dutyInput.className = 'event-field-input';
+      dutyInput.placeholder = 'Enter an event-specific duty';
+      dutyInput.setAttribute('aria-label', 'New event duty');
+      const addDuty = createButton('Add duty', 'btn-turquoise', () => {
+        const value = dutyInput.value.trim();
+        if (!value) return;
+        if (assignedDuties.some((duty) => duty.textContent.trim() === value)) {
+          dutyInput.setCustomValidity('This duty is already assigned to the event.');
+          dutyInput.reportValidity();
+          return;
+        }
+        const duty = state.xml.createElement('Duty');
+        duty.textContent = value;
+        state.eventDraft.append(duty);
+        renderEventFields();
+      });
+      addDuty.disabled = true;
+      dutyInput.addEventListener('input', () => {
+        dutyInput.setCustomValidity('');
+        addDuty.disabled = !dutyInput.value.trim();
+      });
+      dutyInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addDuty.click();
+        }
+      });
+      dutyControl.append(dutyInput, addDuty);
+      dutyGroup.append(dutyControl);
+      elements.append(dutyGroup);
     }
+
+    eventFieldNames('element').forEach((name) => renderFieldGroup(elements, 'element', name));
 
     const pictureContainer = byId('event-picture');
     pictureContainer.replaceChildren();
@@ -705,8 +744,6 @@
     state.eventDraft = eventNode.cloneNode(true);
     state.eventIsNew = isNew;
     state.eventKind = kind;
-    state.eventExtraAttributes.clear();
-    state.eventExtraElements.clear();
     state.pendingEventPicture = null;
     byId('event-editor-message').textContent = '';
     const label = kind === 'charity' ? 'charity' : 'event';
@@ -907,7 +944,7 @@
           node.removeAttribute(name);
         }
       });
-      Array.from(node.children).filter((child) => child.tagName !== 'Picture').forEach((child) => child.remove());
+      Array.from(node.children).filter((child) => child.tagName !== 'Picture' && child.tagName !== 'Duty').forEach((child) => child.remove());
       byId('event-editor').querySelectorAll('[data-add-field-kind="element"]').forEach((field) => {
         const value = linkExampleUrl(field.dataset.addFieldName, field.value);
         if (!value.trim()) return;

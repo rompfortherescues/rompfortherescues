@@ -280,9 +280,36 @@
   margin: 1rem 0;
 }
 
+#event-attributes {
+  gap: 0.2rem;
+  margin: 0.35rem 0;
+}
+
 .event-field-group {
   display: grid;
+  gap: 0.15rem;
+}
+
+.event-duty-group {
+  display: grid;
   gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.event-duty-group h3 {
+  color: #333;
+  font-size: 1rem;
+}
+
+.event-duty-control {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.event-duty-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .event-field-row {
@@ -421,6 +448,11 @@ select:focus-visible {
 
   .admin-row {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .event-duty-control {
+    align-items: stretch;
     flex-direction: column;
   }
 
