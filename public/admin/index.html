@@ -122,13 +122,14 @@
 
   <dialog id="event-editor" class="editor-dialog event-editor-dialog">
     <form id="event-form" method="dialog">
-      <div class="event-editor-toolbar">
-        <button type="button" class="icon-button" data-close-dialog="event-editor" aria-label="Close">&times;</button>
-        <button type="button" class="btn btn-turquoise" data-close-dialog="event-editor">Cancel</button>
-        <button type="submit" class="btn btn-pink">Apply event changes</button>
+      <div class="event-editor-header">
+        <h2 id="event-editor-title">Edit item</h2>
+        <div class="event-editor-toolbar">
+          <button type="button" class="btn btn-turquoise" data-close-dialog="event-editor">Cancel</button>
+          <button type="submit" class="btn btn-pink">Apply event changes</button>
+        </div>
       </div>
       <div class="event-editor-scroll">
-        <h2 id="event-editor-title">Edit item</h2>
         <p id="event-editor-message" class="section-note" role="status" aria-live="polite"></p>
         <div id="event-attributes" class="editor-fields"></div>
         <div id="event-elements" class="editor-fields"></div>

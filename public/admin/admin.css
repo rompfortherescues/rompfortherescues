@@ -217,13 +217,22 @@
   max-height: min(88vh, 900px);
 }
 
+.event-editor-header {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.event-editor-header > h2 {
+  margin: 0 0 0.45rem;
+  color: #333;
+  font-size: 1.25rem;
+}
+
 .event-editor-toolbar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid #ddd;
 }
 
 .event-editor-toolbar .btn {
@@ -237,12 +246,6 @@
   max-height: calc(88vh - 6rem);
   padding: 1.1rem 1.4rem 1.4rem;
   overflow-y: auto;
-}
-
-.event-editor-scroll > h2 {
-  margin-bottom: 0.8rem;
-  color: #333;
-  font-size: 1.3rem;
 }
 
 .editor-dialog::backdrop {
@@ -390,18 +393,11 @@ select:focus-visible {
 
   .event-editor-toolbar {
     gap: 0.35rem;
-    padding: 0.5rem;
   }
 
   .event-editor-toolbar .btn {
     padding: 0.4rem 0.45rem;
     font-size: 0.78rem;
-  }
-
-  .event-editor-toolbar .icon-button {
-    width: 2.3rem;
-    height: 2.3rem;
-    flex: 0 0 auto;
   }
 
   .admin-heading h1 {
