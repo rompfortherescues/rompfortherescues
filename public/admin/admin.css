@@ -276,18 +276,18 @@
 
 .editor-fields {
   display: grid;
-  gap: 0.2rem;
-  margin: 0.2rem 0;
+  gap: 15px;
+  margin: 15px 0;
 }
 
 #event-attributes {
-  gap: 0;
-  margin: 0.05rem 0;
+  gap: 15px;
+  margin: 15px 0;
 }
 
 .event-field-group {
   display: grid;
-  gap: 0.04rem;
+  gap: 15px;
 }
 
 .event-duty-group {
@@ -316,7 +316,7 @@
   display: grid;
   grid-template-columns: minmax(4.25rem, 1fr) minmax(0, 3fr) auto;
   align-items: center;
-  gap: 0.25rem;
+  gap: 15px;
 }
 
 .event-field-row label {
@@ -391,7 +391,7 @@
 }
 
 .field-list-heading {
-  margin-top: 0.35rem;
+  margin-top: 15px;
 }
 
 .field-list-heading h3 {
@@ -401,16 +401,18 @@
 
 .dialog-actions {
   justify-content: flex-end;
-  margin-top: 0.4rem;
-  padding-top: 0.45rem;
+  margin-top: 15px;
+  padding-top: 15px;
   border-top: 1px solid #ddd;
 }
 
 .event-field-row .btn,
-.dialog-actions .btn {
-  padding: 0.28rem 0.6rem;
+.dialog-actions .btn,
+.event-duty-control .btn {
+  padding: 0.24rem 0.55rem;
   margin: 0;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
+  line-height: 1.2;
 }
 
 button:focus-visible,
