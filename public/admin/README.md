@@ -18,7 +18,7 @@ The top-level `preview_bucket_name` values select local development buckets; dep
 
 In **R2 Object Storage**, confirm that all four bucket names above exist. Confirm that `data.xml` is present and contains the correct data in both `prod-xmldata` and `dev-xmldata`. Keep production and preview content separate as intended.
 
-Event images are stored at the root of the corresponding event-pictures bucket. The event editor accepts JPG, JPEG, PNG, WebP, and GIF images, converts each upload to WebP, rejects converted files larger than 1 MB, and stores accepted files under a generated filename. A new picture is uploaded first; after event changes are applied and `data.xml` is saved, the previous picture is deleted if no other saved event refers to it. Cancelling an unsaved upload attempts to remove that unused object. The public `/r2-images/*` route serves the files and revalidates its cache.
+Event images are stored at the root of the corresponding event-pictures bucket. The event editor accepts JPG, JPEG, PNG, WebP, and GIF images, converts each upload to WebP under 1 MB, and stores it under a generated filename that includes a sanitized version of the source filename. The event's `Picture` element contains the public URL for that stored filename. A new picture is uploaded first; after event changes are applied and `data.xml` is saved, the previous picture is deleted if no other saved event refers to it. Cancelling an unsaved upload attempts to remove that unused object. The public `/r2-images/*` route serves the files and revalidates its cache.
 
 ### 2. Create Cloudflare Access applications
 

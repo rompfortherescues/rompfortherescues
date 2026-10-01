@@ -118,8 +118,8 @@ export async function onRequestPost({ request, env }) {
   if (!file || typeof file.name !== 'string' || typeof file.stream !== 'function') {
     return jsonResponse({ error: 'Choose an image file to upload.' }, 400);
   }
-  if (file.size < 1 || file.size > MAX_FILE_SIZE) {
-    return jsonResponse({ error: 'Picture must be between 1 byte and 1 MB.' }, 413);
+  if (file.size < 1 || file.size >= MAX_FILE_SIZE) {
+    return jsonResponse({ error: 'Picture must be between 1 byte and less than 1 MB.' }, 413);
   }
   if (!KEY_PATTERN.test(file.name)) {
     return jsonResponse({ error: 'Use a filename containing only letters, numbers, dots, underscores, or hyphens.' }, 400);

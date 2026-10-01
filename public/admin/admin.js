@@ -304,24 +304,6 @@
     const bitmap = await createImageBitmap(file);
     try {
       const canvas = document.createElement('canvas');
-      canvas.width = bitmap.width;
-      canvas.height = bitmap.height;
-      canvas.getContext('2d').drawImage(bitmap, 0, 0);
-      const blob = await new Promise((resolve, reject) => {
-        canvas.toBlob((result) => result ? resolve(result) : reject(new Error('This browser could not convert the picture to WebP.')), 'image/webp', 0.9);
-      });
-      if (blob.type !== 'image/webp') throw new Error('This browser does not support WebP image conversion.');
-      if (blob.size > 1024 * 1024) throw new Error('The converted WebP exceeds the 1 MB upload limit.');
-      return blob;
-    } finally {
-      bitmap.close();
-    }
-  }
-
-  async function convertSlideshowImageToWebp(file) {
-    const bitmap = await createImageBitmap(file);
-    try {
-      const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       if (!context) throw new Error('This browser could not prepare the picture for upload.');
 
@@ -349,10 +331,10 @@
   async function uploadSlideshowPicture(file) {
     if (!file) return;
     const extension = file.name.split('.').pop().toLowerCase();
-    const inputTypes = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+    const inputTypes = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' };
     const expectedType = Object.hasOwn(inputTypes, extension) ? inputTypes[extension] : null;
     if (!expectedType || (file.type && file.type !== expectedType)) {
-      byId('slideshow-upload-status').textContent = 'Choose a JPG, JPEG, PNG, or WebP picture.';
+      byId('slideshow-upload-status').textContent = 'Choose a JPG, JPEG, PNG, WebP, or GIF picture.';
       return;
     }
 
@@ -362,7 +344,7 @@
     submitButton.disabled = true;
     uploadStatus.textContent = `Converting ${file.name} to WebP...`;
     try {
-      const webp = await convertSlideshowImageToWebp(file);
+      const webp = await convertToWebp(file);
       const body = new FormData();
       body.append('file', webp, 'gallery.webp');
       const response = await fetch('/api/admin/slideshow-pictures', {
@@ -451,7 +433,10 @@
 
   async function uploadPicture(file) {
     if (!file) return;
-    if (!/\.(?:jpe?g|png|webp|gif)$/i.test(file.name)) {
+    const extension = file.name.split('.').pop().toLowerCase();
+    const inputTypes = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif' };
+    const expectedType = Object.hasOwn(inputTypes, extension) ? inputTypes[extension] : null;
+    if (!expectedType || (file.type && file.type !== expectedType)) {
       byId('event-editor-message').textContent = 'Choose a JPG, JPEG, PNG, WebP, or GIF image.';
       return;
     }
@@ -464,7 +449,9 @@
     status(`Converting and uploading ${file.name}...`);
     try {
       const webp = await convertToWebp(file);
-      const key = `event-${crypto.randomUUID()}.webp`;
+      const sourceName = file.name.replace(/\\/g, '/').split('/').pop().replace(/\.[^.]*$/, '');
+      const safeSourceName = sourceName.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64) || 'picture';
+      const key = `event-${safeSourceName}-${crypto.randomUUID()}.webp`;
       const form = new FormData();
       form.append('file', webp, key);
       const response = await fetch('/api/admin/pictures', {
