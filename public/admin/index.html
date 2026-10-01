@@ -17,12 +17,7 @@
     <p id="tagline">Romp for the Rescues</p>
     <p class="subtitle">Content management</p>
     <nav>
-      <a href="#events">Events</a>
-      <a href="#charities">Charities</a>
-      <a href="#duties">Duties</a>
-      <a href="#record-description">Descriptions</a>
-      <a href="#record-mission">Missions</a>
-      <a href="/">View public site</a>
+      <button type="button" class="nav-support" id="gallery-upload-open">Gallery</button>
     </nav>
   </header>
 
@@ -80,6 +75,22 @@
     </section>
 
   </main>
+
+  <dialog id="slideshow-upload-dialog" class="editor-dialog">
+    <form id="slideshow-upload-form">
+      <div class="dialog-heading">
+        <h2>Upload to Gallery</h2>
+        <button type="button" class="icon-button" data-close-dialog="slideshow-upload-dialog" aria-label="Close">&times;</button>
+      </div>
+      <label for="slideshow-picture-file">Picture</label>
+      <input id="slideshow-picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
+      <p id="slideshow-upload-status" class="section-note" role="status" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="slideshow-upload-dialog">Cancel</button>
+        <button type="submit" class="btn btn-pink">Upload picture</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="record-text-editor" class="editor-dialog">
     <form id="record-text-form" method="dialog">

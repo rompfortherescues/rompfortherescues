@@ -305,6 +305,10 @@ select:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .banner img {
+    width: 50%;
+  }
+
   .admin-heading h1 {
     font-size: 1.6rem;
   }

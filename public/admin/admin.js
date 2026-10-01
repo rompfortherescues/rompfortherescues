@@ -318,6 +318,70 @@
     }
   }
 
+  async function convertSlideshowImageToWebp(file) {
+    const bitmap = await createImageBitmap(file);
+    try {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('This browser could not prepare the picture for upload.');
+
+      let scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+      for (let resizeAttempt = 0; resizeAttempt < 8; resizeAttempt += 1) {
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+        for (const quality of [0.9, 0.78, 0.66, 0.54, 0.42, 0.3]) {
+          const blob = await new Promise((resolve, reject) => {
+            canvas.toBlob((result) => result ? resolve(result) : reject(new Error('This browser could not convert the picture to WebP.')), 'image/webp', quality);
+          });
+          if (blob.type !== 'image/webp') throw new Error('This browser does not support WebP image conversion.');
+          if (blob.size < 1024 * 1024) return blob;
+        }
+        scale *= 0.75;
+      }
+      throw new Error('Could not reduce this picture below 1 MB.');
+    } finally {
+      bitmap.close();
+    }
+  }
+
+  async function uploadSlideshowPicture(file) {
+    if (!file) return;
+    const extension = file.name.split('.').pop().toLowerCase();
+    const inputTypes = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+    const expectedType = Object.hasOwn(inputTypes, extension) ? inputTypes[extension] : null;
+    if (!expectedType || (file.type && file.type !== expectedType)) {
+      byId('slideshow-upload-status').textContent = 'Choose a JPG, JPEG, PNG, or WebP picture.';
+      return;
+    }
+
+    const form = byId('slideshow-upload-form');
+    const submitButton = form.querySelector('[type="submit"]');
+    const uploadStatus = byId('slideshow-upload-status');
+    submitButton.disabled = true;
+    uploadStatus.textContent = `Converting ${file.name} to WebP...`;
+    try {
+      const webp = await convertSlideshowImageToWebp(file);
+      const body = new FormData();
+      body.append('file', webp, 'gallery.webp');
+      const response = await fetch('/api/admin/slideshow-pictures', {
+        method: 'POST',
+        credentials: 'same-origin',
+        body
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `Upload failed (${response.status}).`);
+      uploadStatus.textContent = `Uploaded ${result.picture.key} to Gallery.`;
+      status(`Uploaded ${result.picture.key} to the slideshow gallery.`);
+    } catch (error) {
+      uploadStatus.textContent = error.message || 'Could not upload picture.';
+    } finally {
+      submitButton.disabled = false;
+      byId('slideshow-picture-file').value = '';
+    }
+  }
+
   function setEventPicture(eventNode, url) {
     const pictureElements = Array.from(eventNode.children).filter((child) => child.tagName === 'Picture');
     if (pictureElements.length) pictureElements.forEach((picture) => { picture.textContent = url; });
@@ -744,6 +808,15 @@
 
   byId('reload-data').addEventListener('click', () => loadData());
   byId('save-data').addEventListener('click', saveData);
+  byId('gallery-upload-open').addEventListener('click', () => {
+    byId('slideshow-upload-form').reset();
+    byId('slideshow-upload-status').textContent = '';
+    byId('slideshow-upload-dialog').showModal();
+  });
+  byId('slideshow-upload-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    uploadSlideshowPicture(byId('slideshow-picture-file').files[0]);
+  });
   byId('add-event').addEventListener('click', () => {
     const eventNode = state.xml.createElement('Event');
     openEventEditor(eventNode, true);
