@@ -14,7 +14,15 @@
     pendingPictureDeletions: new Set(),
     pictureUploading: false,
     dutyEditing: null,
-    dutyIsNew: false
+    dutyIsNew: false,
+    leavePromptSuppressed: false
+  };
+
+  const suppressLeavePrompt = () => {
+    state.leavePromptSuppressed = true;
+    window.setTimeout(() => {
+      state.leavePromptSuppressed = false;
+    }, 0);
   };
 
   const status = (message, kind = 'info') => {
@@ -864,7 +872,10 @@
     }
   }
 
-  byId('reload-data').addEventListener('click', () => loadData());
+  byId('reload-data').addEventListener('click', () => {
+    suppressLeavePrompt();
+    loadData(true);
+  });
   byId('save-data').addEventListener('click', saveData);
   byId('gallery-upload-open').addEventListener('click', () => {
     byId('slideshow-upload-form').reset();
@@ -988,11 +999,24 @@
   });
 
   document.querySelectorAll('[data-close-dialog]').forEach((button) => {
-    button.addEventListener('click', () => byId(button.dataset.closeDialog).close());
+    button.addEventListener('click', () => {
+      suppressLeavePrompt();
+      byId(button.dataset.closeDialog).close();
+    });
+  });
+
+  document.querySelectorAll('dialog').forEach((dialog) => {
+    dialog.addEventListener('cancel', () => {
+      suppressLeavePrompt();
+    });
   });
 
   window.addEventListener('beforeunload', (event) => {
     if (!state.dirty && !state.pendingEventPicture) return;
+    if (state.leavePromptSuppressed) {
+      state.leavePromptSuppressed = false;
+      return;
+    }
     event.preventDefault();
     event.returnValue = '';
   });
