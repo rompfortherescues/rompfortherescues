@@ -325,6 +325,10 @@ document.querySelector('nav a[href="#volunteer"]').addEventListener('click', () 
   message.className = 'message';
 });
 
+document.getElementById('cancel-volunteer').addEventListener('click', () => {
+  document.getElementById('volunteer').hidden = true;
+});
+
 document.getElementById('vol-specific-form').addEventListener('submit', async e => {
   e.preventDefault();
   const eventData = JSON.parse(document.getElementById('vol-spec-event-data').value || '{}');
