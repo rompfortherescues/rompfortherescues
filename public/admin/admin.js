@@ -724,18 +724,24 @@
     pictureContainer.replaceChildren();
     if (state.eventKind !== 'event') return;
     const picture = state.eventDraft.querySelector('Picture');
+    const pictureValue = picture?.textContent.trim() || '';
     const row = document.createElement('div');
     row.className = 'event-field-row';
     const label = document.createElement('label');
-    label.htmlFor = 'event-picture-url';
     label.textContent = 'Picture';
-    const field = document.createElement('input');
-    field.type = 'text';
-    field.id = 'event-picture-url';
-    field.className = 'event-field-input';
-    field.value = picture?.textContent.trim() || '';
-    field.addEventListener('input', () => setEventPicture(state.eventDraft, field.value));
-    row.append(label, field);
+    row.append(label);
+    if (pictureValue) {
+      const thumbnail = document.createElement('img');
+      thumbnail.className = 'event-row-picture';
+      thumbnail.src = pictureValue;
+      thumbnail.alt = 'Event picture';
+      thumbnail.loading = 'lazy';
+      row.append(thumbnail);
+    } else {
+      const empty = document.createElement('span');
+      empty.textContent = '(no picture)';
+      row.append(empty);
+    }
     pictureContainer.append(row);
 
     const actions = document.createElement('div');
