@@ -541,8 +541,91 @@
     if (kind === 'element' && state.eventKind === 'event') {
       names.delete('Picture');
       names.delete('Duty');
+      names.delete('Location');
+      names.delete('Description');
+      names.delete('Included');
+      names.delete('Charity');
     }
     return names;
+  }
+
+  function listFieldConfig(name) {
+    const configs = {
+      Location: { heading: 'Location', itemLabel: 'Location', placeholder: 'Enter a location', addLabel: 'Add location', duplicate: 'This location is already listed.' },
+      Description: { heading: 'Description', itemLabel: 'Description', placeholder: 'Enter a description', addLabel: 'Add description', duplicate: 'This description is already listed.' },
+      Included: { heading: 'Included', itemLabel: 'Included', placeholder: 'Enter an included item', addLabel: 'Add included item', duplicate: 'This item is already listed.' },
+      Charity: { heading: 'Charities', itemLabel: 'Charity', placeholder: '', addLabel: 'Add charity', duplicate: 'This charity is already listed.' }
+    };
+    return configs[name];
+  }
+
+  function renderListFieldGroup(container, name) {
+    const config = listFieldConfig(name);
+    const group = document.createElement('section');
+    group.className = 'event-duty-group';
+    const heading = document.createElement('h3');
+    heading.textContent = config.heading;
+    group.append(heading);
+
+    const items = Array.from(state.eventDraft.children).filter((child) => child.tagName === name);
+    items.forEach((item) => {
+      const row = document.createElement('div');
+      row.className = 'event-field-row';
+      const label = document.createElement('label');
+      label.textContent = config.itemLabel;
+      const value = document.createElement('span');
+      value.className = 'event-duty-name';
+      value.textContent = elementEditorValue(item);
+      row.append(label, value, createButton('Remove', 'btn-danger', () => {
+        item.remove();
+        renderEventFields();
+      }));
+      group.append(row);
+    });
+
+    const control = document.createElement('div');
+    control.className = 'event-duty-control';
+    const input = name === 'Charity' ? document.createElement('select') : document.createElement('input');
+    input.className = 'event-field-input';
+    input.setAttribute('aria-label', `New ${config.itemLabel.toLowerCase()}`);
+    if (name === 'Charity') {
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Select a charity';
+      input.append(placeholder);
+      populateCharityOptions(input);
+      input.value = '';
+    } else {
+      input.type = 'text';
+      input.placeholder = config.placeholder;
+    }
+    const addButton = createButton(config.addLabel, 'btn-turquoise', () => {
+      const value = input.value.trim();
+      if (!value) return;
+      if (items.some((item) => item.textContent.trim() === value)) {
+        input.setCustomValidity(config.duplicate);
+        input.reportValidity();
+        return;
+      }
+      const item = state.xml.createElement(name);
+      item.textContent = value;
+      state.eventDraft.append(item);
+      renderEventFields();
+    });
+    addButton.disabled = true;
+    input.addEventListener('input', () => {
+      input.setCustomValidity('');
+      addButton.disabled = !input.value.trim();
+    });
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addButton.click();
+      }
+    });
+    control.append(input, addButton);
+    group.append(control);
+    container.append(group);
   }
 
   function linkExampleUrl(name, value) {
@@ -593,6 +676,7 @@
       if (kind === 'attribute') {
         field.type = 'text';
         field.required = name === 'name' || (state.eventKind === 'event' && name === 'date');
+        if (name === 'sortorder') field.value = state.eventDraft.getAttribute('sortorder') || '';
       } else if (isEventCharity) {
         populateCharityOptions(field);
       } else {
@@ -716,6 +800,10 @@
       dutyControl.append(dutyInput, addDuty);
       dutyGroup.append(dutyControl);
       elements.append(dutyGroup);
+    }
+
+    if (state.eventKind === 'event') {
+      ['Location', 'Description', 'Included', 'Charity'].forEach((name) => renderListFieldGroup(elements, name));
     }
 
     eventFieldNames('element').forEach((name) => renderFieldGroup(elements, 'element', name));
@@ -979,7 +1067,7 @@
           node.removeAttribute(name);
         }
       });
-      Array.from(node.children).filter((child) => child.tagName !== 'Picture' && child.tagName !== 'Duty').forEach((child) => child.remove());
+      Array.from(node.children).filter((child) => !['Picture', 'Duty', 'Location', 'Description', 'Included', 'Charity'].includes(child.tagName)).forEach((child) => child.remove());
       byId('event-editor').querySelectorAll('[data-add-field-kind="element"]').forEach((field) => {
         const value = linkExampleUrl(field.dataset.addFieldName, field.value);
         if (!value.trim()) return;
