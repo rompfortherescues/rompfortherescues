@@ -676,7 +676,10 @@
       if (kind === 'attribute') {
         field.type = 'text';
         field.required = name === 'name' || (state.eventKind === 'event' && name === 'date');
-        if (name === 'sortorder') field.value = state.eventDraft.getAttribute('sortorder') || '';
+        field.value = state.eventDraft.getAttribute(name) || '';
+        field.addEventListener('input', () => {
+          if (field.value || state.eventDraft.hasAttribute(name)) state.eventDraft.setAttribute(name, field.value);
+        });
       } else if (isEventCharity) {
         populateCharityOptions(field);
       } else {
@@ -1059,14 +1062,6 @@
     event.preventDefault();
     const node = state.eventDraft;
     if (state.eventIsNew) {
-      byId('event-editor').querySelectorAll('[data-add-field-kind="attribute"]').forEach((field) => {
-        const name = field.dataset.addFieldName;
-        if (field.value.trim() || name === 'name' || (state.eventKind === 'event' && name === 'date')) {
-          node.setAttribute(name, field.value);
-        } else {
-          node.removeAttribute(name);
-        }
-      });
       Array.from(node.children).filter((child) => !['Picture', 'Duty', 'Location', 'Description', 'Included', 'Charity'].includes(child.tagName)).forEach((child) => child.remove());
       byId('event-editor').querySelectorAll('[data-add-field-kind="element"]').forEach((field) => {
         const value = linkExampleUrl(field.dataset.addFieldName, field.value);
