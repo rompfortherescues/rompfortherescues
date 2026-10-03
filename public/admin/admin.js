@@ -53,8 +53,32 @@
     container.append(empty);
   };
 
-  const eventNodes = () => Array.from(state.xml.querySelectorAll('Events > Event'));
+  const eventNodes = () => Array.from(state.xml.querySelectorAll('Events > Event'))
+    .sort((a, b) => (parseInt(a.getAttribute('sortorder'), 10) || 0) - (parseInt(b.getAttribute('sortorder'), 10) || 0));
   const dutyNodes = () => Array.from(state.xml.querySelectorAll('Duties > Duty'));
+
+  function ensureEventSortOrder() {
+    let max = 0;
+    let changed = false;
+    eventNodes().forEach((node) => {
+      const value = parseInt(node.getAttribute('sortorder'), 10);
+      if (!Number.isNaN(value)) max = Math.max(max, value);
+    });
+    eventNodes().forEach((node) => {
+      if (node.getAttribute('sortorder')?.trim()) return;
+      max += 100;
+      node.setAttribute('sortorder', String(max));
+      changed = true;
+    });
+    if (changed) markDirty();
+  }
+
+  function resortEventNodes() {
+    if (state.eventKind !== 'event') return;
+    const container = state.xml.querySelector('Events');
+    if (!container) return;
+    eventNodes().forEach((node) => container.append(node));
+  }
 
   async function loadData(discardChanges = false) {
     if (state.dirty && !discardChanges && !window.confirm('Discard your unsaved changes and reload data.xml?')) return;
@@ -74,6 +98,7 @@
 
       state.xml = xml;
       state.dirty = false;
+      ensureEventSortOrder();
       renderLists();
       const pictureError = await loadPictures();
       status(pictureError || `Loaded ${eventNodes().length} events, ${state.xml.querySelectorAll('Charities > Charity').length} charities, and ${dutyNodes().length} duties.`,
@@ -118,7 +143,6 @@
       const actions = document.createElement('div');
       actions.className = 'row-actions';
       actions.append(
-        createButton('View', 'btn-turquoise', () => showItem(name, elementEditorValue(node))),
         createButton('Edit', 'btn-turquoise', () => openRecordTextEditor(name, node)),
         createButton('Delete', 'btn-danger', () => deleteRecordText(name, node))
       );
@@ -380,11 +404,8 @@
       image.src = `/images/slideshow/${picture.key.split('/').map(encodeURIComponent).join('/')}`;
       image.alt = picture.key;
       image.loading = 'lazy';
-      const name = document.createElement('span');
-      name.className = 'gallery-picture-name';
-      name.textContent = picture.key;
       const deleteButton = createButton('Delete', 'btn-danger', () => deleteSlideshowPicture(picture.key, deleteButton));
-      row.append(image, name, deleteButton);
+      row.append(image, deleteButton);
       list.append(row);
     });
   }
@@ -508,10 +529,10 @@
   function eventFieldNames(kind) {
     const nodes = state.eventKind === 'event' ? eventNodes() : [state.eventDraft];
     const defaults = kind === 'attribute'
-      ? state.eventKind === 'event' ? ['name', 'date', 'fee', 'time'] : ['name']
+      ? state.eventKind === 'event' ? ['name', 'date', 'fee', 'time', 'sortorder'] : ['name']
       : state.eventKind === 'event' ? ['Location', 'Description', 'Included', 'Charity'] : ['Description', 'Website', 'PayLink'];
     const names = new Set(state.eventIsNew ? defaults : kind === 'attribute'
-      ? state.eventKind === 'event' ? ['name', 'date', 'fee'] : ['name']
+      ? state.eventKind === 'event' ? ['name', 'date', 'fee', 'sortorder'] : ['name']
       : []);
     for (const node of [...nodes, state.eventDraft]) {
       const fields = kind === 'attribute' ? Array.from(node.attributes) : Array.from(node.children);
@@ -889,6 +910,8 @@
   });
   byId('add-event').addEventListener('click', () => {
     const eventNode = state.xml.createElement('Event');
+    const max = eventNodes().reduce((highest, node) => Math.max(highest, parseInt(node.getAttribute('sortorder'), 10) || 0), 0);
+    eventNode.setAttribute('sortorder', String(max + 100));
     openEventEditor(eventNode, true);
   });
   byId('add-charity').addEventListener('click', () => {
@@ -976,6 +999,7 @@
     state.eventEditing = null;
     state.eventDraft = null;
     state.eventIsNew = false;
+    resortEventNodes();
     markDirty();
     if (state.eventKind === 'charity') renderCharities();
     else renderEvents();
