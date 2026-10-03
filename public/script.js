@@ -127,13 +127,16 @@ async function loadData() {
         ? `<div class="event-picture"><img src="${picture}" alt="${name}"></div>`
         : '';
 
-      const card = document.createElement('div');
+      const card = document.createElement('details');
       card.className = 'event-card';
       card.innerHTML = `
-        <h3>${name}</h3>
+        <summary>
+          <h3>${name}</h3>
+          <span class="event-summary-meta">${[date, time].filter(Boolean).join(' · ')}</span>
+        </summary>
         <div class="event-card-content">
           <div class="event-details">
-            <p>${time} · ${type}</p>
+            ${type ? `<p>${type}</p>` : ''}
             <div class="locations">${locHtml}</div>
             <div class="event-descriptions"></div>
             ${inclHtml}
@@ -147,7 +150,7 @@ async function loadData() {
       renderRecordParagraphs(ev, 'Description', card.querySelector('.event-descriptions'));
       card.querySelector('.register-btn')?.addEventListener('click', () => openRegister(eventObj));
       card.querySelector('.volunteer-btn').addEventListener('click', () => openSpecificVolunteer(eventObj));
-      eventsList.appendChild(createListItem(name, date, picture, card));
+      eventsList.appendChild(card);
     });
 
     // Charities
@@ -158,13 +161,10 @@ async function loadData() {
       const website = ch.querySelector('Website')?.textContent?.trim() || '#';
       const payLink = ch.querySelector('PayLink')?.textContent?.trim() || '#';
 
-      const date = ch.getAttribute('date') || ch.querySelector('Date')?.textContent?.trim() || '';
-      const picture = ch.querySelector('Picture, Logo')?.textContent?.trim() || '';
-
-      const card = document.createElement('div');
+      const card = document.createElement('details');
       card.className = 'charity-card';
       card.innerHTML = `
-        <h3>${name}</h3>
+        <summary><h3>${name}</h3></summary>
         <div class="charity-content">
           <div class="charity-descriptions"></div>
           <p>
@@ -174,37 +174,14 @@ async function loadData() {
         </div>
       `;
       renderRecordParagraphs(ch, 'Description', card.querySelector('.charity-descriptions'));
-      charitiesList.appendChild(createListItem(name, date, picture, card));
+      charitiesList.appendChild(card);
     });
   } catch (err) {
     console.error('Failed to load XML data from R2', err);
   }
 }
 
-function createListItem(name, date, picture, card) {
-  const item = document.createElement('div');
-  item.className = 'list-item';
-  item.innerHTML = `
-    ${picture ? `<img class="list-thumb" src="${picture}" alt="">` : '<div class="list-thumb"></div>'}
-    <div class="list-text">
-      <button type="button" class="list-name"></button>
-      ${date ? `<span class="list-date"></span>` : ''}
-    </div>
-  `;
-  item.querySelector('.list-name').textContent = name;
-  const dateEl = item.querySelector('.list-date');
-  if (dateEl) dateEl.textContent = date;
-  item.querySelector('.list-name').addEventListener('click', () => {
-    const body = document.getElementById('detail-body');
-    body.innerHTML = '';
-    body.appendChild(card);
-    openModal('detail-modal');
-  });
-  return item;
-}
-
 function openRegister(eventData) {
-  document.getElementById('detail-modal').style.display = 'none';
   document.getElementById('reg-event-info').textContent =
     `${eventData.name} – ${eventData.date} ${eventData.time} · Fee ${eventData.fee}`;
   document.getElementById('reg-event-data').value = JSON.stringify(eventData);
@@ -229,7 +206,6 @@ function populateDutyOptions(selectId, duties, defaultValue) {
 }
 
 function openSpecificVolunteer(eventData) {
-  document.getElementById('detail-modal').style.display = 'none';
   document.getElementById('vol-event-info').textContent =
     `${eventData.name} – ${eventData.date} ${eventData.time}`;
   document.getElementById('vol-spec-event-data').value = JSON.stringify(eventData);
