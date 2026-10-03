@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Romp for the Rescues</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="banner">
+    <img src="/r2-images/banners.jpg" alt="Romp for the Rescues – Fun events that raise funds for animal charities" id="banner-img">
+  </div>
+
+  <header>
+    <p id="tagline">Romp for the Rescues</p>
+    <p class="subtitle">Content management</p>
+    <nav>
+      <button type="button" class="nav-support" id="gallery-upload-open">Gallery</button>
+    </nav>
+  </header>
+
+  <main class="admin-main">
+    <div class="admin-heading">
+      <div>
+        <h1>Administration</h1>
+      </div>
+      <div class="admin-toolbar">
+        <button type="button" class="btn btn-turquoise" id="reload-data">Cancel all changes</button>
+        <button type="button" class="btn btn-pink" id="save-data" disabled>Save changes</button>
+      </div>
+    </div>
+
+    <p id="status-message" class="admin-status" role="status" aria-live="polite">Loading data.xml...</p>
+
+    <section class="admin-section" id="events">
+      <div class="section-heading">
+        <h2>Events - Click edit to see details</h2>
+        <button type="button" class="btn btn-turquoise" id="add-event">Add event</button>
+      </div>
+      <div id="events-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="charities">
+      <div class="section-heading">
+        <h2>Charities - Click edit to see details</h2>
+        <button type="button" class="btn btn-turquoise" id="add-charity">Add charity</button>
+      </div>
+      <div id="charities-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="duties">
+      <div class="section-heading">
+        <h2>Duties</h2>
+        <button type="button" class="btn btn-turquoise" id="add-duty">Add duty</button>
+      </div>
+      <div id="duties-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="record-description">
+      <div class="section-heading">
+        <h2>Descriptions</h2>
+        <button type="button" class="btn btn-turquoise" id="add-description">Add description</button>
+      </div>
+      <div id="descriptions-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-section" id="record-mission">
+      <div class="section-heading">
+        <h2>Missions</h2>
+        <button type="button" class="btn btn-turquoise" id="add-mission">Add mission</button>
+      </div>
+      <div id="missions-list" class="admin-list" aria-live="polite"></div>
+    </section>
+
+  </main>
+
+  <dialog id="slideshow-upload-dialog" class="editor-dialog">
+    <form id="slideshow-upload-form">
+      <div class="dialog-heading">
+        <h2>Gallery</h2>
+        <button type="button" class="icon-button" data-close-dialog="slideshow-upload-dialog" aria-label="Close">&times;</button>
+      </div>
+      <div id="slideshow-picture-list" class="gallery-picture-list" aria-live="polite"></div>
+      <label for="slideshow-picture-file">Picture</label>
+      <input id="slideshow-picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" required>
+      <p id="slideshow-upload-status" class="section-note" role="status" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="slideshow-upload-dialog">Cancel</button>
+        <button type="submit" class="btn btn-pink">Upload picture</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="record-text-editor" class="editor-dialog">
+    <form id="record-text-form" method="dialog">
+      <div class="dialog-heading">
+        <h2 id="record-text-title">Edit text</h2>
+        <button type="button" class="icon-button" data-close-dialog="record-text-editor" aria-label="Close">&times;</button>
+      </div>
+      <label for="record-text-input">Content</label>
+      <textarea id="record-text-input" class="description-input" rows="7" maxlength="4000" required></textarea>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="record-text-editor">Cancel</button>
+        <button type="submit" class="btn btn-pink">Apply changes</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="item-view" class="editor-dialog">
+    <div class="dialog-heading">
+      <h2 id="item-view-title">View item</h2>
+      <button type="button" class="icon-button" data-close-dialog="item-view" aria-label="Close">&times;</button>
+    </div>
+    <img id="item-view-image" class="item-view-image" alt="Event picture" hidden>
+    <pre id="item-view-content" class="item-view-content"></pre>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-turquoise" data-close-dialog="item-view">Close</button>
+    </div>
+  </dialog>
+
+  <dialog id="event-editor" class="editor-dialog event-editor-dialog">
+    <form id="event-form" method="dialog">
+      <div class="event-editor-header">
+        <h2 id="event-editor-title">Edit item</h2>
+        <div class="event-editor-toolbar">
+          <button type="button" class="btn btn-turquoise" data-close-dialog="event-editor">Cancel</button>
+          <button type="submit" class="btn btn-pink">Apply event changes</button>
+        </div>
+      </div>
+      <div class="event-editor-scroll">
+        <p id="event-editor-message" class="section-note" role="status" aria-live="polite"></p>
+        <div id="event-attributes" class="editor-fields"></div>
+        <div id="event-elements" class="editor-fields"></div>
+        <div id="event-picture" class="editor-fields"></div>
+      </div>
+    </form>
+  </dialog>
+
+  <input id="picture-file" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" hidden>
+
+  <dialog id="duty-editor" class="editor-dialog">
+    <form id="duty-form" method="dialog">
+      <div class="dialog-heading">
+        <h2 id="duty-editor-title">Edit duty</h2>
+        <button type="button" class="icon-button" data-close-dialog="duty-editor" aria-label="Close">&times;</button>
+      </div>
+      <label class="form-group" for="duty-name">Duty name</label>
+      <input id="duty-name" name="duty-name" type="text" required maxlength="160">
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-turquoise" data-close-dialog="duty-editor">Cancel</button>
+        <button type="submit" class="btn btn-pink">Apply duty changes</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer>
+    <p>Romp for the Rescues administration</p>
+  </footer>
+
+  <script src="/admin/admin.js" defer></script>
+</body>
+</html>

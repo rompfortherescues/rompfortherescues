@@ -16,6 +16,46 @@ function linkifyText(text) {
   });
 }
 
+function appendSafeInline(target, source) {
+  if (source.nodeType === Node.TEXT_NODE) {
+    const linkedText = new DOMParser().parseFromString(linkifyText(source.nodeValue), 'text/html');
+    Array.from(linkedText.body.childNodes).forEach((child) => target.append(document.importNode(child, true)));
+    return;
+  }
+  if (source.nodeType !== Node.ELEMENT_NODE) return;
+
+  const tag = source.tagName.toLowerCase();
+  if (['script', 'style', 'iframe', 'svg', 'object'].includes(tag)) return;
+  const allowed = ['strong', 'em', 'b', 'i', 'u', 'a', 'br', 'span', 'code'];
+  const container = allowed.includes(tag) ? document.createElement(tag) : target;
+  if (tag === 'a' && container !== target) {
+    const href = source.getAttribute('href');
+    if (href && /^(https?:\/\/|mailto:)/i.test(href)) {
+      container.href = href;
+      container.rel = 'noopener noreferrer';
+    }
+  }
+  Array.from(source.childNodes).forEach((child) => appendSafeInline(container, child));
+  if (container !== target) target.append(container);
+}
+
+function renderDescriptionMarkup(target, element) {
+  const markup = Array.from(element.childNodes).map((child) =>
+    child.nodeType === Node.ELEMENT_NODE ? new XMLSerializer().serializeToString(child) : child.nodeValue || ''
+  ).join('');
+  const parsed = new DOMParser().parseFromString(markup, 'text/html');
+  Array.from(parsed.body.childNodes).forEach((child) => appendSafeInline(target, child));
+}
+
+function renderRecordParagraphs(record, name, container) {
+  container.replaceChildren();
+  Array.from(record.children).filter((child) => child.tagName === name).forEach((element) => {
+    const paragraph = document.createElement('p');
+    renderDescriptionMarkup(paragraph, element);
+    container.append(paragraph);
+  });
+}
+
 function closeModal(id) {
   const el = document.getElementById(id);
   if (el) el.style.display = 'none';
@@ -28,7 +68,7 @@ function openModal(id) {
 
 async function loadData() {
   try {
-    const res = await fetch('/data.xml');
+    const res = await fetch(`/xml-data/data.xml?v=${Date.now()}`, { cache: 'no-store' });
     const text = await res.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'application/xml');
@@ -38,12 +78,10 @@ async function loadData() {
     }
 
     const record = xml.querySelector('Record');
-    const tagline = record.querySelector('Description')?.textContent || '';
     const tagEl = document.getElementById('tagline');
-    if (tagEl) tagEl.textContent = tagline;
-    const mission = record.querySelector('Mission')?.textContent?.trim() || '';
+    if (tagEl) renderRecordParagraphs(record, 'Description', tagEl);
     const missionEl = document.getElementById('mission');
-    if (missionEl) missionEl.textContent = mission;
+    if (missionEl) renderRecordParagraphs(record, 'Mission', missionEl);
 
     // General volunteer duties
     const recordDuties = Array.from(record.querySelector('Duties')?.querySelectorAll('Duty') || [])
@@ -89,15 +127,18 @@ async function loadData() {
         ? `<div class="event-picture"><img src="${picture}" alt="${name}"></div>`
         : '';
 
-      const card = document.createElement('div');
+      const card = document.createElement('details');
       card.className = 'event-card';
       card.innerHTML = `
+        <summary>
+          <h3>${name}</h3>
+          <p><strong>${date}</strong></p>
+        </summary>
         <div class="event-card-content">
           <div class="event-details">
-            <h3>${name}</h3>
-            <p><strong>${date}</strong> · ${time} · ${type}</p>
+            <p>${time} · ${type}</p>
             <div class="locations">${locHtml}</div>
-            <p>${linkifyText(description)}</p>
+            <div class="event-descriptions"></div>
             ${inclHtml}
             ${detailsHtml ? `<p>${detailsHtml}</p>` : ''}
             ${registerHtml}
@@ -106,6 +147,7 @@ async function loadData() {
           ${pictureHtml}
         </div>
       `;
+      renderRecordParagraphs(ev, 'Description', card.querySelector('.event-descriptions'));
       card.querySelector('.register-btn')?.addEventListener('click', () => openRegister(eventObj));
       card.querySelector('.volunteer-btn').addEventListener('click', () => openSpecificVolunteer(eventObj));
       eventsList.appendChild(card);
@@ -116,24 +158,26 @@ async function loadData() {
     charitiesList.innerHTML = '';
     xml.querySelectorAll('Charities > Charity').forEach(ch => {
       const name = ch.getAttribute('name') || '';
-      const desc = ch.querySelector('Description')?.textContent?.trim() || '';
       const website = ch.querySelector('Website')?.textContent?.trim() || '#';
       const payLink = ch.querySelector('PayLink')?.textContent?.trim() || '#';
 
-      const card = document.createElement('div');
+      const card = document.createElement('details');
       card.className = 'charity-card';
       card.innerHTML = `
-        <h3>${name}</h3>
-        <p>${desc}</p>
-        <p>
-          <a href="${website}" target="_blank" rel="noopener">Website</a> ·
-          <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink" style="padding:0.3rem 0.8rem;font-size:0.9rem;">Donate</a>
-        </p>
+        <summary><h3>${name}</h3></summary>
+        <div class="charity-content">
+          <div class="charity-descriptions"></div>
+          <p>
+            <a href="${website}" target="_blank" rel="noopener">Website</a> ·
+            <a href="${payLink}" target="_blank" rel="noopener" class="btn btn-pink" style="padding:0.3rem 0.8rem;font-size:0.9rem;">Donate</a>
+          </p>
+        </div>
       `;
+      renderRecordParagraphs(ch, 'Description', card.querySelector('.charity-descriptions'));
       charitiesList.appendChild(card);
     });
   } catch (err) {
-    console.error('Failed to load data.xml', err);
+    console.error('Failed to load XML data from R2', err);
   }
 }
 
@@ -276,6 +320,20 @@ document.getElementById('volunteer-form').addEventListener('submit', async e => 
   }, 'vol-message', e.target);
 });
 
+document.querySelector('nav a[href="#volunteer"]').addEventListener('click', () => {
+  const volunteerSection = document.getElementById('volunteer');
+  const volunteerForm = document.getElementById('volunteer-form');
+  const message = document.getElementById('vol-message');
+  volunteerSection.hidden = false;
+  volunteerForm.hidden = false;
+  message.textContent = '';
+  message.className = 'message';
+});
+
+document.getElementById('cancel-volunteer').addEventListener('click', () => {
+  document.getElementById('volunteer').hidden = true;
+});
+
 document.getElementById('vol-specific-form').addEventListener('submit', async e => {
   e.preventDefault();
   const eventData = JSON.parse(document.getElementById('vol-spec-event-data').value || '{}');
@@ -305,6 +363,7 @@ async function submitVolunteer(payload, msgId, form) {
       msg.textContent = 'Thank you! Confirmation email sent.';
       msg.className = 'message success';
       form.reset();
+      if (form.id === 'volunteer-form') form.hidden = true;
       setTimeout(() => {
         const modal = document.getElementById('vol-modal');
         if (modal) modal.style.display = 'none';

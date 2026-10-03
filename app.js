@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadXML() {
-  const res = await fetch('data.xml');
+  const res = await fetch('/xml-data/data.xml');
   const text = await res.text();
   const xml = new DOMParser().parseFromString(text, 'application/xml');
 
